@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Online Booking System</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <!-- Custom CSS -->
+  <link href="css/styles.css" rel="stylesheet">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">
+        <i class="fas fa-globe-americas me-2"></i>
+        TravelEase
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="pages/flights.html">Flights</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="pages/trains.html">Trains</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="pages/hotels.html">Hotels</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="pages/about.html">About</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="pages/contact.html">Contact</a>
+          </li>
+        </ul>
+        <div id="authButtons" class="d-flex">
+          <button class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#loginModal">Login</button>
+          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#registerModal">Register</button>
+        </div>
+        <div id="userDropdown" class="dropdown d-none">
+          <button class="btn btn-outline-primary dropdown-toggle" type="button" id="userMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-user-circle me-1"></i>
+            <span id="userName">User</span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuButton">
+            <li><a class="dropdown-item" href="pages/profile.html"><i class="fas fa-user me-2"></i>My Profile</a></li>
+            <li><a class="dropdown-item" href="pages/bookings.html"><i class="fas fa-list me-2"></i>My Bookings</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Alert Container -->
+  <div id="mainAlert" class="container mt-3"></div>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container text-center">
+      <h1>Book Your Perfect Trip</h1>
+      <p class="lead">Find and book flights, trains, and hotels all in one place.</p>
+      <div class="d-flex justify-content-center">
+        <a href="pages/flights.html" class="btn btn-primary btn-lg me-3">
+          <i class="fas fa-plane me-2"></i>Book Flights
+        </a>
+        <a href="pages/trains.html" class="btn btn-secondary btn-lg">
+          <i class="fas fa-train me-2"></i>Book Trains
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Search Form -->
+  <section class="container mt-n5">
+    <div class="search-form">
+      <ul class="nav nav-tabs" id="searchTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="flights-tab" data-bs-toggle="tab" data-bs-target="#flights" type="button" role="tab" aria-controls="flights" aria-selected="true">
+            <i class="fas fa-plane me-2"></i>Flights
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="trains-tab" data-bs-toggle="tab" data-bs-target="#trains" type="button" role="tab" aria-controls="trains" aria-selected="false">
+            <i class="fas fa-train me-2"></i>Trains
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="hotels-tab" data-bs-toggle="tab" data-bs-target="#hotels" type="button" role="tab" aria-controls="hotels" aria-selected="false">
+            <i class="fas fa-hotel me-2"></i>Hotels
+          </button>
+        </li>
+      </ul>
+      <div class="tab-content mt-4" id="searchTabsContent">
+        <!-- Flight Search Form -->
+        <div class="tab-pane fade show active" id="flights" role="tabpanel" aria-labelledby="flights-tab">
+          <form id="flightSearchForm">
+            <div class="row g-3">
+              <div class="col-md-5">
+                <label for="flightSource" class="form-label">From</label>
+                <input type="text" class="form-control" id="flightSource" placeholder="City or Airport" required>
+              </div>
+              <div class="col-md-5">
+                <label for="flightDestination" class="form-label">To</label>
+                <input type="text" class="form-control" id="flightDestination" placeholder="City or Airport" required>
+              </div>
+              <div class="col-md-2">
+                <label for="flightDate" class="form-label">Departure Date</label>
+                <input type="date" class="form-control" id="flightDate" required>
+              </div>
+              <div class="col-12 text-center mt-4">
+                <button type="submit" class="btn btn-primary btn-lg px-5">
+                  <i class="fas fa-search me-2"></i>Search Flights
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+        
+        <!-- Train Search Form -->
+        <div class="tab-pane fade" id="trains" role="tabpanel" aria-labelledby="trains-tab">
+          <form id="trainSearchForm">
+            <div class="row g-3">
+              <div class="col-md-5">
+                <label for="trainSource" class="form-label">From</label>
+                <input type="text" class="form-control" id="trainSource" placeholder="City or Station" required>
+              </div>
+              <div class="col-md-5">
+                <label for="trainDestination" class="form-label">To</label>
+                <input type="text" class="form-control" id="trainDestination" placeholder="City or Station" required>
+              </div>
+              <div class="col-md-2">
+                <label for="trainDate" class="form-label">Departure Date</label>
+                <input type="date" class="form-control" id="trainDate" required>
+              </div>
+              <div class="col-12 text-center mt-4">
+                <button type="submit" class="btn btn-primary btn-lg px-5">
+                  <i class="fas fa-search me-2"></i>Search Trains
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+        
+        <!-- Hotel Search Form -->
+        <div class="tab-pane fade" id="hotels" role="tabpanel" aria-labelledby="hotels-tab">
+          <form id="hotelSearchForm">
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label for="hotelLocation" class="form-label">Destination</label>
+                <input type="text" class="form-control" id="hotelLocation" placeholder="City or Area" required>
+              </div>
+              <div class="col-md-3">
+                <label for="hotelCheckIn" class="form-label">Check-in Date</label>
+                <input type="date" class="form-control" id="hotelCheckIn" required>
+              </div>
+              <div class="col-md-3">
+                <label for="hotelCheckOut" class="form-label">Check-out Date</label>
+                <input type="date" class="form-control" id="hotelCheckOut" required>
+              </div>
+              <div class="col-md-2">
+                <label for="hotelGuests" class="form-label">Guests</label>
+                <select class="form-select" id="hotelGuests">
+                  <option value="1">1 Guest</option>
+                  <option value="2" selected>2 Guests</option>
+                  <option value="3">3 Guests</option>
+                  <option value="4">4 Guests</option>
+                  <option value="5">5+ Guests</option>
+                </select>
+              </div>
+              <div class="col-12 text-center mt-4">
+                <button type="submit" class="btn btn-primary btn-lg px-5">
+                  <i class="fas fa-search me-2"></i>Search Hotels
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Destinations -->
+  <section class="container my-5">
+    <h2 class="text-center mb-4">Popular Destinations</h2>
+    <div class="row">
+      <div class="col-md-4 mb-4">
+        <div class="card">
+          <img src="images/flight-placeholder.jpg" class="card-img-top" alt="Mumbai">
+          <div class="card-body">
+            <h5 class="card-title">Mumbai</h5>
+            <p class="card-text">Experience the vibrant culture and bustling streets of India's financial capital.</p>
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <small class="text-muted">Flights from</small>
+                <div class="price">₹5,500</div>
+              </div>
+              <a href="pages/flights.html?destination=Mumbai" class="btn btn-outline-primary">Explore</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="card">
+          <img src="images/train-placeholder.jpg" class="card-img-top" alt="Delhi">
+          <div class="card-body">
+            <h5 class="card-title">Delhi</h5>
+            <p class="card-text">Discover the perfect blend of ancient history and modern development.</p>
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <small class="text-muted">Trains from</small>
+                <div class="price">₹2,500</div>
+              </div>
+              <a href="pages/trains.html?destination=Delhi" class="btn btn-outline-primary">Explore</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="card">
+          <img src="images/hotel-placeholder.jpg" class="card-img-top" alt="Goa">
+          <div class="card-body">
+            <h5 class="card-title">Goa</h5>
+            <p class="card-text">Relax on pristine beaches and enjoy the unique Portuguese-influenced culture.</p>
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <small class="text-muted">Hotels from</small>
+                <div class="price">₹3,500</div>
+              </div>
+              <a href="pages/hotels.html?location=Goa" class="btn btn-outline-primary">Explore</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why Choose Us -->
+  <section class="bg-light py-5 my-5">
+    <div class="container">
+      <h2 class="text-center mb-5">Why Choose TravelEase</h2>
+      <div class="row g-4">
+        <div class="col-md-4 text-center">
+          <div class="p-3">
+            <i class="fas fa-tags fa-3x text-primary mb-3"></i>
+            <h4>Best Prices</h4>
+            <p>We offer competitive prices on flights, trains, and hotels with no hidden fees.</p>
+          </div>
+        </div>
+        <div class="col-md-4 text-center">
+          <div class="p-3">
+            <i class="fas fa-headset fa-3x text-primary mb-3"></i>
+            <h4>24/7 Support</h4>
+            <p>Our customer support team is available round the clock to assist you with any issues.</p>
+          </div>
+        </div>
+        <div class="col-md-4 text-center">
+          <div class="p-3">
+            <i class="fas fa-shield-alt fa-3x text-primary mb-3"></i>
+            <h4>Secure Booking</h4>
+            <p>Your personal information and payment details are protected with advanced encryption.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-white">
+    <div class="container py-5">
+      <div class="row">
+        <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+          <h5>TravelEase</h5>
+          <p>Your one-stop solution for all your travel booking needs. Find the best deals on flights, trains, and hotels.</p>
+          <div class="d-flex">
+            <a href="#" class="me-3"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="me-3"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="me-3"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+          <h5>Quick Links</h5>
+          <ul class="list-unstyled">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="pages/flights.html">Flights</a></li>
+            <li><a href="pages/trains.html">Trains</a></li>
+            <li><a href="pages/hotels.html">Hotels</a></li>
+            <li><a href="pages/about.html">About Us</a></li>
+            <li><a href="pages/contact.html">Contact Us</a></li>
+          </ul>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+          <h5>Support</h5>
+          <ul class="list-unstyled">
+            <li><a href="pages/faq.html">FAQs</a></li>
+            <li><a href="#">Help Center</a></li>
+            <li><a href="pages/terms.html">Terms of Service</a></li>
+            <li><a href="pages/privacy.html">Privacy Policy</a></li>
+            <li><a href="#">Refund Policy</a></li>
+          </ul>
+        </div>
+        <div class="col-lg-3 col-md-6">
+          <h5>Contact Us</h5>
+          <ul class="list-unstyled">
+            <li><i class="fas fa-map-marker-alt me-2"></i> 123 Travel Street, Mumbai, India</li>
+            <li><i class="fas fa-phone me-2"></i> +91 1234567890</li>
+            <li><i class="fas fa-envelope me-2"></i> info@travelease.com</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="bg-darker py-3">
+      <div class="container text-center">
+        <p class="mb-0">&copy; 2025 TravelEase. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Login Modal -->
+  <div class="modal fade auth-modal" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="loginModalLabel">Login to Your Account</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="loginAlert"></div>
+          <form id="loginForm">
+            <div class="mb-3">
+              <label for="loginEmail" class="form-label">Email address</label>
+              <input type="email" class="form-control" id="loginEmail" required>
+            </div>
+            <div class="mb-3">
+              <label for="loginPassword" class="form-label">Password</label>
+              <input type="password" class="form-control" id="loginPassword" required>
+            </div>
+            <div class="mb-3 form-check">
+              <input type="checkbox" class="form-check-input" id="rememberMe">
+              <label class="form-check-label" for="rememberMe">Remember me</label>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Login</button>
+          </form>
+          <div class="text-center mt-3">
+            <p>Don't have an account? <a href="#" data-bs-toggle="modal" data-bs-target="#registerModal" data-bs-dismiss="modal">Register now</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Register Modal -->
+  <div class="modal fade auth-modal" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="registerModalLabel">Create an Account</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="registerAlert"></div>
+          <form id="registerForm">
+            <div class="mb-3">
+              <label for="registerName" class="form-label">Full Name</label>
+              <input type="text" class="form-control" id="registerName" required>
+            </div>
+            <div class="mb-3">
+              <label for="registerEmail" class="form-label">Email address</label>
+              <input type="email" class="form-control" id="registerEmail" required>
+            </div>
+            <div class="mb-3">
+              <label for="registerPhone" class="form-label">Phone Number</label>
+              <input type="tel" class="form-control" id="registerPhone" required>
+            </div>
+            <div class="mb-3">
+              <label for="registerPassword" class="form-label">Password</label>
+              <input type="password" class="form-control" id="registerPassword" required>
+            </div>
+            <div class="mb-3 form-check">
+              <input type="checkbox" class="form-check-input" id="agreeTerms" required>
+              <label class="form-check-label" for="agreeTerms">I agree to the <a href="#">Terms and Conditions</a></label>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Register</button>
+          </form>
+          <div class="text-center mt-3">
+            <p>Already have an account? <a href="#" data-bs-toggle="modal" data-bs-target="#loginModal" data-bs-dismiss="modal">Login</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Custom JavaScript -->
+  <script src="js/main.js"></script>
+</body>
+</html>
+

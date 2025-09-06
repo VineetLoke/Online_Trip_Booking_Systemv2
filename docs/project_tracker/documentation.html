@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documentation - Project Tracker</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #0d6efd;
+      --secondary-color: #6c757d;
+      --success-color: #198754;
+      --info-color: #0dcaf0;
+      --warning-color: #ffc107;
+      --danger-color: #dc3545;
+      --light-color: #f8f9fa;
+      --dark-color: #212529;
+    }
+    
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #f5f5f5;
+    }
+    
+    .navbar-brand {
+      font-weight: 700;
+    }
+    
+    .card {
+      border: none;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .card-header {
+      border-radius: 10px 10px 0 0 !important;
+      font-weight: 600;
+    }
+    
+    .doc-icon {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      margin-right: 15px;
+    }
+    
+    .bg-primary-light {
+      background-color: rgba(13, 110, 253, 0.2);
+      color: var(--primary-color);
+    }
+    
+    .bg-success-light {
+      background-color: rgba(25, 135, 84, 0.2);
+      color: var(--success-color);
+    }
+    
+    .bg-warning-light {
+      background-color: rgba(255, 193, 7, 0.2);
+      color: var(--warning-color);
+    }
+    
+    .bg-info-light {
+      background-color: rgba(13, 202, 240, 0.2);
+      color: var(--info-color);
+    }
+    
+    .bg-danger-light {
+      background-color: rgba(220, 53, 69, 0.2);
+      color: var(--danger-color);
+    }
+    
+    .bg-secondary-light {
+      background-color: rgba(108, 117, 125, 0.2);
+      color: var(--secondary-color);
+    }
+    
+    .tab-content {
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 0 0 10px 10px;
+    }
+    
+    .nav-tabs .nav-link {
+      border: none;
+      color: var(--secondary-color);
+      font-weight: 500;
+    }
+    
+    .nav-tabs .nav-link.active {
+      color: var(--primary-color);
+      border-bottom: 2px solid var(--primary-color);
+      background-color: transparent;
+    }
+    
+    .timeline {
+      position: relative;
+      padding-left: 30px;
+    }
+    
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 2px;
+      height: 100%;
+      background-color: var(--primary-color);
+    }
+    
+    .timeline-item {
+      position: relative;
+      margin-bottom: 30px;
+    }
+    
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -34px;
+      top: 0;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: var(--primary-color);
+    }
+    
+    .timeline-date {
+      font-weight: 600;
+      color: var(--primary-color);
+      margin-bottom: 5px;
+    }
+    
+    .timeline-content {
+      padding: 15px;
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .download-btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 15px;
+      border-radius: 5px;
+      background-color: var(--light-color);
+      color: var(--dark-color);
+      text-decoration: none;
+      margin-right: 10px;
+      margin-bottom: 10px;
+      transition: background-color 0.3s ease;
+    }
+    
+    .download-btn:hover {
+      background-color: #e2e6ea;
+    }
+    
+    .download-btn i {
+      margin-right: 8px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">
+        <i class="fas fa-tasks me-2"></i>
+        Project Tracker
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="diagrams.html">UML Diagrams</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="database.html">Database</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="backend.html">Backend</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="frontend.html">Frontend</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="testing.html">Testing</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="documentation.html">Documentation</a>
+          </li>
+        </ul>
+        <a href="../../index.html" class="btn btn-outline-light" target="_blank">
+          <i class="fas fa-external-link-alt me-2"></i>
+          View Application
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container py-5">
+    <!-- Page Header -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="bg-primary text-white p-3 rounded me-3">
+                <i class="fas fa-book fa-2x"></i>
+              </div>
+              <div>
+                <h2 class="mb-0">Documentation</h2>
+                <p class="text-muted mb-0">Comprehensive project documentation and resources</p>
+              </div>
+              <div class="ms-auto">
+                <span class="badge bg-success">Completed</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Documentation Overview -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Documentation Overview</h5>
+          </div>
+          <div class="card-body">
+            <p>This section provides comprehensive documentation for the Online Booking System project. The documentation covers all aspects of the project, from requirements and design to implementation and testing.</p>
+            <div class="row mt-4">
+              <div class="col-md-4 mb-3">
+                <div class="d-flex align-items-center">
+                  <div class="doc-icon bg-success-light">
+                    <i class="fas fa-file-alt fa-lg"></i>
+                  </div>
+                  <div>
+                    <h5 class="mb-0">Project Documentation</h5>
+                    <p class="text-muted mb-0">Comprehensive project details</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4 mb-3">
+                <div class="d-flex align-items-center">
+                  <div class="doc-icon bg-info-light">
+                    <i class="fas fa-code fa-lg"></i>
+                  </div>
+                  <div>
+                    <h5 class="mb-0">Technical Documentation</h5>
+                    <p class="text-muted mb-0">Code and implementation details</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4 mb-3">
+                <div class="d-flex align-items-center">
+                  <div class="doc-icon bg-warning-light">
+                    <i class="fas fa-user fa-lg"></i>
+                  </div>
+                  <div>
+                    <h5 class="mb-0">User Documentation</h5>
+                    <p class="text-muted mb-0">User guides and manuals</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Project Documentation -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Project Documentation</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <h5>Project Overview</h5>
+                <p>The Online Booking System is a comprehensive web application that allows users to search for and book flights, trains, and hotels. The system provides a user-friendly interface for searching, booking, and managing travel arrangements.</p>
+                <p>The project was developed as a college project to demonstrate the application of software engineering principles in building a real-world application.</p>
+                
+                <h5 class="mt-4">Project Objectives</h5>
+                <ul>
+                  <li>Develop a user-friendly online booking system for flights, trains, and hotels</li>
+                  <li>Implement a secure authentication system for users and administrators</li>
+                  <li>Create a responsive and intuitive user interface for all devices</li>
+                  <li>Design a robust backend API for handling booking operations</li>
+                  <li>Implement a database schema for storing user and booking information</li>
+                  <li>Ensure the system is secure, reliable, and scalable</li>
+                </ul>
+                
+                <h5 class="mt-4">Project Scope</h5>
+                <p>The scope of the project includes:</p>
+                <ul>
+                  <li>User registration and authentication</li>
+                  <li>Search functionality for flights, trains, and hotels</li>
+                  <li>Booking and payment processing</li>
+                  <li>Booking management (view, cancel)</li>
+                  <li>User profile management</li>
+                  <li>Admin panel for managing users, flights, trains, and hotels</li>
+                </ul>
+              </div>
+              <div class="col-md-6">
+                <h5>Project Timeline</h5>
+                <div class="timeline">
+                  <div class="timeline-item">
+                    <div class="timeline-date">Week 1</div>
+                    <div class="timeline-content">
+                      <h6>Project Planning and Requirements Gathering</h6>
+                      <p>Defined project scope, objectives, and requirements. Created initial project plan and timeline.</p>
+                    </div>
+                  </div>
+                  <div class="timeline-item">
+                    <div class="timeline-date">Week 2</div>
+                    <div class="timeline-content">
+                      <h6>System Design and Architecture</h6>
+                      <p>Created UML diagrams, designed database schema, and defined system architecture.</p>
+                    </div>
+                  </div>
+                  <div class="timeline-item">
+                    <div class="timeline-date">Week 3</div>
+                    <div class="timeline-content">
+                      <h6>Database Setup and Backend Development</h6>
+                      <p>Set up MongoDB database, implemented backend API endpoints, and created authentication system.</p>
+                    </div>
+                  </div>
+                  <div class="timeline-item">
+                    <div class="timeline-date">Week 4</div>
+                    <div class="timeline-content">
+                      <h6>Frontend Development</h6>
+                      <p>Designed and implemented user interface using HTML, CSS, JavaScript, and Bootstrap.</p>
+                    </div>
+                  </div>
+                  <div class="timeline-item">
+                    <div class="timeline-date">Week 5</div>
+                    <div class="timeline-content">
+                      <h6>Integration and Testing</h6>
+                      <p>Integrated frontend with backend, conducted unit testing, integration testing, and user acceptance testing.</p>
+                    </div>
+                  </div>
+                  <div class="timeline-item">
+                    <div class="timeline-date">Week 6</div>
+                    <div class="timeline-content">
+                      <h6>Documentation and Deployment</h6>
+                      <p>Created comprehensive documentation, prepared for deployment, and finalized the project.</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <h5 class="mt-4">Project Team</h5>
+                <p>The project was developed by a team of one student as part of a college project.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Technical Documentation -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Technical Documentation</h5>
+          </div>
+          <div class="card-body">
+            <ul class="nav nav-tabs" id="techDocTabs" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="architecture-tab" data-bs-toggle="tab" data-bs-target="#architecture" type="button" role="tab" aria-controls="architecture" aria-selected="true">Architecture</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="database-tab" data-bs-toggle="tab" data-bs-target="#database" type="button" role="tab" aria-controls="database" aria-selected="false">Database</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="backend-tab" data-bs-toggle="tab" data-bs-target="#backend" type="button" role="tab" aria-controls="backend" aria-selected="false">Backend</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="frontend-tab" data-bs-toggle="tab" data-bs-target="#frontend" type="button" role="tab" aria-controls="frontend" aria-selected="false">Frontend</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="deployment-tab" data-bs-toggle="tab" data-bs-target="#deployment" type="button" role="tab" aria-controls="deployment" aria-selected="false">Deployment</button>
+              </li>
+            </ul>
+            <div class="tab-content" id="techDocTabsContent">
+              <!-- Architecture -->
+              <div class="tab-pane fade show active" id="architecture" role="tabpanel" aria-labelledby="architecture-tab">
+                <h5 class="mb-3">System Architecture</h5>
+                <p>The Online Booking System follows a client-server architecture with a RESTful API. The system is divided into three main components:</p>
+                <ul>
+                  <li><strong>Frontend:</strong> HTML, CSS, JavaScript, and Bootstrap</li>
+                  <li><strong>Backend:</strong> Node.js with Express.js</li>
+                  <li><strong>Database:</strong> MongoDB</li>
+                </ul>
+                
+                <h6 class="mt-4">Architecture Diagram</h6>
+                <div class="row">
+                  <div class="col-md-8">
+                    <img src="../system_architecture.png" alt="System Architecture" class="img-fluid">
+                  </div>
+                </div>
+                
+                <h6 class="mt-4">Component Interaction</h6>
+                <p>The components interact with each other as follows:</p>
+                <ul>
+                  <li>The frontend sends HTTP requests to the backend API</li>
+                  <li>The backend API processes the requests, interacts with the database, and returns responses</li>
+                  <li>The database stores and retrieves data as requested by the backend</li>
+                </ul>
+                
+                <h6 class="mt-4">Security Architecture</h6>
+                <p>The system implements several security measures:</p>
+                <ul>
+                  <li><strong>Authentication:</strong> JWT-based authentication for users and administrators</li>
+                  <li><strong>Authorization:</strong> Role-based access control for different user types</li>
+                  <li><strong>Data Protection:</strong> Password hashing using bcrypt</li>
+                  <li><strong>Input Validation:</strong> Server-side validation of all inputs</li>
+                  <li><strong>HTTPS:</strong> Secure communication between client and server</li>
+                </ul>
+              </div>
+              
+              <!-- Database -->
+              <div class="tab-pane fade" id="database" role="tabpanel" aria-labelledby="database-tab">
+                <h5 class="mb-3">Database Design</h5>
+                <p>The Online Booking System uses MongoDB, a NoSQL document database, to store and manage data. The database schema consists of the following collections:</p>
+                <ul>
+                  <li><strong>users:</strong> Stores user information</li>
+                  <li><strong>flights:</strong> Stores flight information</li>
+                  <li><strong>trains:</strong> Stores train information</li>
+                  <li><strong>hotels:</strong> Stores hotel information</li>
+                  <li><strong>bookings:</strong> Stores booking information</li>
+                  <li><strong>admins:</strong> Stores administrator information</li>
+                </ul>
+                
+                <h6 class="mt-4">Database Schema</h6>
+                <p>For detailed information about the database schema, please refer to the <a href="database.html">Database</a> section of the Project Tracker.</p>
+                
+                <h6 class="mt-4">Data Relationships</h6>
+                <p>The database uses a mix of embedding and referencing to represent relationships between entities:</p>
+                <ul>
+                  <li><strong>Embedding:</strong> Used for data that is always accessed together (e.g., traveler information in bookings)</li>
+                  <li><strong>Referencing:</strong> Used for relationships between major entities (e.g., user to booking)</li>
+                </ul>
+                
+                <h6 class="mt-4">Indexing Strategy</h6>
+                <p>Indexes are created on fields that are frequently used in queries to improve performance:</p>
+                <ul>
+                  <li><strong>Single-Field Indexes:</strong> For simple queries on one field</li>
+                  <li><strong>Compound Indexes:</strong> For queries that filter on multiple fields</li>
+                  <li><strong>Unique Indexes:</strong> To enforce data integrity</li>
+                </ul>
+              </div>
+              
+              <!-- Backend -->
+              <div class="tab-pane fade" id="backend" role="tabpanel" aria-labelledby="backend-tab">
+                <h5 class="mb-3">Backend Implementation</h5>
+                <p>The backend of the Online Booking System is built using Node.js with Express.js framework. It provides a RESTful API for the frontend to interact with the MongoDB database.</p>
+                
+                <h6 class="mt-4">Project Structure</h6>
+                <div class="code-block">
+<pre>backend/
+├── node_modules/
+├── models/
+│   ├── User.js
+│   ├── Flight.js
+│   ├── Train.js
+│   ├── Hotel.js
+│   ├── Booking.js
+│   └── Admin.js
+├── routes/
+│   ├── auth.js
+│   ├── search.js
+│   ├── bookings.js
+│   ├── users.js
+│   └── admin.js
+├── middleware/
+│   └── auth.js
+├── server.js
+├── package.json
+└── .env</pre>
+                </div>
+                
+                <h6 class="mt-4">API Endpoints</h6>
+                <p>For detailed information about the API endpoints, please refer to the <a href="backend.html">Backend</a> section of the Project Tracker.</p>
+                
+                <h6 class="mt-4">Authentication</h6>
+                <p>The backend implements JWT-based authentication for users and administrators. The authentication flow is as follows:</p>
+                <ol>
+                  <li>User submits login credentials (email and password)</li>
+                  <li>Backend verifies credentials against the database</li>
+                  <li>If credentials are valid, backend generates a JWT token</li>
+                  <li>Token is returned to the client and stored in localStorage</li>
+                  <li>Client includes token in Authorization header for subsequent requests</li>
+                  <li>Backend verifies token for protected routes</li>
+                </ol>
+                
+                <h6 class="mt-4">Error Handling</h6>
+                <p>The backend implements a centralized error handling mechanism to ensure consistent error responses. Errors are categorized as:</p>
+                <ul>
+                  <li><strong>Validation Errors:</strong> Invalid input data</li>
+                  <li><strong>Authentication Errors:</strong> Invalid or expired tokens</li>
+                  <li><strong>Authorization Errors:</strong> Insufficient permissions</li>
+                  <li><strong>Resource Errors:</strong> Resource not found or already exists</li>
+                  <li><strong>Server Errors:</strong> Internal server errors</li>
+                </ul>
+              </div>
+              
+              <!-- Frontend -->
+              <div class="tab-pane fade" id="frontend" role="tabpanel" aria-labelledby="frontend-tab">
+                <h5 class="mb-3">Frontend Implementation</h5>
+                <p>The frontend of the Online Booking System is built using HTML5, CSS3, JavaScript, and Bootstrap 5. It provides a responsive and user-friendly interface for users to search, book, and manage their travel arrangements.</p>
+                
+                <h6 class="mt-4">Project Structure</h6>
+                <div class="code-block">
+<pre>frontend/
+├── css/
+│   └── styles.css
+├── js/
+│   └── main.js
+├── images/
+│   └── ...
+├── pages/
+│   ├── flights.html
+│   ├── trains.html
+│   ├── hotels.html
+│   ├── booking.html
+│   ├── bookings.html
+│   ├── about.html
+│   └── contact.html
+└── index.html</pre>
+                </div>
+                
+                <h6 class="mt-4">Pages</h6>
+                <p>For detailed information about the frontend pages, please refer to the <a href="frontend.html">Frontend</a> section of the Project Tracker.</p>
+                
+                <h6 class="mt-4">JavaScript Implementation</h6>
+                <p>The frontend JavaScript handles several key functions:</p>
+                <ul>
+                  <li><strong>Form Validation:</strong> Client-side validation of all forms</li>
+                  <li><strong>API Integration:</strong> Fetching data from the backend API</li>
+                  <li><strong>Authentication:</strong> Handling user login, registration, and session management</li>
+                  <li><strong>Dynamic Content:</strong> Updating the UI based on user interactions</li>
+                  <li><strong>Search Functionality:</strong> Processing search queries and displaying results</li>
+                  <li><strong>Booking Process:</strong> Managing the multi-step booking process</li>
+                </ul>
+                
+                <h6 class="mt-4">Responsive Design</h6>
+                <p>The frontend is fully responsive and works well on all device sizes:</p>
+                <ul>
+                  <li><strong>Desktop:</strong> Optimized for large screens (1200px and above)</li>
+                  <li><strong>Tablet:</strong> Adapted for medium screens (768px to 1199px)</li>
+                  <li><strong>Mobile:</strong> Optimized for small screens (below 768px)</li>
+                </ul>
+              </div>
+              
+              <!-- Deployment -->
+              <div class="tab-pane fade" id="deployment" role="tabpanel" aria-labelledby="deployment-tab">
+                <h5 class="mb-3">Deployment Guide</h5>
+                <p>This section provides instructions for deploying the Online Booking System to a production environment.</p>
+                
+                <h6 class="mt-4">Prerequisites</h6>
+                <ul>
+                  <li>Node.js (v14 or higher)</li>
+                  <li>MongoDB (v4 or higher)</li>
+                  <li>npm or yarn</li>
+                  <li>A web server (e.g., Nginx or Apache)</li>
+                </ul>
+                
+                <h6 class="mt-4">Backend Deployment</h6>
+                <ol>
+                  <li>Clone the repository: <code>git clone https://github.com/username/online-booking-system.git</code></li>
+                  <li>Navigate to the backend directory: <code>cd online-booking-system/backend</code></li>
+                  <li>Install dependencies: <code>npm install</code></li>
+                  <li>Create a <code>.env</code> file with the following variables:
+                    <ul>
+                      <li><code>PORT=3000</code></li>
+                      <li><code>MONGODB_URI=mongodb://localhost:27017/online_booking_system</code></li>
+                      <li><code>JWT_SECRET=your_jwt_secret_key_here</code></li>
+                      <li><code>JWT_EXPIRES_IN=24h</code></li>
+                      <li><code>NODE_ENV=production</code></li>
+                    </ul>
+                  </li>
+                  <li>Start the server: <code>npm start</code></li>
+                </ol>
+                
+                <h6 class="mt-4">Frontend Deployment</h6>
+                <ol>
+                  <li>Navigate to the frontend directory: <code>cd ../frontend</code></li>
+                  <li>Configure the API endpoint in <code>js/main.js</code> to point to your backend server</li>
+                  <li>Deploy the frontend files to your web server</li>
+                </ol>
+                
+                <h6 class="mt-4">Database Setup</h6>
+                <ol>
+                  <li>Start MongoDB: <code>mongod</code></li>
+                  <li>Run the database setup script: <code>node database_setup.js</code></li>
+                </ol>
+                
+                <h6 class="mt-4">Production Considerations</h6>
+                <ul>
+                  <li><strong>Security:</strong> Use HTTPS, secure cookies, and proper authentication</li>
+                  <li><strong>Performance:</strong> Implement caching, compression, and CDN for static assets</li>
+                  <li><strong>Scalability:</strong> Consider load balancing and database sharding for high traffic</li>
+                  <li><strong>Monitoring:</strong> Set up logging and monitoring for the application</li>
+                  <li><strong>Backup:</strong> Implement regular database backups</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- User Documentation -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">User Documentation</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <h5>User Guide</h5>
+                <p>The User Guide provides instructions for using the Online Booking System. It covers all the features and functionalities available to users.</p>
+                
+                <h6 class="mt-4">Getting Started</h6>
+                <ol>
+                  <li><strong>Registration:</strong> Create a new account by clicking on the "Register" button and filling in the required information.</li>
+                  <li><strong>Login:</strong> Log in to your account using your email and password.</li>
+                  <li><strong>Home Page:</strong> The home page provides quick access to search for flights, trains, and hotels.</li>
+                </ol>
+                
+                <h6 class="mt-4">Searching for Travel Options</h6>
+                <ol>
+                  <li><strong>Flights:</strong> Navigate to the Flights page, enter source, destination, and date, and click on "Search".</li>
+                  <li><strong>Trains:</strong> Navigate to the Trains page, enter source, destination, and date, and click on "Search".</li>
+                  <li><strong>Hotels:</strong> Navigate to the Hotels page, enter location, check-in/out dates, and guests, and click on "Search".</li>
+                </ol>
+                
+                <h6 class="mt-4">Making a Booking</h6>
+                <ol>
+                  <li><strong>Select Option:</strong> From the search results, select the flight, train, or hotel you want to book.</li>
+                  <li><strong>Enter Details:</strong> Fill in the traveler information and any additional details required.</li>
+                  <li><strong>Payment:</strong> Enter payment information and complete the booking.</li>
+                  <li><strong>Confirmation:</strong> Receive a booking confirmation with details of your booking.</li>
+                </ol>
+                
+                <h6 class="mt-4">Managing Bookings</h6>
+                <ol>
+                  <li><strong>View Bookings:</strong> Navigate to the Profile page and click on "Booking History" to view all your bookings.</li>
+                  <li><strong>Cancel Booking:</strong> From the Booking History, select a booking and click on "Cancel Booking" to cancel it.</li>
+                </ol>
+              </div>
+              <div class="col-md-6">
+                <h5>Administrator Guide</h5>
+                <p>The Administrator Guide provides instructions for administrators to manage the Online Booking System. It covers all the features and functionalities available to administrators.</p>
+                
+                <h6 class="mt-4">Getting Started</h6>
+                <ol>
+                  <li><strong>Login:</strong> Log in to the admin panel using your admin credentials.</li>
+                  <li><strong>Dashboard:</strong> The dashboard provides an overview of the system, including users, bookings, and inventory.</li>
+                </ol>
+                
+                <h6 class="mt-4">Managing Users</h6>
+                <ol>
+                  <li><strong>View Users:</strong> Navigate to the Users section to view all registered users.</li>
+                  <li><strong>Edit User:</strong> Click on a user to view and edit their details.</li>
+                  <li><strong>Delete User:</strong> Click on the "Delete" button to remove a user from the system.</li>
+                </ol>
+                
+                <h6 class="mt-4">Managing Inventory</h6>
+                <ol>
+                  <li><strong>Flights:</strong> Navigate to the Flights section to view, add, edit, or delete flights.</li>
+                  <li><strong>Trains:</strong> Navigate to the Trains section to view, add, edit, or delete trains.</li>
+                  <li><strong>Hotels:</strong> Navigate to the Hotels section to view, add, edit, or delete hotels.</li>
+                </ol>
+                
+                <h6 class="mt-4">Managing Bookings</h6>
+                <ol>
+                  <li><strong>View Bookings:</strong> Navigate to the Bookings section to view all bookings in the system.</li>
+                  <li><strong>Edit Booking:</strong> Click on a booking to view and edit its details.</li>
+                  <li><strong>Cancel Booking:</strong> Click on the "Cancel" button to cancel a booking.</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Documentation Downloads -->
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Documentation Downloads</h5>
+          </div>
+          <div class="card-body">
+            <p>The following documentation files are available for download:</p>
+            
+            <div class="row mt-4">
+              <div class="col-md-6">
+                <h5>Project Documentation</h5>
+                <div>
+                  <a href="#" class="download-btn">
+                    <i class="fas fa-file-pdf"></i>
+                    Project Overview
+                  </a>
+                  <a href="#" class="download-btn">
+                    <i class="fas fa-file-pdf"></i>
+                    Requirements Specification
+                  </a>
+                  <a href="#" class="download-btn">
+                    <i class="fas fa-file-pdf"></i>
+                    System Design Document
+                  </a>
+                  <a href="#" class="download-btn">
+                    <i class="fas fa-file-pdf"></i>
+                    Test Plan
+                  </a>
+                </div>
+                
+                <h5 class="mt-4">Technical Documentation</h5>
+                <div>
+                  <a href="#" class="download-btn">
+                    <i class="fas fa-file-pdf"></i>
+                    API Documentation
+                  </a>
+                  <a href="#" class="download-btn">
+                    <i class="fas fa-file-pdf"></i>
+                    Database Schema
+                  </a>
+                  <a href="#" class="download-btn">
+                    <i class="fas fa-file-pdf"></i>
+                    Frontend Architecture
+                  </a>
+                  <a href="#" class="download-btn">
+                    <i class="fas fa-file-pdf"></i>
+                    Deployment Guide
+                  </a>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <h5>User Documentation</h5>
+                <div>
+                  <a href="#" class="download-btn">
+                    <i class="fas fa-file-pdf"></i>
+                    User Guide
+                  </a>
+                  <a href="#" class="download-btn">
+                    <i class="fas fa-file-pdf"></i>
+                    Administrator Guide
+                  </a>
+                  <a href="#" class="download-btn">
+                    <i class="fas fa-file-pdf"></i>
+                    FAQ
+                  </a>
+                </div>
+                
+                <h5 class="mt-4">Diagrams</h5>
+                <div>
+                  <a href="#" class="download-btn">
+                    <i class="fas fa-file-image"></i>
+                    Use Case Diagram
+                  </a>
+                  <a href="#" class="download-btn">
+                    <i class="fas fa-file-image"></i>
+                    ER Diagram
+                  </a>
+                  <a href="#" class="download-btn">
+                    <i class="fas fa-file-image"></i>
+                    Class Diagram
+                  </a>
+                  <a href="#" class="download-btn">
+                    <i class="fas fa-file-image"></i>
+                    Sequence Diagrams
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-white py-4">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <h5>Online Booking System</h5>
+          <p class="mb-0">A comprehensive college project for booking trains, planes, and hotels.</p>
+        </div>
+        <div class="col-md-6 text-md-end">
+          <p class="mb-0">&copy; 2025 | Created for College Project</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

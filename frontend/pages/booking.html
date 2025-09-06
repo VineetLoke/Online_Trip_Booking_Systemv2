@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Booking - Online Booking System</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <!-- Custom CSS -->
+  <link href="../css/styles.css" rel="stylesheet">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top">
+    <div class="container">
+      <a class="navbar-brand" href="../index.html">
+        <i class="fas fa-globe-americas me-2"></i>
+        TravelEase
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="../index.html">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="flights.html">Flights</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="trains.html">Trains</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="hotels.html">Hotels</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="about.html">About</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="contact.html">Contact</a>
+          </li>
+        </ul>
+        <div id="authButtons" class="d-flex">
+          <button class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#loginModal">Login</button>
+          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#registerModal">Register</button>
+        </div>
+        <div id="userDropdown" class="dropdown d-none">
+          <button class="btn btn-outline-primary dropdown-toggle" type="button" id="userMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-user-circle me-1"></i>
+            <span id="userName">User</span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuButton">
+            <li><a class="dropdown-item" href="profile.html"><i class="fas fa-user me-2"></i>My Profile</a></li>
+            <li><a class="dropdown-item" href="bookings.html"><i class="fas fa-list me-2"></i>My Bookings</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Alert Container -->
+  <div id="mainAlert" class="container mt-3"></div>
+
+  <!-- Page Header -->
+  <section class="bg-primary text-white py-4">
+    <div class="container">
+      <h1 id="bookingHeader"><i class="fas fa-ticket-alt me-2"></i>Complete Your Booking</h1>
+      <p class="lead mb-0" id="bookingSubheader">Review details and proceed to payment</p>
+    </div>
+  </section>
+
+  <!-- Booking Content -->
+  <section class="container my-5">
+    <div class="row">
+      <!-- Booking Details -->
+      <div class="col-lg-8">
+        <div class="booking-details mb-4">
+          <div id="bookingDetailsContent">
+            <!-- Content will be loaded dynamically based on booking type -->
+            <div class="text-center py-5">
+              <div class="spinner-border text-primary" role="status"></div>
+              <p class="mt-3">Loading booking details...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Traveler Information -->
+        <div class="booking-details mb-4">
+          <h3 class="mb-4">Traveler Information</h3>
+          <form id="travelerForm">
+            <div class="mb-3">
+              <label for="travelerName" class="form-label">Full Name</label>
+              <input type="text" class="form-control" id="travelerName" required>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="travelerAge" class="form-label">Age</label>
+                <input type="number" class="form-control" id="travelerAge" min="1" max="120" required>
+              </div>
+              <div class="col-md-6">
+                <label for="travelerGender" class="form-label">Gender</label>
+                <select class="form-select" id="travelerGender" required>
+                  <option value="">Select Gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="travelerIdType" class="form-label">ID Type</label>
+                <select class="form-select" id="travelerIdType" required>
+                  <option value="">Select ID Type</option>
+                  <option value="Passport">Passport</option>
+                  <option value="Driving License">Driving License</option>
+                  <option value="Aadhar">Aadhar</option>
+                  <option value="Voter ID">Voter ID</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="travelerIdNumber" class="form-label">ID Number</label>
+                <input type="text" class="form-control" id="travelerIdNumber" required>
+              </div>
+            </div>
+            <div id="hotelGuestFields" class="d-none">
+              <div class="mb-3">
+                <label for="numberOfGuests" class="form-label">Number of Guests</label>
+                <select class="form-select" id="numberOfGuests">
+                  <option value="1">1 Guest</option>
+                  <option value="2" selected>2 Guests</option>
+                  <option value="3">3 Guests</option>
+                  <option value="4">4 Guests</option>
+                  <option value="5">5 Guests</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="specialRequests" class="form-label">Special Requests</label>
+                <textarea class="form-control" id="specialRequests" rows="3" placeholder="Any special requests for your stay?"></textarea>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Payment Information -->
+        <div class="booking-details">
+          <h3 class="mb-4">Payment Information</h3>
+          <form id="paymentForm">
+            <div class="mb-3">
+              <label for="cardName" class="form-label">Name on Card</label>
+              <input type="text" class="form-control" id="cardName" required>
+            </div>
+            <div class="mb-3">
+              <label for="cardNumber" class="form-label">Card Number</label>
+              <input type="text" class="form-control" id="cardNumber" placeholder="XXXX XXXX XXXX XXXX" required>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="cardExpiry" class="form-label">Expiry Date</label>
+                <input type="text" class="form-control" id="cardExpiry" placeholder="MM/YY" required>
+              </div>
+              <div class="col-md-6">
+                <label for="cardCvv" class="form-label">CVV</label>
+                <input type="text" class="form-control" id="cardCvv" placeholder="XXX" required>
+              </div>
+            </div>
+            <div class="mb-3 form-check">
+              <input type="checkbox" class="form-check-input" id="saveCard">
+              <label class="form-check-label" for="saveCard">Save card for future bookings</label>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Booking Summary -->
+      <div class="col-lg-4">
+        <div class="booking-summary sticky-top" style="top: 100px;">
+          <h3 class="mb-4">Booking Summary</h3>
+          <div id="bookingSummaryContent">
+            <!-- Content will be loaded dynamically based on booking type -->
+            <div class="text-center py-5">
+              <div class="spinner-border text-primary" role="status"></div>
+              <p class="mt-3">Loading summary...</p>
+            </div>
+          </div>
+          <hr>
+          <div class="d-flex justify-content-between mb-2">
+            <span>Base Price</span>
+            <span id="basePrice">₹0</span>
+          </div>
+          <div class="d-flex justify-content-between mb-2">
+            <span>Taxes & Fees</span>
+            <span id="taxesAndFees">₹0</span>
+          </div>
+          <hr>
+          <div class="d-flex justify-content-between mb-4">
+            <strong>Total Amount</strong>
+            <strong id="totalAmount" class="text-primary">₹0</strong>
+          </div>
+          <button id="confirmBookingBtn" class="btn btn-primary w-100 py-3">
+            <i class="fas fa-lock me-2"></i>Confirm & Pay
+          </button>
+          <p class="text-muted small text-center mt-3">
+            <i class="fas fa-shield-alt me-1"></i> Your payment information is secure and encrypted
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-white">
+    <div class="container py-5">
+      <div class="row">
+        <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+          <h5>TravelEase</h5>
+          <p>Your one-stop solution for all your travel booking needs. Find the best deals on flights, trains, and hotels.</p>
+          <div class="d-flex">
+            <a href="#" class="me-3"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="me-3"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="me-3"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+          <h5>Quick Links</h5>
+          <ul class="list-unstyled">
+            <li><a href="../index.html">Home</a></li>
+            <li><a href="flights.html">Flights</a></li>
+            <li><a href="trains.html">Trains</a></li>
+            <li><a href="hotels.html">Hotels</a></li>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="contact.html">Contact Us</a></li>
+          </ul>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+          <h5>Support</h5>
+          <ul class="list-unstyled">
+            <li><a href="#">FAQs</a></li>
+            <li><a href="#">Help Center</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Refund Policy</a></li>
+          </ul>
+        </div>
+        <div class="col-lg-3 col-md-6">
+          <h5>Contact Us</h5>
+          <ul class="list-unstyled">
+            <li><i class="fas fa-map-marker-alt me-2"></i> 123 Travel Street, Mumbai, India</li>
+            <li><i class="fas fa-phone me-2"></i> +91 1234567890</li>
+            <li><i class="fas fa-envelope me-2"></i> info@travelease.com</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="bg-darker py-3">
+      <div class="container text-center">
+        <p class="mb-0">&copy; 2025 TravelEase. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Login Modal -->
+  <div class="modal fade auth-modal" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="loginModalLabel">Login to Your Account</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="loginAlert"></div>
+          <form id="loginForm">
+            <div class="mb-3">
+              <label for="loginEmail" class="form-label">Email address</label>
+              <input type="email" class="form-control" id="loginEmail" required>
+            </div>
+            <div class="mb-3">
+              <label for="loginPassword" class="form-label">Password</label>
+              <input type="password" class="form-control" id="loginPassword" required>
+            </div>
+            <div class="mb-3 form-check">
+              <input type="checkbox" class="form-check-input" id="rememberMe">
+              <label class="form-check-label" for="rememberMe">Remember me</label>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Login</button>
+          </form>
+          <div class="text-center mt-3">
+            <p>Don't have an account? <a href="#" data-bs-toggle="modal" data-bs-target="#registerModal" data-bs-dismiss="modal">Register now</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Register Modal -->
+  <div class="modal fade auth-modal" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="registerModalLabel">Create an Account</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="registerAlert"></div>
+          <form id="registerForm">
+            <div class="mb-3">
+              <label for="registerName" class="form-label">Full Name</label>
+              <input type="text" class="form-control" id="registerName" required>
+            </div>
+            <div class="mb-3">
+              <label for="registerEmail" class="form-label">Email address</label>
+              <input type="email" class="form-control" id="registerEmail" required>
+            </div>
+            <div class="mb-3">
+              <label for="registerPhone" class="form-label">Phone Number</label>
+              <input type="tel" class="form-control" id="registerPhone" required>
+            </div>
+            <div class="mb-3">
+              <label for="registerPassword" class="form-label">Password</label>
+              <input type="password" class="form-control" id="registerPassword" required>
+            </div>
+            <div class="mb-3 form-check">
+              <input type="checkbox" class="form-check-input" id="agreeTerms" required>
+              <label class="form-check-label" for="agreeTerms">I agree to the <a href="#">Terms and Conditions</a></label>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Register</button>
+          </form>
+          <div class="text-center mt-3">
+            <p>Already have an account? <a href="#" data-bs-toggle="modal" data-bs-target="#loginModal" data-bs-dismiss="modal">Login</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Booking Success Modal -->
+  <div class="modal fade" id="bookingSuccessModal" tabindex="-1" aria-labelledby="bookingSuccessModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header border-0">
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center">
+          <div class="mb-4">
+            <i class="fas fa-check-circle text-success" style="font-size: 5rem;"></i>
+          </div>
+          <h3 class="mb-3">Booking Confirmed!</h3>
+          <p class="mb-4">Your booking has been successfully confirmed. A confirmation email has been sent to your registered email address.</p>
+          <div class="d-flex justify-content-center">
+            <a href="bookings.html" class="btn btn-primary me-2">View My Bookings</a>
+            <a href="../index.html" class="btn btn-outline-primary">Return to Home</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Custom JavaScript -->
+  <script src="../js/main.js"></script>
+  <script>
+    // Booking Page JavaScript
+    document.addEventListener('DOMContentLoaded', function() {
+      // Check if user is logged in
+      if (!isLoggedIn()) {
+        // Show login modal
+        const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+        loginModal.show();
+        
+        // Show alert in modal
+        showAlert('loginAlert', 'Please login to continue with booking.', 'info');
+        return;
+      }
+      
+      // Get booking parameters from URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const bookingType = urlParams.get('type');
+      const itemId = urlParams.get('id');
+      
+      if (!bookingType || !itemId) {
+        // Invalid booking parameters
+        window.location.href = '../index.html';
+        return;
+      }
+      
+      // Update page header based on booking type
+      updatePageHeader(bookingType);
+      
+      // Load booking details
+      loadBookingDetails(bookingType, itemId);
+      
+      // Show/hide hotel guest fields based on booking type
+      if (bookingType === 'hotel') {
+        document.getElementById('hotelGuestFields').classList.remove('d-none');
+      }
+      
+      // Handle confirm booking button
+      document.getElementById('confirmBookingBtn').addEventListener('click', function() {
+        // Validate forms
+        const travelerForm = document.getElementById('travelerForm');
+        const paymentForm = document.getElementById('paymentForm');
+        
+        if (!travelerForm.checkValidity() || !paymentForm.checkValidity()) {
+          // Show validation errors
+          travelerForm.reportValidity();
+          paymentForm.reportValidity();
+          return;
+        }
+        
+        // Simulate booking process
+        this.disabled = true;
+        this.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Processing...';
+        
+        // Create booking data
+        const bookingData = {
+          type: bookingType,
+          itemId: itemId,
+          travelerInfo: {
+            name: document.getElementById('travelerName').value,
+            age: document.getElementById('travelerAge').value,
+            gender: document.getElementById('travelerGender').value,
+            idType: document.getElementById('travelerIdType').value,
+            idNumber: document.getElementById('travelerIdNumber').value
+          },
+          paymentInfo: {
+            cardName: document.getElementById('cardName').value,
+            cardNumber: document.getElementById('cardNumber').value,
+            cardExpiry: document.getElementById('cardExpiry').value,
+            cardCvv: document.getElementById('cardCvv').value,
+            saveCard: document.getElementById('saveCard').checked
+          }
+        };
+        
+        // Add hotel-specific fields if applicable
+        if (bookingType === 'hotel') {
+          bookingData.hotelInfo = {
+            numberOfGuests: document.getElementById('numberOfGuests').value,
+            specialRequests: document.getElementById('specialRequests').value
+          };
+        }
+        
+        // Create real booking via API
+        createBooking(bookingData, bookingType, itemId);
+      });
+    });
+    
+    // Create booking via API
+    async function createBooking(bookingData, bookingType, itemId) {
+      const API_BASE_URL = 'http://localhost:3000/api';
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        alert('Please login to make a booking');
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      try {
+        let apiUrl = '';
+        let requestBody = {};
+        
+        // Prepare request based on booking type
+        switch (bookingType) {
+          case 'flight':
+            apiUrl = `${API_BASE_URL}/bookings/flights`;
+            requestBody = {
+              flightId: itemId,
+              passengerDetails: {
+                name: bookingData.travelerInfo.name,
+                age: parseInt(bookingData.travelerInfo.age),
+                gender: bookingData.travelerInfo.gender,
+                idType: bookingData.travelerInfo.idType,
+                idNumber: bookingData.travelerInfo.idNumber
+              }
+            };
+            break;
+          case 'train':
+            apiUrl = `${API_BASE_URL}/bookings/trains`;
+            requestBody = {
+              trainId: itemId,
+              passengerDetails: {
+                name: bookingData.travelerInfo.name,
+                age: parseInt(bookingData.travelerInfo.age),
+                gender: bookingData.travelerInfo.gender,
+                idType: bookingData.travelerInfo.idType,
+                idNumber: bookingData.travelerInfo.idNumber
+              }
+            };
+            break;
+          case 'hotel':
+            apiUrl = `${API_BASE_URL}/bookings/hotels`;
+            requestBody = {
+              hotelId: itemId,
+              checkInDate: new Date().toISOString().split('T')[0], // Use current date as default
+              checkOutDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Next day
+              guestDetails: {
+                name: bookingData.travelerInfo.name,
+                age: parseInt(bookingData.travelerInfo.age),
+                gender: bookingData.travelerInfo.gender,
+                idType: bookingData.travelerInfo.idType,
+                idNumber: bookingData.travelerInfo.idNumber,
+                numberOfGuests: parseInt(bookingData.hotelInfo?.numberOfGuests || 1),
+                specialRequests: bookingData.hotelInfo?.specialRequests || ''
+              }
+            };
+            break;
+          default:
+            throw new Error('Invalid booking type');
+        }
+        
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(requestBody)
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error?.message || 'Failed to create booking');
+        }
+        
+        const result = await response.json();
+        
+        // Show success modal
+        const successModal = new bootstrap.Modal(document.getElementById('bookingSuccessModal'));
+        successModal.show();
+        
+        // Reset button state
+        document.getElementById('confirmBookingBtn').disabled = false;
+        document.getElementById('confirmBookingBtn').innerHTML = '<i class="fas fa-lock me-2"></i>Confirm & Pay';
+        
+        console.log('Booking created successfully:', result);
+        
+      } catch (error) {
+        console.error('Error creating booking:', error);
+        alert('Failed to create booking: ' + error.message);
+        
+        // Reset button state
+        document.getElementById('confirmBookingBtn').disabled = false;
+        document.getElementById('confirmBookingBtn').innerHTML = '<i class="fas fa-lock me-2"></i>Confirm & Pay';
+      }
+    }
+
+    // Update page header based on booking type
+    function updatePageHeader(bookingType) {
+      const header = document.getElementById('bookingHeader');
+      const subheader = document.getElementById('bookingSubheader');
+      
+      switch (bookingType) {
+        case 'flight':
+          header.innerHTML = '<i class="fas fa-plane me-2"></i>Flight Booking';
+          subheader.textContent = 'Complete your flight booking details';
+          break;
+        case 'train':
+          header.innerHTML = '<i class="fas fa-train me-2"></i>Train Booking';
+          subheader.textContent = 'Complete your train booking details';
+          break;
+        case 'hotel':
+          header.innerHTML = '<i class="fas fa-hotel me-2"></i>Hotel Booking';
+          subheader.textContent = 'Complete your hotel booking details';
+          break;
+      }
+    }
+    
+    // Load booking details
+   
+async function loadBookingDetails(bookingType, itemId) {
+  const detailsContainer = document.getElementById('bookingDetailsContent');
+  const summaryContainer = document.getElementById('bookingSummaryContent');
+  if (!detailsContainer || !summaryContainer) return;
+
+  // API base URL (update if needed)
+  const API_BASE_URL = 'http://localhost:3000/api';
+
+  // Get token if needed for protected endpoints
+  const token = localStorage.getItem('token');
+
+  let apiUrl = '';
+  switch (bookingType) {
+    case 'flight':
+      apiUrl = `${API_BASE_URL}/search/flights/${itemId}`;
+      break;
+    case 'train':
+      apiUrl = `${API_BASE_URL}/search/trains/${itemId}`;
+      break;
+    case 'hotel':
+      apiUrl = `${API_BASE_URL}/search/hotels/${itemId}`;
+      break;
+    default:
+      detailsContainer.innerHTML = '<div class="alert alert-danger">Invalid booking type.</div>';
+      summaryContainer.innerHTML = '';
+      return;
+  }
+
+  try {
+    const res = await fetch(apiUrl, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {}
+    });
+    if (!res.ok) throw new Error('Network error');
+    const data = await res.json();
+    
+    // Extract the item from the response (backend returns { flight: {...} }, { train: {...} }, etc.)
+    let item;
+    switch (bookingType) {
+      case 'flight':
+        item = data.flight;
+        break;
+      case 'train':
+        item = data.train;
+        break;
+      case 'hotel':
+        item = data.hotel;
+        break;
+      default:
+        throw new Error('Invalid booking type');
+    }
+
+    // Render details and summary
+    renderItemDetails(bookingType, item, detailsContainer, summaryContainer);
+  } catch (err) {
+    console.error(err);
+    detailsContainer.innerHTML = '<div class="alert alert-danger">Failed to load booking details.</div>';
+    summaryContainer.innerHTML = '';
+  }
+}
+
+function renderItemDetails(type, item, detailsContainer, summaryContainer) {
+  let detailsHtml = '';
+  let summaryHtml = '';
+  let basePrice = item.price || item.totalAmount || 0;
+  let taxesAndFees = Math.round(basePrice * (type === 'flight' ? 0.18 : type === 'train' ? 0.12 : 0.18));
+
+  if (type === 'flight') {
+    detailsHtml = `
+      <h3 class="mb-4">Flight Details</h3>
+      <div class="card mb-4">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">${item.airline}</h5>
+            <span class="badge bg-primary">${item.flightNumber}</span>
+          </div>
+          <div class="row">
+            <div class="col-md-5 text-center">
+              <h5>${new Date(item.departureTime).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</h5>
+              <p class="mb-0">${item.source}</p>
+            </div>
+            <div class="col-md-2 text-center">
+              <i class="fas fa-plane"></i>
+              <div class="progress my-2" style="height:2px"><div class="progress-bar bg-primary" style="width:100%"></div></div>
+              <small>${getDurationString(new Date(item.departureTime), new Date(item.arrivalTime))}</small>
+            </div>
+            <div class="col-md-5 text-center">
+              <h5>${new Date(item.arrivalTime).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</h5>
+              <p class="mb-0">${item.destination}</p>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    summaryHtml = `
+      <div class="mb-4">
+        <div class="d-flex justify-content-between mb-2"><span>Flight</span><span>${item.flightNumber}</span></div>
+        <div class="d-flex justify-content-between mb-2"><span>Date</span><span>${new Date(item.departureTime).toLocaleDateString()}</span></div>
+        <div class="d-flex justify-content-between mb-2"><span>Route</span><span>${item.source} – ${item.destination}</span></div>
+      </div>`;
+  } else if (type === 'train') {
+    detailsHtml = `
+      <h3 class="mb-4">Train Details</h3>
+      <div class="card mb-4">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">${item.trainName}</h5>
+            <span class="badge bg-primary">${item.trainNumber}</span>
+          </div>
+          <div class="row">
+            <div class="col-md-5 text-center">
+              <h5>${new Date(item.departureTime).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</h5>
+              <p class="mb-0">${item.source}</p>
+            </div>
+            <div class="col-md-2 text-center">
+              <i class="fas fa-train"></i>
+              <div class="progress my-2" style="height:2px"><div class="progress-bar bg-primary" style="width:100%"></div></div>
+              <small>${getDurationString(new Date(item.departureTime), new Date(item.arrivalTime))}</small>
+            </div>
+            <div class="col-md-5 text-center">
+              <h5>${new Date(item.arrivalTime).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</h5>
+              <p class="mb-0">${item.destination}</p>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    summaryHtml = `
+      <div class="mb-4">
+        <div class="d-flex justify-content-between mb-2"><span>Train</span><span>${item.trainNumber}</span></div>
+        <div class="d-flex justify-content-between mb-2"><span>Date</span><span>${new Date(item.departureTime).toLocaleDateString()}</span></div>
+        <div class="d-flex justify-content-between mb-2"><span>Class</span><span>${item.class || ''}</span></div>
+      </div>`;
+  } else if (type === 'hotel') {
+    const nights = item.nights || 1;
+    detailsHtml = `
+      <h3 class="mb-4">Hotel Details</h3>
+      <div class="card mb-4">
+        <div class="card-body">
+          <h5>${item.name}</h5>
+          <p class="mb-3"><i class="fas fa-map-marker-alt text-secondary me-2"></i>${item.location}</p>
+          <div class="row mb-3">
+            <div class="col-md-6"><strong>Check-in</strong><br>${new Date(item.checkInDate).toLocaleDateString()}</div>
+            <div class="col-md-6"><strong>Check-out</strong><br>${new Date(item.checkOutDate).toLocaleDateString()}</div>
+          </div>
+          <p><strong>Room type:</strong> ${item.roomType}</p>
+          <p><strong>Nights:</strong> ${nights}</p>
+        </div>
+      </div>`;
+    summaryHtml = `
+      <div class="mb-4">
+        <div class="d-flex justify-content-between mb-2"><span>Hotel</span><span>${item.name}</span></div>
+        <div class="d-flex justify-content-between mb-2"><span>Check-in</span><span>${new Date(item.checkInDate).toLocaleDateString()}</span></div>
+        <div class="d-flex justify-content-between mb-2"><span>Nights</span><span>${nights}</span></div>
+      </div>`;
+  }
+
+  detailsContainer.innerHTML = detailsHtml;
+  summaryContainer.innerHTML = summaryHtml;
+  document.getElementById('basePrice').textContent = `₹${basePrice}`;
+  document.getElementById('taxesAndFees').textContent = `₹${taxesAndFees}`;
+  document.getElementById('totalAmount').textContent = `₹${basePrice + taxesAndFees}`;
+}
+
+// Helper function for duration
+function getDurationString(start, end) {
+  const durationMs = end - start;
+  const hours = Math.floor(durationMs / (1000 * 60 * 60));
+  const minutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
+  return `${hours}h ${minutes}m`;
+}
+  </script>
+</body>
+</html>
+

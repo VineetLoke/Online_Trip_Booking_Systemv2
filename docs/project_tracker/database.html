@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Database - Project Tracker</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #0d6efd;
+      --secondary-color: #6c757d;
+      --success-color: #198754;
+      --info-color: #0dcaf0;
+      --warning-color: #ffc107;
+      --danger-color: #dc3545;
+      --light-color: #f8f9fa;
+      --dark-color: #212529;
+    }
+    
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #f5f5f5;
+    }
+    
+    .navbar-brand {
+      font-weight: 700;
+    }
+    
+    .card {
+      border: none;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .card-header {
+      border-radius: 10px 10px 0 0 !important;
+      font-weight: 600;
+    }
+    
+    .code-block {
+      background-color: #f8f9fa;
+      border-radius: 5px;
+      padding: 15px;
+      font-family: 'Courier New', monospace;
+      overflow-x: auto;
+    }
+    
+    .json-key {
+      color: #d63384;
+    }
+    
+    .json-string {
+      color: #20c997;
+    }
+    
+    .json-number {
+      color: #fd7e14;
+    }
+    
+    .json-boolean {
+      color: #0d6efd;
+    }
+    
+    .json-null {
+      color: #6c757d;
+    }
+    
+    .collection-icon {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      margin-right: 15px;
+    }
+    
+    .bg-primary-light {
+      background-color: rgba(13, 110, 253, 0.2);
+      color: var(--primary-color);
+    }
+    
+    .bg-success-light {
+      background-color: rgba(25, 135, 84, 0.2);
+      color: var(--success-color);
+    }
+    
+    .bg-warning-light {
+      background-color: rgba(255, 193, 7, 0.2);
+      color: var(--warning-color);
+    }
+    
+    .bg-info-light {
+      background-color: rgba(13, 202, 240, 0.2);
+      color: var(--info-color);
+    }
+    
+    .bg-danger-light {
+      background-color: rgba(220, 53, 69, 0.2);
+      color: var(--danger-color);
+    }
+    
+    .bg-secondary-light {
+      background-color: rgba(108, 117, 125, 0.2);
+      color: var(--secondary-color);
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">
+        <i class="fas fa-tasks me-2"></i>
+        Project Tracker
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="diagrams.html">UML Diagrams</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="database.html">Database</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="backend.html">Backend</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="frontend.html">Frontend</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="testing.html">Testing</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="documentation.html">Documentation</a>
+          </li>
+        </ul>
+        <a href="../../index.html" class="btn btn-outline-light" target="_blank">
+          <i class="fas fa-external-link-alt me-2"></i>
+          View Application
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container py-5">
+    <!-- Page Header -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="bg-primary text-white p-3 rounded me-3">
+                <i class="fas fa-database fa-2x"></i>
+              </div>
+              <div>
+                <h2 class="mb-0">Database</h2>
+                <p class="text-muted mb-0">MongoDB database design and implementation</p>
+              </div>
+              <div class="ms-auto">
+                <span class="badge bg-success">Completed</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Database Overview -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Database Overview</h5>
+          </div>
+          <div class="card-body">
+            <p>The Online Booking System uses <strong>MongoDB</strong>, a NoSQL document database, to store and manage data. MongoDB was chosen for its flexibility, scalability, and ability to handle complex data structures.</p>
+            <div class="row mt-4">
+              <div class="col-md-4 mb-3">
+                <div class="d-flex align-items-center">
+                  <div class="collection-icon bg-success-light">
+                    <i class="fas fa-users fa-lg"></i>
+                  </div>
+                  <div>
+                    <h5 class="mb-0">6 Collections</h5>
+                    <p class="text-muted mb-0">Organized data structure</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4 mb-3">
+                <div class="d-flex align-items-center">
+                  <div class="collection-icon bg-info-light">
+                    <i class="fas fa-key fa-lg"></i>
+                  </div>
+                  <div>
+                    <h5 class="mb-0">Indexed Fields</h5>
+                    <p class="text-muted mb-0">For optimized queries</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4 mb-3">
+                <div class="d-flex align-items-center">
+                  <div class="collection-icon bg-warning-light">
+                    <i class="fas fa-shield-alt fa-lg"></i>
+                  </div>
+                  <div>
+                    <h5 class="mb-0">Secure Storage</h5>
+                    <p class="text-muted mb-0">Hashed passwords</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Database Schema -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Database Schema</h5>
+          </div>
+          <div class="card-body">
+            <p>The database schema consists of the following collections:</p>
+            
+            <div class="accordion" id="collectionsAccordion">
+              <!-- Users Collection -->
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="usersHeading">
+                  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#usersCollapse" aria-expanded="true" aria-controls="usersCollapse">
+                    <div class="d-flex align-items-center">
+                      <div class="collection-icon bg-primary-light me-2">
+                        <i class="fas fa-user"></i>
+                      </div>
+                      <span>Users Collection</span>
+                    </div>
+                  </button>
+                </h2>
+                <div id="usersCollapse" class="accordion-collapse collapse show" aria-labelledby="usersHeading" data-bs-parent="#collectionsAccordion">
+                  <div class="accordion-body">
+                    <p>Stores information about registered users of the system.</p>
+                    <h6>Schema:</h6>
+                    <div class="code-block">
+<pre><span class="json-key">{
+  "_id"</span>: <span class="json-string">ObjectId</span>,
+  <span class="json-key">"name"</span>: <span class="json-string">String</span>,
+  <span class="json-key">"email"</span>: <span class="json-string">String</span>,
+  <span class="json-key">"password"</span>: <span class="json-string">String</span> <span class="text-muted">// Hashed</span>,
+  <span class="json-key">"phone"</span>: <span class="json-string">String</span>,
+  <span class="json-key">"address"</span>: <span class="json-string">String</span>,
+  <span class="json-key">"role"</span>: <span class="json-string">String</span> <span class="text-muted">// "user" or "admin"</span>,
+  <span class="json-key">"createdAt"</span>: <span class="json-string">Date</span>,
+  <span class="json-key">"updatedAt"</span>: <span class="json-string">Date</span>
+}</pre>
+                    </div>
+                    <h6 class="mt-3">Indexes:</h6>
+                    <ul>
+                      <li><code>email</code> (unique)</li>
+                      <li><code>phone</code></li>
+                    </ul>
+                    <h6 class="mt-3">Sample Document:</h6>
+                    <div class="code-block">
+<pre><span class="json-key">{
+  "_id"</span>: <span class="json-string">ObjectId("60d5ec9af682fbd12a0b4567")</span>,
+  <span class="json-key">"name"</span>: <span class="json-string">"John Doe"</span>,
+  <span class="json-key">"email"</span>: <span class="json-string">"john@example.com"</span>,
+  <span class="json-key">"password"</span>: <span class="json-string">"$2a$10$XYZ..."</span> <span class="text-muted">// Hashed password</span>,
+  <span class="json-key">"phone"</span>: <span class="json-string">"+91 9876543210"</span>,
+  <span class="json-key">"address"</span>: <span class="json-string">"123 Main St, Mumbai"</span>,
+  <span class="json-key">"role"</span>: <span class="json-string">"user"</span>,
+  <span class="json-key">"createdAt"</span>: <span class="json-string">ISODate("2025-06-25T10:30:00Z")</span>,
+  <span class="json-key">"updatedAt"</span>: <span class="json-string">ISODate("2025-06-25T10:30:00Z")</span>
+}</pre>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Flights Collection -->
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="flightsHeading">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flightsCollapse" aria-expanded="false" aria-controls="flightsCollapse">
+                    <div class="d-flex align-items-center">
+                      <div class="collection-icon bg-info-light me-2">
+                        <i class="fas fa-plane"></i>
+                      </div>
+                      <span>Flights Collection</span>
+                    </div>
+                  </button>
+                </h2>
+                <div id="flightsCollapse" class="accordion-collapse collapse" aria-labelledby="flightsHeading" data-bs-parent="#collectionsAccordion">
+                  <div class="accordion-body">
+                    <p>Stores information about available flights.</p>
+                    <h6>Schema:</h6>
+                    <div class="code-block">
+<pre><span class="json-key">{
+  "_id"</span>: <span class="json-string">ObjectId</span>,
+  <span class="json-key">"flightNumber"</span>: <span class="json-string">String</span>,
+  <span class="json-key">"airline"</span>: <span class="json-string">String</span>,
+  <span class="json-key">"source"</span>: <span class="json-string">String</span>,
+  <span class="json-key">"destination"</span>: <span class="json-string">String</span>,
+  <span class="json-key">"departureTime"</span>: <span class="json-string">Date</span>,
+  <span class="json-key">"arrivalTime"</span>: <span class="json-string">Date</span>,
+  <span class="json-key">"duration"</span>: <span class="json-number">Number</span> <span class="text-muted">// in minutes</span>,
+  <span class="json-key">"price"</span>: <span class="json-number">Number</span>,
+  <span class="json-key">"totalSeats"</span>: <span class="json-number">Number</span>,
+  <span class="json-key">"availableSeats"</span>: <span class="json-number">Number</span>,
+  <span class="json-key">"class"</span>: <span class="json-string">String</span> <span class="text-muted">// "Economy", "Business", "First"</span>,
+  <span class="json-key">"createdAt"</span>: <span class="json-string">Date</span>,
+  <span class="json-key">"updatedAt"</span>: <span class="json-string">Date</span>
+}</pre>
+                    </div>
+                    <h6 class="mt-3">Indexes:</h6>
+                    <ul>
+                      <li><code>flightNumber</code> (unique)</li>
+                      <li><code>source</code>, <code>destination</code>, <code>departureTime</code> (compound index)</li>
+                    </ul>
+                    <h6 class="mt-3">Sample Document:</h6>
+                    <div class="code-block">
+<pre><span class="json-key">{
+  "_id"</span>: <span class="json-string">ObjectId("60d5ec9af682fbd12a0b4568")</span>,
+  <span class="json-key">"flightNumber"</span>: <span class="json-string">"AI302"</span>,
+  <span class="json-key">"airline"</span>: <span class="json-string">"Air India"</span>,
+  <span class="json-key">"source"</span>: <span class="json-string">"Mumbai"</span>,
+  <span class="json-key">"destination"</span>: <span class="json-string">"Delhi"</span>,
+  <span class="json-key">"departureTime"</span>: <span class="json-string">ISODate("2025-07-10T08:00:00Z")</span>,
+  <span class="json-key">"arrivalTime"</span>: <span class="json-string">ISODate("2025-07-10T10:30:00Z")</span>,
+  <span class="json-key">"duration"</span>: <span class="json-number">150</span>,
+  <span class="json-key">"price"</span>: <span class="json-number">5500</span>,
+  <span class="json-key">"totalSeats"</span>: <span class="json-number">180</span>,
+  <span class="json-key">"availableSeats"</span>: <span class="json-number">120</span>,
+  <span class="json-key">"class"</span>: <span class="json-string">"Economy"</span>,
+  <span class="json-key">"createdAt"</span>: <span class="json-string">ISODate("2025-06-25T10:30:00Z")</span>,
+  <span class="json-key">"updatedAt"</span>: <span class="json-string">ISODate("2025-06-25T10:30:00Z")</span>
+}</pre>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Trains Collection -->
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="trainsHeading">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#trainsCollapse" aria-expanded="false" aria-controls="trainsCollapse">
+                    <div class="d-flex align-items-center">
+                      <div class="collection-icon bg-warning-light me-2">
+                        <i class="fas fa-train"></i>
+                      </div>
+                      <span>Trains Collection</span>
+                    </div>
+                  </button>
+                </h2>
+                <div id="trainsCollapse" class="accordion-collapse collapse" aria-labelledby="trainsHeading" data-bs-parent="#collectionsAccordion">
+                  <div class="accordion-body">
+                    <p>Stores information about available trains.</p>
+                    <h6>Schema:</h6>
+                    <div class="code-block">
+<pre><span class="json-key">{
+  "_id"</span>: <span class="json-string">ObjectId</span>,
+  <span class="json-key">"trainNumber"</span>: <span class="json-string">String</span>,
+  <span class="json-key">"name"</span>: <span class="json-string">String</span>,
+  <span class="json-key">"source"</span>: <span class="json-string">String</span>,
+  <span class="json-key">"destination"</span>: <span class="json-string">String</span>,
+  <span class="json-key">"departureTime"</span>: <span class="json-string">Date</span>,
+  <span class="json-key">"arrivalTime"</span>: <span class="json-string">Date</span>,
+  <span class="json-key">"duration"</span>: <span class="json-number">Number</span> <span class="text-muted">// in minutes</span>,
+  <span class="json-key">"price"</span>: <span class="json-number">Number</span>,
+  <span class="json-key">"totalSeats"</span>: <span class="json-number">Number</span>,
+  <span class="json-key">"availableSeats"</span>: <span class="json-number">Number</span>,
+  <span class="json-key">"class"</span>: <span class="json-string">String</span> <span class="text-muted">// "Sleeper", "AC 3 Tier", "AC 2 Tier", "AC First Class"</span>,
+  <span class="json-key">"createdAt"</span>: <span class="json-string">Date</span>,
+  <span class="json-key">"updatedAt"</span>: <span class="json-string">Date</span>
+}</pre>
+                    </div>
+                    <h6 class="mt-3">Indexes:</h6>
+                    <ul>
+                      <li><code>trainNumber</code> (unique)</li>
+                      <li><code>source</code>, <code>destination</code>, <code>departureTime</code> (compound index)</li>
+                    </ul>
+                    <h6 class="mt-3">Sample Document:</h6>
+                    <div class="code-block">
+<pre><span class="json-key">{
+  "_id"</span>: <span class="json-string">ObjectId("60d5ec9af682fbd12a0b4569")</span>,
+  <span class="json-key">"trainNumber"</span>: <span class="json-string">"12952"</span>,
+  <span class="json-key">"name"</span>: <span class="json-string">"Mumbai Rajdhani Express"</span>,
+  <span class="json-key">"source"</span>: <span class="json-string">"Mumbai"</span>,
+  <span class="json-key">"destination"</span>: <span class="json-string">"Delhi"</span>,
+  <span class="json-key">"departureTime"</span>: <span class="json-string">ISODate("2025-07-10T16:35:00Z")</span>,
+  <span class="json-key">"arrivalTime"</span>: <span class="json-string">ISODate("2025-07-11T08:35:00Z")</span>,
+  <span class="json-key">"duration"</span>: <span class="json-number">960</span>,
+  <span class="json-key">"price"</span>: <span class="json-number">2500</span>,
+  <span class="json-key">"totalSeats"</span>: <span class="json-number">72</span>,
+  <span class="json-key">"availableSeats"</span>: <span class="json-number">45</span>,
+  <span class="json-key">"class"</span>: <span class="json-string">"AC 3 Tier"</span>,
+  <span class="json-key">"createdAt"</span>: <span class="json-string">ISODate("2025-06-25T10:30:00Z")</span>,
+  <span class="json-key">"updatedAt"</span>: <span class="json-string">ISODate("2025-06-25T10:30:00Z")</span>
+}</pre>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Hotels Collection -->
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="hotelsHeading">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#hotelsCollapse" aria-expanded="false" aria-controls="hotelsCollapse">
+                    <div class="d-flex align-items-center">
+                      <div class="collection-icon bg-danger-light me-2">
+                        <i class="fas fa-hotel"></i>
+                      </div>
+                      <span>Hotels Collection</span>
+                    </div>
+                  </button>
+                </h2>
+                <div id="hotelsCollapse" class="accordion-collapse collapse" aria-labelledby="hotelsHeading" data-bs-parent="#collectionsAccordion">
+                  <div class="accordion-body">
+                    <p>Stores information about available hotels.</p>
+                    <h6>Schema:</h6>
+                    <div class="code-block">
+<pre><span class="json-key">{
+  "_id"</span>: <span class="json-string">ObjectId</span>,
+  <span class="json-key">"name"</span>: <span class="json-string">String</span>,
+  <span class="json-key">"location"</span>: <span class="json-string">String</span>,
+  <span class="json-key">"address"</span>: <span class="json-string">String</span>,
+  <span class="json-key">"rating"</span>: <span class="json-number">Number</span>,
+  <span class="json-key">"price"</span>: <span class="json-number">Number</span> <span class="text-muted">// per night</span>,
+  <span class="json-key">"amenities"</span>: [<span class="json-string">String</span>],
+  <span class="json-key">"images"</span>: [<span class="json-string">String</span>],
+  <span class="json-key">"rooms"</span>: [
+    <span class="json-key">{
+      "type"</span>: <span class="json-string">String</span>,
+      <span class="json-key">"price"</span>: <span class="json-number">Number</span>,
+      <span class="json-key">"totalRooms"</span>: <span class="json-number">Number</span>,
+      <span class="json-key">"availableRooms"</span>: <span class="json-number">Number</span>
+    }
+  ],
+  <span class="json-key">"createdAt"</span>: <span class="json-string">Date</span>,
+  <span class="json-key">"updatedAt"</span>: <span class="json-string">Date</span>
+}</pre>
+                    </div>
+                    <h6 class="mt-3">Indexes:</h6>
+                    <ul>
+                      <li><code>location</code></li>
+                      <li><code>price</code></li>
+                      <li><code>rating</code></li>
+                    </ul>
+                    <h6 class="mt-3">Sample Document:</h6>
+                    <div class="code-block">
+<pre><span class="json-key">{
+  "_id"</span>: <span class="json-string">ObjectId("60d5ec9af682fbd12a0b456a")</span>,
+  <span class="json-key">"name"</span>: <span class="json-string">"Taj Palace"</span>,
+  <span class="json-key">"location"</span>: <span class="json-string">"Mumbai"</span>,
+  <span class="json-key">"address"</span>: <span class="json-string">"Apollo Bunder, Mumbai, Maharashtra 400001"</span>,
+  <span class="json-key">"rating"</span>: <span class="json-number">4.8</span>,
+  <span class="json-key">"price"</span>: <span class="json-number">12000</span>,
+  <span class="json-key">"amenities"</span>: [<span class="json-string">"WiFi"</span>, <span class="json-string">"Swimming Pool"</span>, <span class="json-string">"Spa"</span>, <span class="json-string">"Restaurant"</span>, <span class="json-string">"Gym"</span>],
+  <span class="json-key">"images"</span>: [<span class="json-string">"taj_palace_1.jpg"</span>, <span class="json-string">"taj_palace_2.jpg"</span>],
+  <span class="json-key">"rooms"</span>: [
+    <span class="json-key">{
+      "type"</span>: <span class="json-string">"Deluxe"</span>,
+      <span class="json-key">"price"</span>: <span class="json-number">12000</span>,
+      <span class="json-key">"totalRooms"</span>: <span class="json-number">50</span>,
+      <span class="json-key">"availableRooms"</span>: <span class="json-number">30</span>
+    },
+    <span class="json-key">{
+      "type"</span>: <span class="json-string">"Suite"</span>,
+      <span class="json-key">"price"</span>: <span class="json-number">20000</span>,
+      <span class="json-key">"totalRooms"</span>: <span class="json-number">20</span>,
+      <span class="json-key">"availableRooms"</span>: <span class="json-number">15</span>
+    }
+  ],
+  <span class="json-key">"createdAt"</span>: <span class="json-string">ISODate("2025-06-25T10:30:00Z")</span>,
+  <span class="json-key">"updatedAt"</span>: <span class="json-string">ISODate("2025-06-25T10:30:00Z")</span>
+}</pre>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Bookings Collection -->
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="bookingsHeading">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#bookingsCollapse" aria-expanded="false" aria-controls="bookingsCollapse">
+                    <div class="d-flex align-items-center">
+                      <div class="collection-icon bg-success-light me-2">
+                        <i class="fas fa-ticket-alt"></i>
+                      </div>
+                      <span>Bookings Collection</span>
+                    </div>
+                  </button>
+                </h2>
+                <div id="bookingsCollapse" class="accordion-collapse collapse" aria-labelledby="bookingsHeading" data-bs-parent="#collectionsAccordion">
+                  <div class="accordion-body">
+                    <p>Stores information about user bookings.</p>
+                    <h6>Schema:</h6>
+                    <div class="code-block">
+<pre><span class="json-key">{
+  "_id"</span>: <span class="json-string">ObjectId</span>,
+  <span class="json-key">"userId"</span>: <span class="json-string">ObjectId</span>,
+  <span class="json-key">"type"</span>: <span class="json-string">String</span> <span class="text-muted">// "flight", "train", or "hotel"</span>,
+  <span class="json-key">"itemId"</span>: <span class="json-string">ObjectId</span>,
+  <span class="json-key">"status"</span>: <span class="json-string">String</span> <span class="text-muted">// "confirmed", "cancelled", "completed"</span>,
+  <span class="json-key">"bookingDate"</span>: <span class="json-string">Date</span>,
+  <span class="json-key">"travelDate"</span>: <span class="json-string">Date</span>,
+  <span class="json-key">"returnDate"</span>: <span class="json-string">Date</span> <span class="text-muted">// for hotels</span>,
+  <span class="json-key">"travelerInfo"</span>: [
+    <span class="json-key">{
+      "name"</span>: <span class="json-string">String</span>,
+      <span class="json-key">"age"</span>: <span class="json-number">Number</span>,
+      <span class="json-key">"gender"</span>: <span class="json-string">String</span>,
+      <span class="json-key">"idType"</span>: <span class="json-string">String</span>,
+      <span class="json-key">"idNumber"</span>: <span class="json-string">String</span>
+    }
+  ],
+  <span class="json-key">"paymentInfo"</span>: <span class="json-key">{
+    "method"</span>: <span class="json-string">String</span>,
+    <span class="json-key">"amount"</span>: <span class="json-number">Number</span>,
+    <span class="json-key">"transactionId"</span>: <span class="json-string">String</span>,
+    <span class="json-key">"status"</span>: <span class="json-string">String</span>
+  },
+  <span class="json-key">"cancellationInfo"</span>: <span class="json-key">{
+    "cancelledAt"</span>: <span class="json-string">Date</span>,
+    <span class="json-key">"reason"</span>: <span class="json-string">String</span>,
+    <span class="json-key">"refundAmount"</span>: <span class="json-number">Number</span>,
+    <span class="json-key">"refundStatus"</span>: <span class="json-string">String</span>
+  },
+  <span class="json-key">"createdAt"</span>: <span class="json-string">Date</span>,
+  <span class="json-key">"updatedAt"</span>: <span class="json-string">Date</span>
+}</pre>
+                    </div>
+                    <h6 class="mt-3">Indexes:</h6>
+                    <ul>
+                      <li><code>userId</code></li>
+                      <li><code>type</code>, <code>itemId</code> (compound index)</li>
+                      <li><code>status</code></li>
+                      <li><code>bookingDate</code></li>
+                      <li><code>travelDate</code></li>
+                    </ul>
+                    <h6 class="mt-3">Sample Document:</h6>
+                    <div class="code-block">
+<pre><span class="json-key">{
+  "_id"</span>: <span class="json-string">ObjectId("60d5ec9af682fbd12a0b456b")</span>,
+  <span class="json-key">"userId"</span>: <span class="json-string">ObjectId("60d5ec9af682fbd12a0b4567")</span>,
+  <span class="json-key">"type"</span>: <span class="json-string">"flight"</span>,
+  <span class="json-key">"itemId"</span>: <span class="json-string">ObjectId("60d5ec9af682fbd12a0b4568")</span>,
+  <span class="json-key">"status"</span>: <span class="json-string">"confirmed"</span>,
+  <span class="json-key">"bookingDate"</span>: <span class="json-string">ISODate("2025-07-01T15:30:00Z")</span>,
+  <span class="json-key">"travelDate"</span>: <span class="json-string">ISODate("2025-07-10T08:00:00Z")</span>,
+  <span class="json-key">"travelerInfo"</span>: [
+    <span class="json-key">{
+      "name"</span>: <span class="json-string">"John Doe"</span>,
+      <span class="json-key">"age"</span>: <span class="json-number">35</span>,
+      <span class="json-key">"gender"</span>: <span class="json-string">"Male"</span>,
+      <span class="json-key">"idType"</span>: <span class="json-string">"Passport"</span>,
+      <span class="json-key">"idNumber"</span>: <span class="json-string">"A1234567"</span>
+    }
+  ],
+  <span class="json-key">"paymentInfo"</span>: <span class="json-key">{
+    "method"</span>: <span class="json-string">"credit_card"</span>,
+    <span class="json-key">"amount"</span>: <span class="json-number">5500</span>,
+    <span class="json-key">"transactionId"</span>: <span class="json-string">"txn_123456789"</span>,
+    <span class="json-key">"status"</span>: <span class="json-string">"completed"</span>
+  },
+  <span class="json-key">"createdAt"</span>: <span class="json-string">ISODate("2025-07-01T15:30:00Z")</span>,
+  <span class="json-key">"updatedAt"</span>: <span class="json-string">ISODate("2025-07-01T15:30:00Z")</span>
+}</pre>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Admins Collection -->
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="adminsHeading">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#adminsCollapse" aria-expanded="false" aria-controls="adminsCollapse">
+                    <div class="d-flex align-items-center">
+                      <div class="collection-icon bg-secondary-light me-2">
+                        <i class="fas fa-user-shield"></i>
+                      </div>
+                      <span>Admins Collection</span>
+                    </div>
+                  </button>
+                </h2>
+                <div id="adminsCollapse" class="accordion-collapse collapse" aria-labelledby="adminsHeading" data-bs-parent="#collectionsAccordion">
+                  <div class="accordion-body">
+                    <p>Stores information about system administrators.</p>
+                    <h6>Schema:</h6>
+                    <div class="code-block">
+<pre><span class="json-key">{
+  "_id"</span>: <span class="json-string">ObjectId</span>,
+  <span class="json-key">"name"</span>: <span class="json-string">String</span>,
+  <span class="json-key">"email"</span>: <span class="json-string">String</span>,
+  <span class="json-key">"password"</span>: <span class="json-string">String</span> <span class="text-muted">// Hashed</span>,
+  <span class="json-key">"role"</span>: <span class="json-string">String</span> <span class="text-muted">// "admin", "super_admin"</span>,
+  <span class="json-key">"permissions"</span>: [<span class="json-string">String</span>],
+  <span class="json-key">"lastLogin"</span>: <span class="json-string">Date</span>,
+  <span class="json-key">"createdAt"</span>: <span class="json-string">Date</span>,
+  <span class="json-key">"updatedAt"</span>: <span class="json-string">Date</span>
+}</pre>
+                    </div>
+                    <h6 class="mt-3">Indexes:</h6>
+                    <ul>
+                      <li><code>email</code> (unique)</li>
+                      <li><code>role</code></li>
+                    </ul>
+                    <h6 class="mt-3">Sample Document:</h6>
+                    <div class="code-block">
+<pre><span class="json-key">{
+  "_id"</span>: <span class="json-string">ObjectId("60d5ec9af682fbd12a0b456c")</span>,
+  <span class="json-key">"name"</span>: <span class="json-string">"Admin User"</span>,
+  <span class="json-key">"email"</span>: <span class="json-string">"admin@example.com"</span>,
+  <span class="json-key">"password"</span>: <span class="json-string">"$2a$10$XYZ..."</span> <span class="text-muted">// Hashed password</span>,
+  <span class="json-key">"role"</span>: <span class="json-string">"admin"</span>,
+  <span class="json-key">"permissions"</span>: [<span class="json-string">"manage_users"</span>, <span class="json-string">"manage_flights"</span>, <span class="json-string">"manage_trains"</span>, <span class="json-string">"manage_hotels"</span>, <span class="json-string">"manage_bookings"</span>],
+  <span class="json-key">"lastLogin"</span>: <span class="json-string">ISODate("2025-07-01T10:15:00Z")</span>,
+  <span class="json-key">"createdAt"</span>: <span class="json-string">ISODate("2025-06-25T10:30:00Z")</span>,
+  <span class="json-key">"updatedAt"</span>: <span class="json-string">ISODate("2025-07-01T10:15:00Z")</span>
+}</pre>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Database Design Considerations -->
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Database Design Considerations</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <h5>MongoDB vs. Relational Database</h5>
+                <p>MongoDB was chosen over a relational database for the following reasons:</p>
+                <ul>
+                  <li><strong>Flexible Schema:</strong> Allows for easy adaptation to changing requirements</li>
+                  <li><strong>Document Structure:</strong> Natural fit for the hierarchical data in the system</li>
+                  <li><strong>Scalability:</strong> Horizontal scaling capabilities for future growth</li>
+                  <li><strong>Performance:</strong> Fast reads and writes for the query patterns in the application</li>
+                </ul>
+                
+                <h5>Embedding vs. Referencing</h5>
+                <p>The database design uses a mix of embedding and referencing:</p>
+                <ul>
+                  <li><strong>Embedding:</strong> Used for data that is always accessed together (e.g., traveler information in bookings)</li>
+                  <li><strong>Referencing:</strong> Used for relationships between major entities (e.g., user to booking)</li>
+                </ul>
+              </div>
+              <div class="col-md-6">
+                <h5>Indexing Strategy</h5>
+                <p>Indexes are created on fields that are frequently used in queries to improve performance:</p>
+                <ul>
+                  <li><strong>Single-Field Indexes:</strong> For simple queries on one field</li>
+                  <li><strong>Compound Indexes:</strong> For queries that filter on multiple fields</li>
+                  <li><strong>Unique Indexes:</strong> To enforce data integrity</li>
+                </ul>
+                
+                <h5>Security Considerations</h5>
+                <p>The database design includes several security measures:</p>
+                <ul>
+                  <li><strong>Password Hashing:</strong> User and admin passwords are hashed using bcrypt</li>
+                  <li><strong>Access Control:</strong> Different roles have different levels of access</li>
+                  <li><strong>Data Validation:</strong> Schema validation ensures data integrity</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-white py-4">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <h5>Online Booking System</h5>
+          <p class="mb-0">A comprehensive college project for booking trains, planes, and hotels.</p>
+        </div>
+        <div class="col-md-6 text-md-end">
+          <p class="mb-0">&copy; 2025 | Created for College Project</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Backend API - Project Tracker</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #0d6efd;
+      --secondary-color: #6c757d;
+      --success-color: #198754;
+      --info-color: #0dcaf0;
+      --warning-color: #ffc107;
+      --danger-color: #dc3545;
+      --light-color: #f8f9fa;
+      --dark-color: #212529;
+    }
+    
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #f5f5f5;
+    }
+    
+    .navbar-brand {
+      font-weight: 700;
+    }
+    
+    .card {
+      border: none;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .card-header {
+      border-radius: 10px 10px 0 0 !important;
+      font-weight: 600;
+    }
+    
+    .code-block {
+      background-color: #f8f9fa;
+      border-radius: 5px;
+      padding: 15px;
+      font-family: 'Courier New', monospace;
+      overflow-x: auto;
+    }
+    
+    .endpoint-card {
+      height: 100%;
+    }
+    
+    .endpoint-card .card-body {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .endpoint-card .card-text {
+      flex-grow: 1;
+    }
+    
+    .method-badge {
+      font-size: 0.8rem;
+      padding: 0.35em 0.65em;
+      font-weight: 600;
+    }
+    
+    .method-get {
+      background-color: #0dcaf0;
+      color: #fff;
+    }
+    
+    .method-post {
+      background-color: #198754;
+      color: #fff;
+    }
+    
+    .method-put {
+      background-color: #ffc107;
+      color: #212529;
+    }
+    
+    .method-delete {
+      background-color: #dc3545;
+      color: #fff;
+    }
+    
+    .api-path {
+      font-family: 'Courier New', monospace;
+      background-color: #f8f9fa;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+    
+    .tab-content {
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 0 0 10px 10px;
+    }
+    
+    .nav-tabs .nav-link {
+      border: none;
+      color: var(--secondary-color);
+      font-weight: 500;
+    }
+    
+    .nav-tabs .nav-link.active {
+      color: var(--primary-color);
+      border-bottom: 2px solid var(--primary-color);
+      background-color: transparent;
+    }
+    
+    .endpoint-icon {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      margin-right: 15px;
+    }
+    
+    .bg-primary-light {
+      background-color: rgba(13, 110, 253, 0.2);
+      color: var(--primary-color);
+    }
+    
+    .bg-success-light {
+      background-color: rgba(25, 135, 84, 0.2);
+      color: var(--success-color);
+    }
+    
+    .bg-warning-light {
+      background-color: rgba(255, 193, 7, 0.2);
+      color: var(--warning-color);
+    }
+    
+    .bg-info-light {
+      background-color: rgba(13, 202, 240, 0.2);
+      color: var(--info-color);
+    }
+    
+    .bg-danger-light {
+      background-color: rgba(220, 53, 69, 0.2);
+      color: var(--danger-color);
+    }
+    
+    .bg-secondary-light {
+      background-color: rgba(108, 117, 125, 0.2);
+      color: var(--secondary-color);
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">
+        <i class="fas fa-tasks me-2"></i>
+        Project Tracker
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="diagrams.html">UML Diagrams</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="database.html">Database</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="backend.html">Backend</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="frontend.html">Frontend</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="testing.html">Testing</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="documentation.html">Documentation</a>
+          </li>
+        </ul>
+        <a href="../../index.html" class="btn btn-outline-light" target="_blank">
+          <i class="fas fa-external-link-alt me-2"></i>
+          View Application
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container py-5">
+    <!-- Page Header -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="bg-primary text-white p-3 rounded me-3">
+                <i class="fas fa-server fa-2x"></i>
+              </div>
+              <div>
+                <h2 class="mb-0">Backend API</h2>
+                <p class="text-muted mb-0">RESTful API endpoints and server implementation</p>
+              </div>
+              <div class="ms-auto">
+                <span class="badge bg-success">Completed</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Backend Overview -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Backend Overview</h5>
+          </div>
+          <div class="card-body">
+            <p>The backend of the Online Booking System is built using <strong>Node.js</strong> with <strong>Express.js</strong> framework. It provides a RESTful API for the frontend to interact with the MongoDB database.</p>
+            <div class="row mt-4">
+              <div class="col-md-3 col-sm-6 mb-3">
+                <div class="d-flex align-items-center">
+                  <div class="endpoint-icon bg-success-light">
+                    <i class="fas fa-code fa-lg"></i>
+                  </div>
+                  <div>
+                    <h5 class="mb-0">Node.js + Express</h5>
+                    <p class="text-muted mb-0">Server Framework</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3 col-sm-6 mb-3">
+                <div class="d-flex align-items-center">
+                  <div class="endpoint-icon bg-info-light">
+                    <i class="fas fa-exchange-alt fa-lg"></i>
+                  </div>
+                  <div>
+                    <h5 class="mb-0">RESTful API</h5>
+                    <p class="text-muted mb-0">API Architecture</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3 col-sm-6 mb-3">
+                <div class="d-flex align-items-center">
+                  <div class="endpoint-icon bg-warning-light">
+                    <i class="fas fa-key fa-lg"></i>
+                  </div>
+                  <div>
+                    <h5 class="mb-0">JWT Authentication</h5>
+                    <p class="text-muted mb-0">Security</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3 col-sm-6 mb-3">
+                <div class="d-flex align-items-center">
+                  <div class="endpoint-icon bg-danger-light">
+                    <i class="fas fa-database fa-lg"></i>
+                  </div>
+                  <div>
+                    <h5 class="mb-0">Mongoose ODM</h5>
+                    <p class="text-muted mb-0">Database Integration</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- API Endpoints -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">API Endpoints</h5>
+          </div>
+          <div class="card-body">
+            <ul class="nav nav-tabs" id="apiTabs" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="auth-tab" data-bs-toggle="tab" data-bs-target="#auth" type="button" role="tab" aria-controls="auth" aria-selected="true">Authentication</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="search-tab" data-bs-toggle="tab" data-bs-target="#search" type="button" role="tab" aria-controls="search" aria-selected="false">Search</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="bookings-tab" data-bs-toggle="tab" data-bs-target="#bookings" type="button" role="tab" aria-controls="bookings" aria-selected="false">Bookings</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab" aria-controls="users" aria-selected="false">Users</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="admin-tab" data-bs-toggle="tab" data-bs-target="#admin" type="button" role="tab" aria-controls="admin" aria-selected="false">Admin</button>
+              </li>
+            </ul>
+            <div class="tab-content" id="apiTabsContent">
+              <!-- Authentication Endpoints -->
+              <div class="tab-pane fade show active" id="auth" role="tabpanel" aria-labelledby="auth-tab">
+                <h5 class="mb-3">Authentication Endpoints</h5>
+                <div class="table-responsive">
+                  <table class="table table-hover">
+                    <thead>
+                      <tr>
+                        <th>Method</th>
+                        <th>Endpoint</th>
+                        <th>Description</th>
+                        <th>Authentication</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><span class="badge method-badge method-post">POST</span></td>
+                        <td><code class="api-path">/api/auth/register</code></td>
+                        <td>Register a new user</td>
+                        <td>None</td>
+                      </tr>
+                      <tr>
+                        <td><span class="badge method-badge method-post">POST</span></td>
+                        <td><code class="api-path">/api/auth/login</code></td>
+                        <td>Login a user</td>
+                        <td>None</td>
+                      </tr>
+                      <tr>
+                        <td><span class="badge method-badge method-post">POST</span></td>
+                        <td><code class="api-path">/api/auth/admin/login</code></td>
+                        <td>Login an admin</td>
+                        <td>None</td>
+                      </tr>
+                      <tr>
+                        <td><span class="badge method-badge method-get">GET</span></td>
+                        <td><code class="api-path">/api/auth/verify</code></td>
+                        <td>Verify JWT token</td>
+                        <td>JWT</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                
+                <h6 class="mt-4">Example: Register a User</h6>
+                <div class="row">
+                  <div class="col-md-6">
+                    <p><strong>Request:</strong></p>
+                    <div class="code-block">
+<pre>POST /api/auth/register
+Content-Type: application/json
+
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "Password123",
+  "phone": "+91 9876543210",
+  "address": "123 Main St, Mumbai"
+}</pre>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <p><strong>Response:</strong></p>
+                    <div class="code-block">
+<pre>Status: 201 Created
+Content-Type: application/json
+
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "_id": "60d5ec9af682fbd12a0b4567",
+    "name": "John Doe",
+    "email": "john@example.com",
+    "phone": "+91 9876543210",
+    "role": "user"
+  }
+}</pre>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Search Endpoints -->
+              <div class="tab-pane fade" id="search" role="tabpanel" aria-labelledby="search-tab">
+                <h5 class="mb-3">Search Endpoints</h5>
+                <div class="table-responsive">
+                  <table class="table table-hover">
+                    <thead>
+                      <tr>
+                        <th>Method</th>
+                        <th>Endpoint</th>
+                        <th>Description</th>
+                        <th>Authentication</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><span class="badge method-badge method-get">GET</span></td>
+                        <td><code class="api-path">/api/search/flights</code></td>
+                        <td>Search for flights</td>
+                        <td>None</td>
+                      </tr>
+                      <tr>
+                        <td><span class="badge method-badge method-get">GET</span></td>
+                        <td><code class="api-path">/api/search/trains</code></td>
+                        <td>Search for trains</td>
+                        <td>None</td>
+                      </tr>
+                      <tr>
+                        <td><span class="badge method-badge method-get">GET</span></td>
+                        <td><code class="api-path">/api/search/hotels</code></td>
+                        <td>Search for hotels</td>
+                        <td>None</td>
+                      </tr>
+                      <tr>
+                        <td><span class="badge method-badge method-get">GET</span></td>
+                        <td><code class="api-path">/api/search/flights/:id</code></td>
+                        <td>Get flight details by ID</td>
+                        <td>None</td>
+                      </tr>
+                      <tr>
+                        <td><span class="badge method-badge method-get">GET</span></td>
+                        <td><code class="api-path">/api/search/trains/:id</code></td>
+                        <td>Get train details by ID</td>
+                        <td>None</td>
+                      </tr>
+                      <tr>
+                        <td><span class="badge method-badge method-get">GET</span></td>
+                        <td><code class="api-path">/api/search/hotels/:id</code></td>
+                        <td>Get hotel details by ID</td>
+                        <td>None</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                
+                <h6 class="mt-4">Example: Search for Flights</h6>
+                <div class="row">
+                  <div class="col-md-6">
+                    <p><strong>Request:</strong></p>
+                    <div class="code-block">
+<pre>GET /api/search/flights?source=Mumbai&destination=Delhi&date=2025-07-10
+Content-Type: application/json</pre>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <p><strong>Response:</strong></p>
+                    <div class="code-block">
+<pre>Status: 200 OK
+Content-Type: application/json
+
+[
+  {
+    "_id": "60d5ec9af682fbd12a0b4568",
+    "flightNumber": "AI302",
+    "airline": "Air India",
+    "source": "Mumbai",
+    "destination": "Delhi",
+    "departureTime": "2025-07-10T08:00:00Z",
+    "arrivalTime": "2025-07-10T10:30:00Z",
+    "duration": 150,
+    "price": 5500,
+    "availableSeats": 120,
+    "class": "Economy"
+  },
+  {
+    "_id": "60d5ec9af682fbd12a0b4569",
+    "flightNumber": "6E123",
+    "airline": "IndiGo",
+    "source": "Mumbai",
+    "destination": "Delhi",
+    "departureTime": "2025-07-10T12:00:00Z",
+    "arrivalTime": "2025-07-10T14:15:00Z",
+    "duration": 135,
+    "price": 4800,
+    "availableSeats": 85,
+    "class": "Economy"
+  }
+]</pre>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Bookings Endpoints -->
+              <div class="tab-pane fade" id="bookings" role="tabpanel" aria-labelledby="bookings-tab">
+                <h5 class="mb-3">Bookings Endpoints</h5>
+                <div class="table-responsive">
+                  <table class="table table-hover">
+                    <thead>
+                      <tr>
+                        <th>Method</th>
+                        <th>Endpoint</th>
+                        <th>Description</th>
+                        <th>Authentication</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><span class="badge method-badge method-post">POST</span></td>
+                        <td><code class="api-path">/api/bookings</code></td>
+                        <td>Create a new booking</td>
+                        <td>JWT</td>
+                      </tr>
+                      <tr>
+                        <td><span class="badge method-badge method-get">GET</span></td>
+                        <td><code class="api-path">/api/bookings/:id</code></td>
+                        <td>Get booking details by ID</td>
+                        <td>JWT</td>
+                      </tr>
+                      <tr>
+                        <td><span class="badge method-badge method-put">PUT</span></td>
+                        <td><code class="api-path">/api/bookings/:id/cancel</code></td>
+                        <td>Cancel a booking</td>
+                        <td>JWT</td>
+                      </tr>
+                      <tr>
+                        <td><span class="badge method-badge method-post">POST</span></td>
+                        <td><code class="api-path">/api/bookings/:id/payment</code></td>
+                        <td>Process payment for a booking</td>
+                        <td>JWT</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                
+                <h6 class="mt-4">Example: Create a Booking</h6>
+                <div class="row">
+                  <div class="col-md-6">
+                    <p><strong>Request:</strong></p>
+                    <div class="code-block">
+<pre>POST /api/bookings
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+{
+  "type": "flight",
+  "itemId": "60d5ec9af682fbd12a0b4568",
+  "travelerInfo": [
+    {
+      "name": "John Doe",
+      "age": 35,
+      "gender": "Male",
+      "idType": "Passport",
+      "idNumber": "A1234567"
+    }
+  ],
+  "paymentInfo": {
+    "method": "credit_card",
+    "amount": 5500
+  }
+}</pre>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <p><strong>Response:</strong></p>
+                    <div class="code-block">
+<pre>Status: 201 Created
+Content-Type: application/json
+
+{
+  "_id": "60d5ec9af682fbd12a0b456b",
+  "userId": "60d5ec9af682fbd12a0b4567",
+  "type": "flight",
+  "itemId": "60d5ec9af682fbd12a0b4568",
+  "status": "confirmed",
+  "bookingDate": "2025-07-01T15:30:00Z",
+  "travelDate": "2025-07-10T08:00:00Z",
+  "travelerInfo": [
+    {
+      "name": "John Doe",
+      "age": 35,
+      "gender": "Male",
+      "idType": "Passport",
+      "idNumber": "A1234567"
+    }
+  ],
+  "paymentInfo": {
+    "method": "credit_card",
+    "amount": 5500,
+    "transactionId": "txn_123456789",
+    "status": "completed"
+  },
+  "createdAt": "2025-07-01T15:30:00Z",
+  "updatedAt": "2025-07-01T15:30:00Z"
+}</pre>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Users Endpoints -->
+              <div class="tab-pane fade" id="users" role="tabpanel" aria-labelledby="users-tab">
+                <h5 class="mb-3">Users Endpoints</h5>
+                <div class="table-responsive">
+                  <table class="table table-hover">
+                    <thead>
+                      <tr>
+                        <th>Method</th>
+                        <th>Endpoint</th>
+                        <th>Description</th>
+                        <th>Authentication</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><span class="badge method-badge method-get">GET</span></td>
+                        <td><code class="api-path">/api/users/profile</code></td>
+                        <td>Get user profile</td>
+                        <td>JWT</td>
+                      </tr>
+                      <tr>
+                        <td><span class="badge method-badge method-put">PUT</span></td>
+                        <td><code class="api-path">/api/users/profile</code></td>
+                        <td>Update user profile</td>
+                        <td>JWT</td>
+                      </tr>
+                      <tr>
+                        <td><span class="badge method-badge method-get">GET</span></td>
+                        <td><code class="api-path">/api/users/bookings</code></td>
+                        <td>Get user bookings</td>
+                        <td>JWT</td>
+                      </tr>
+                      <tr>
+                        <td><span class="badge method-badge method-put">PUT</span></td>
+                        <td><code class="api-path">/api/users/password</code></td>
+                        <td>Change user password</td>
+                        <td>JWT</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                
+                <h6 class="mt-4">Example: Get User Profile</h6>
+                <div class="row">
+                  <div class="col-md-6">
+                    <p><strong>Request:</strong></p>
+                    <div class="code-block">
+<pre>GET /api/users/profile
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...</pre>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <p><strong>Response:</strong></p>
+                    <div class="code-block">
+<pre>Status: 200 OK
+Content-Type: application/json
+
+{
+  "_id": "60d5ec9af682fbd12a0b4567",
+  "name": "John Doe",
+  "email": "john@example.com",
+  "phone": "+91 9876543210",
+  "address": "123 Main St, Mumbai",
+  "role": "user",
+  "createdAt": "2025-06-25T10:30:00Z",
+  "updatedAt": "2025-06-25T10:30:00Z"
+}</pre>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Admin Endpoints -->
+              <div class="tab-pane fade" id="admin" role="tabpanel" aria-labelledby="admin-tab">
+                <h5 class="mb-3">Admin Endpoints</h5>
+                <div class="table-responsive">
+                  <table class="table table-hover">
+                    <thead>
+                      <tr>
+                        <th>Method</th>
+                        <th>Endpoint</th>
+                        <th>Description</th>
+                        <th>Authentication</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><span class="badge method-badge method-get">GET</span></td>
+                        <td><code class="api-path">/api/admin/users</code></td>
+                        <td>Get all users</td>
+                        <td>Admin JWT</td>
+                      </tr>
+                      <tr>
+                        <td><span class="badge method-badge method-get">GET</span></td>
+                        <td><code class="api-path">/api/admin/users/:id</code></td>
+                        <td>Get user by ID</td>
+                        <td>Admin JWT</td>
+                      </tr>
+                      <tr>
+                        <td><span class="badge method-badge method-put">PUT</span></td>
+                        <td><code class="api-path">/api/admin/users/:id</code></td>
+                        <td>Update user</td>
+                        <td>Admin JWT</td>
+                      </tr>
+                      <tr>
+                        <td><span class="badge method-badge method-delete">DELETE</span></td>
+                        <td><code class="api-path">/api/admin/users/:id</code></td>
+                        <td>Delete user</td>
+                        <td>Admin JWT</td>
+                      </tr>
+                      <tr>
+                        <td><span class="badge method-badge method-get">GET</span></td>
+                        <td><code class="api-path">/api/admin/bookings</code></td>
+                        <td>Get all bookings</td>
+                        <td>Admin JWT</td>
+                      </tr>
+                      <tr>
+                        <td><span class="badge method-badge method-post">POST</span></td>
+                        <td><code class="api-path">/api/admin/flights</code></td>
+                        <td>Create a flight</td>
+                        <td>Admin JWT</td>
+                      </tr>
+                      <tr>
+                        <td><span class="badge method-badge method-put">PUT</span></td>
+                        <td><code class="api-path">/api/admin/flights/:id</code></td>
+                        <td>Update a flight</td>
+                        <td>Admin JWT</td>
+                      </tr>
+                      <tr>
+                        <td><span class="badge method-badge method-delete">DELETE</span></td>
+                        <td><code class="api-path">/api/admin/flights/:id</code></td>
+                        <td>Delete a flight</td>
+                        <td>Admin JWT</td>
+                      </tr>
+                      <tr>
+                        <td><span class="badge method-badge method-post">POST</span></td>
+                        <td><code class="api-path">/api/admin/trains</code></td>
+                        <td>Create a train</td>
+                        <td>Admin JWT</td>
+                      </tr>
+                      <tr>
+                        <td><span class="badge method-badge method-put">PUT</span></td>
+                        <td><code class="api-path">/api/admin/trains/:id</code></td>
+                        <td>Update a train</td>
+                        <td>Admin JWT</td>
+                      </tr>
+                      <tr>
+                        <td><span class="badge method-badge method-delete">DELETE</span></td>
+                        <td><code class="api-path">/api/admin/trains/:id</code></td>
+                        <td>Delete a train</td>
+                        <td>Admin JWT</td>
+                      </tr>
+                      <tr>
+                        <td><span class="badge method-badge method-post">POST</span></td>
+                        <td><code class="api-path">/api/admin/hotels</code></td>
+                        <td>Create a hotel</td>
+                        <td>Admin JWT</td>
+                      </tr>
+                      <tr>
+                        <td><span class="badge method-badge method-put">PUT</span></td>
+                        <td><code class="api-path">/api/admin/hotels/:id</code></td>
+                        <td>Update a hotel</td>
+                        <td>Admin JWT</td>
+                      </tr>
+                      <tr>
+                        <td><span class="badge method-badge method-delete">DELETE</span></td>
+                        <td><code class="api-path">/api/admin/hotels/:id</code></td>
+                        <td>Delete a hotel</td>
+                        <td>Admin JWT</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Backend Architecture -->
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Backend Architecture</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <h5>Project Structure</h5>
+                <div class="code-block">
+<pre>backend/
+├── node_modules/
+├── models/
+│   ├── User.js
+│   ├── Flight.js
+│   ├── Train.js
+│   ├── Hotel.js
+│   ├── Booking.js
+│   └── Admin.js
+├── routes/
+│   ├── auth.js
+│   ├── search.js
+│   ├── bookings.js
+│   ├── users.js
+│   └── admin.js
+├── middleware/
+│   └── auth.js
+├── server.js
+├── package.json
+└── .env</pre>
+                </div>
+                
+                <h5 class="mt-4">Middleware</h5>
+                <p>The backend uses several middleware for various purposes:</p>
+                <ul>
+                  <li><strong>Authentication Middleware:</strong> Verifies JWT tokens and protects routes</li>
+                  <li><strong>CORS Middleware:</strong> Enables cross-origin requests from the frontend</li>
+                  <li><strong>Body Parser:</strong> Parses incoming request bodies</li>
+                  <li><strong>Error Handling Middleware:</strong> Catches and processes errors</li>
+                </ul>
+              </div>
+              <div class="col-md-6">
+                <h5>Authentication & Security</h5>
+                <p>The backend implements several security measures:</p>
+                <ul>
+                  <li><strong>JWT Authentication:</strong> Secure token-based authentication</li>
+                  <li><strong>Password Hashing:</strong> Passwords are hashed using bcrypt</li>
+                  <li><strong>Role-Based Access Control:</strong> Different roles have different access levels</li>
+                  <li><strong>Input Validation:</strong> All inputs are validated before processing</li>
+                  <li><strong>HTTPS Support:</strong> Secure communication between client and server</li>
+                </ul>
+                
+                <h5 class="mt-4">Database Integration</h5>
+                <p>The backend connects to MongoDB using Mongoose ODM:</p>
+                <div class="code-block">
+<pre>// server.js
+const mongoose = require('mongoose');
+
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useCreateIndex: true,
+  useFindAndModify: false
+})
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => console.error('MongoDB connection error:', err));</pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-white py-4">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <h5>Online Booking System</h5>
+          <p class="mb-0">A comprehensive college project for booking trains, planes, and hotels.</p>
+        </div>
+        <div class="col-md-6 text-md-end">
+          <p class="mb-0">&copy; 2025 | Created for College Project</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

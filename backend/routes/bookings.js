@@ -1,0 +1,537 @@
+const PDFDocument = require("pdfkit");
+const express = require("express");
+const router = express.Router();
+const Booking = require("../models/Booking");
+const Flight = require("../models/Flight");
+const Train = require("../models/Train");
+const Hotel = require("../models/Hotel");
+const { authenticateUser } = require("../middleware/auth"); // Correctly import the authenticateUser function
+
+// Create flight booking
+router.post("/flights", authenticateUser, async (req, res) => {
+  try {
+    const { flightId, passengerDetails } = req.body;
+
+    // Check if flight exists and has available seats
+    const flight = await Flight.findById(flightId);
+
+    if (!flight) {
+      return res.status(404).json({
+        error: {
+          message: "Flight not found",
+          status: 404,
+        },
+      });
+    }
+
+    if (flight.availableSeats <= 0) {
+      return res.status(409).json({
+        error: {
+          message: "No available seats for this flight",
+          status: 409,
+        },
+      });
+    }
+
+    // Create booking
+    const booking = new Booking({
+      userId: req.user._id,
+      bookingType: "flight",
+      totalAmount: flight.price,
+      status: "confirmed", // Set status to confirmed
+      paymentStatus: "completed", // Set payment status to completed
+      trip: {
+        type: "flight",
+        destination: flight.destination,
+        startDate: flight.departureTime,
+        endDate: flight.arrivalTime,
+        flightDetails: {
+          flightId: flight._id,
+          flightNumber: flight.flightNumber,
+          airline: flight.airline,
+          source: flight.source,
+          destination: flight.destination,
+          departureTime: flight.departureTime,
+          arrivalTime: flight.arrivalTime,
+          passengerDetails,
+        },
+      },
+    });
+
+    await booking.save();
+
+    // Update flight available seats
+    flight.availableSeats -= 1;
+    await flight.save();
+
+    res.status(201).json({
+      message: "Flight booking created successfully",
+      booking,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: {
+        message: error.message,
+        status: 500,
+      },
+    });
+  }
+});
+
+// Create train booking
+router.post("/trains", authenticateUser, async (req, res) => {
+  try {
+    const { trainId, passengerDetails } = req.body;
+
+    // Check if train exists and has available seats
+    const train = await Train.findById(trainId);
+
+    if (!train) {
+      return res.status(404).json({
+        error: {
+          message: "Train not found",
+          status: 404,
+        },
+      });
+    }
+
+    if (train.availableSeats <= 0) {
+      return res.status(409).json({
+        error: {
+          message: "No available seats for this train",
+          status: 409,
+        },
+      });
+    }
+
+    // Create booking
+    const booking = new Booking({
+      userId: req.user._id,
+      bookingType: "train",
+      totalAmount: train.price,
+      status: "confirmed", // Set status to confirmed
+      paymentStatus: "completed", // Set payment status to completed
+      trip: {
+        type: "train",
+        destination: train.destination,
+        startDate: train.departureTime,
+        endDate: train.arrivalTime,
+        trainDetails: {
+          trainId: train._id,
+          trainNumber: train.trainNumber,
+          trainName: train.trainName,
+          source: train.source,
+          destination: train.destination,
+          departureTime: train.departureTime,
+          arrivalTime: train.arrivalTime,
+          class: train.class,
+          passengerDetails,
+        },
+      },
+    });
+
+    await booking.save();
+
+    // Update train available seats
+    train.availableSeats -= 1;
+    await train.save();
+
+    res.status(201).json({
+      message: "Train booking created successfully",
+      booking,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: {
+        message: error.message,
+        status: 500,
+      },
+    });
+  }
+});
+
+// Create hotel booking
+router.post("/hotels", authenticateUser, async (req, res) => {
+  try {
+    const { hotelId, checkInDate, checkOutDate, guestDetails } = req.body;
+
+    // Check if hotel exists and has available rooms
+    const hotel = await Hotel.findById(hotelId);
+
+    if (!hotel) {
+      return res.status(404).json({
+        error: {
+          message: "Hotel not found",
+          status: 404,
+        },
+      });
+    }
+
+    if (hotel.availableRooms <= 0) {
+      return res.status(409).json({
+        error: {
+          message: "No available rooms for this hotel",
+          status: 409,
+        },
+      });
+    }
+
+    // Calculate number of nights
+    const checkIn = new Date(checkInDate);
+    const checkOut = new Date(checkOutDate);
+    const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+
+    if (nights <= 0) {
+      return res.status(400).json({
+        error: {
+          message: "Check-out date must be after check-in date",
+          status: 400,
+        },
+      });
+    }
+
+    // Calculate total amount
+    const totalAmount = hotel.price * nights;
+
+    // Create booking
+    const booking = new Booking({
+      userId: req.user._id,
+      bookingType: "hotel",
+      totalAmount,
+      status: "confirmed", // Set status to confirmed
+      paymentStatus: "completed", // Set payment status to completed
+      trip: {
+        type: "hotel",
+        destination: hotel.location,
+        startDate: checkIn,
+        endDate: checkOut,
+        hotelDetails: {
+          hotelId: hotel._id,
+          name: hotel.name,
+          location: hotel.location,
+          checkInDate: checkIn,
+          checkOutDate: checkOut,
+          nights,
+          roomType: hotel.roomType,
+          guestDetails,
+        },
+      },
+    });
+
+    await booking.save();
+
+    // Update hotel available rooms
+    hotel.availableRooms -= 1;
+    await hotel.save();
+
+    res.status(201).json({
+      message: "Hotel booking created successfully",
+      booking,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: {
+        message: error.message,
+        status: 500,
+      },
+    });
+  }
+});
+
+// Process payment for booking
+router.post("/:id/payment", authenticateUser, async (req, res) => {
+  try {
+    const { paymentMethod, paymentDetails } = req.body;
+
+    // Find booking
+    const booking = await Booking.findById(req.params.id);
+
+    if (!booking) {
+      return res.status(404).json({
+        error: {
+          message: "Booking not found",
+          status: 404,
+        },
+      });
+    }
+
+    // Check if booking belongs to user
+    if (booking.userId.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        error: {
+          message: "Unauthorized. This booking does not belong to you.",
+          status: 403,
+        },
+      });
+    }
+
+    // Check if booking is already paid
+    if (booking.paymentStatus === "completed") {
+      return res.status(409).json({
+        error: {
+          message: "Payment has already been processed for this booking",
+          status: 409,
+        },
+      });
+    }
+
+    // In a real application, you would integrate with a payment gateway here
+    // For this example, we will simulate a successful payment
+
+    // Generate a fake payment ID
+    const paymentId = "PAY_" + Math.random().toString(36).substring(2, 15);
+
+    // Update booking
+    booking.paymentStatus = "completed";
+    booking.status = "confirmed";
+    booking.paymentId = paymentId;
+
+    await booking.save();
+
+    res.status(200).json({
+      message: "Payment processed successfully",
+      booking,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: {
+        message: error.message,
+        status: 500,
+      },
+    });
+  }
+});
+
+// Get user's bookings
+router.get("/history", authenticateUser, async (req, res) => {
+  try {
+    const bookings = await Booking.find({ userId: req.user._id }).sort({bookingDate: -1,
+    });
+
+    res.status(200).json({
+      count: bookings.length,
+      bookings,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: {
+        message: error.message,
+        status: 500,
+      },
+    });
+  }
+});
+
+// Get booking by ID
+router.get("/:id", authenticateUser, async (req, res) => {
+  try {
+    const booking = await Booking.findById(req.params.id);
+
+    if (!booking) {
+      return res.status(404).json({
+        error: {
+          message: "Booking not found",
+          status: 404,
+        },
+      });
+    }
+
+    // Check if booking belongs to user
+    if (booking.userId.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        error: {
+          message: "Unauthorized. This booking does not belong to you.",
+          status: 403,
+        },
+      });
+    }
+
+    res.status(200).json({ booking });
+  } catch (error) {
+    res.status(500).json({
+      error: {
+        message: error.message,
+        status: 500,
+      },
+    });
+  }
+});
+
+// Cancel booking
+router.delete("/:id", authenticateUser, async (req, res) => {
+  try {
+    const booking = await Booking.findById(req.params.id);
+
+    if (!booking) {
+      return res.status(404).json({
+        error: {
+          message: "Booking not found",
+          status: 404,
+        },
+      });
+    }
+
+    // Check if booking belongs to user
+    if (booking.userId.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        error: {
+          message: "Unauthorized. This booking does not belong to you.",
+          status: 403,
+        },
+      });
+    }
+
+    // Check if booking can be cancelled
+    if (booking.status === "cancelled") {
+      return res.status(409).json({
+        error: {
+          message: "Booking is already cancelled",
+          status: 409,
+        },
+      });
+    }
+
+    // Update booking status
+    booking.status = "cancelled";
+
+    // If payment was completed, set to refunded
+    if (booking.paymentStatus === "completed") {
+      booking.paymentStatus = "refunded";
+    }
+
+    await booking.save();
+
+    // Update available seats/rooms based on booking type
+    if (booking.bookingType === "flight" && booking.trip.flightDetails) {
+      const flight = await Flight.findById(booking.trip.flightDetails.flightId);
+      if (flight) {
+        flight.availableSeats += 1;
+        await flight.save();
+      }
+    } else if (booking.bookingType === "train" && booking.trip.trainDetails) {
+      const train = await Train.findById(booking.trip.trainDetails.trainId);
+      if (train) {
+        train.availableSeats += 1;
+        await train.save();
+      }
+    } else if (booking.bookingType === "hotel" && booking.trip.hotelDetails) {
+      const hotel = await Hotel.findById(booking.trip.hotelDetails.hotelId);
+      if (hotel) {
+        hotel.availableRooms += 1;
+        await hotel.save();
+      }
+    }
+
+    res.status(200).json({
+      message: "Booking cancelled successfully",
+      booking,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: {
+        message: error.message,
+        status: 500,
+      },
+    });
+  }
+});
+
+// @route   GET /api/bookings/ticket/:bookingId
+// @desc    Download booking ticket as PDF
+// @access  Private
+router.get("/ticket/:bookingId", authenticateUser, async (req, res) => {
+  try {
+    const booking = await Booking.findById(req.params.bookingId);
+
+    if (!booking) {
+      return res.status(404).json({ msg: "Booking not found" });
+    }
+
+    // Ensure the user requesting the ticket owns the booking
+    if (booking.userId.toString() !== req.user._id.toString()) {
+      return res.status(401).json({ msg: "User not authorized" });
+    }
+
+    const doc = new PDFDocument();
+    // For sending directly as response, use res.pipe(doc)
+    doc.pipe(res);
+
+    // Set response headers for PDF download
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=ticket_${booking._id}.pdf`
+    );
+
+    doc.fontSize(25).text("TravelEase Booking Confirmation", { align: "center" });
+    doc.moveDown();
+
+    doc.fontSize(16).text(`Booking ID: ${booking._id}`);
+    doc.text(`User: ${req.user.username} (${req.user.email})`);
+    doc.text(
+      `Booking Date: ${new Date(booking.bookingDate).toLocaleDateString()}`
+    );
+    doc.moveDown();
+
+    // Add booking details based on type
+    if (booking.bookingType === "flight" && booking.trip.flightDetails) {
+      doc.fontSize(14).text("Flight Details:", { underline: true });
+      doc.text(`Flight Number: ${booking.trip.flightDetails.flightNumber}`);
+      doc.text(`Airline: ${booking.trip.flightDetails.airline}`);
+      doc.text(
+        `From: ${booking.trip.flightDetails.source} To: ${booking.trip.flightDetails.destination}`
+      );
+      doc.text(
+        `Departure: ${new Date(booking.trip.flightDetails.departureTime).toLocaleString()}`
+      );
+      doc.text(
+        `Arrival: ${new Date(booking.trip.flightDetails.arrivalTime).toLocaleString()}`
+      );
+      doc.moveDown();
+    }
+
+    if (booking.bookingType === "train" && booking.trip.trainDetails) {
+      doc.fontSize(14).text("Train Details:", { underline: true });
+      doc.text(`Train Number: ${booking.trip.trainDetails.trainNumber}`);
+      doc.text(`Train Name: ${booking.trip.trainDetails.trainName}`);
+      doc.text(
+        `From: ${booking.trip.trainDetails.source} To: ${booking.trip.trainDetails.destination}`
+      );
+      doc.text(
+        `Departure: ${new Date(booking.trip.trainDetails.departureTime).toLocaleString()}`
+      );
+      doc.text(
+        `Arrival: ${new Date(booking.trip.trainDetails.arrivalTime).toLocaleString()}`
+      );
+      doc.text(`Class: ${booking.trip.trainDetails.class}`);
+      doc.moveDown();
+    }
+
+    if (booking.bookingType === "hotel" && booking.trip.hotelDetails) {
+      doc.fontSize(14).text("Hotel Details:", { underline: true });
+      doc.text(`Hotel Name: ${booking.trip.hotelDetails.name}`);
+      doc.text(`Location: ${booking.trip.hotelDetails.location}`);
+      doc.text(
+        `Check-in: ${new Date(booking.trip.hotelDetails.checkInDate).toLocaleDateString()}`
+      );
+      doc.text(
+        `Check-out: ${new Date(booking.trip.hotelDetails.checkOutDate).toLocaleDateString()}`
+      );
+      doc.text(`Nights: ${booking.trip.hotelDetails.nights}`);
+      doc.text(`Room Type: ${booking.trip.hotelDetails.roomType}`);
+      doc.moveDown();
+    }
+
+    doc.fontSize(16).text(`Total Amount: ₹${booking.totalAmount}`, { align: "right" });
+    doc.fontSize(12).text(`Status: ${booking.status}`, { align: "right" });
+    doc.text(`Payment Status: ${booking.paymentStatus}`, { align: "right" });
+
+    doc.end();
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
+module.exports = router;
+

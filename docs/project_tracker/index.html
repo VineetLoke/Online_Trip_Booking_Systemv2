@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Online Booking System - Project Tracker</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #0d6efd;
+      --secondary-color: #6c757d;
+      --success-color: #198754;
+      --info-color: #0dcaf0;
+      --warning-color: #ffc107;
+      --danger-color: #dc3545;
+      --light-color: #f8f9fa;
+      --dark-color: #212529;
+    }
+    
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #f5f5f5;
+    }
+    
+    .navbar-brand {
+      font-weight: 700;
+    }
+    
+    .card {
+      border: none;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .card-header {
+      border-radius: 10px 10px 0 0 !important;
+      font-weight: 600;
+    }
+    
+    .progress {
+      height: 10px;
+      border-radius: 5px;
+    }
+    
+    .phase-complete {
+      background-color: rgba(25, 135, 84, 0.1);
+    }
+    
+    .phase-in-progress {
+      background-color: rgba(13, 110, 253, 0.1);
+    }
+    
+    .phase-pending {
+      background-color: rgba(108, 117, 125, 0.1);
+    }
+    
+    .icon-container {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 15px;
+    }
+    
+    .bg-primary-light {
+      background-color: rgba(13, 110, 253, 0.2);
+      color: var(--primary-color);
+    }
+    
+    .bg-success-light {
+      background-color: rgba(25, 135, 84, 0.2);
+      color: var(--success-color);
+    }
+    
+    .bg-warning-light {
+      background-color: rgba(255, 193, 7, 0.2);
+      color: var(--warning-color);
+    }
+    
+    .bg-info-light {
+      background-color: rgba(13, 202, 240, 0.2);
+      color: var(--info-color);
+    }
+    
+    .bg-secondary-light {
+      background-color: rgba(108, 117, 125, 0.2);
+      color: var(--secondary-color);
+    }
+    
+    .bg-danger-light {
+      background-color: rgba(220, 53, 69, 0.2);
+      color: var(--danger-color);
+    }
+    
+    .timeline {
+      position: relative;
+      padding-left: 30px;
+    }
+    
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 2px;
+      height: 100%;
+      background-color: var(--primary-color);
+    }
+    
+    .timeline-item {
+      position: relative;
+      margin-bottom: 30px;
+    }
+    
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -34px;
+      top: 0;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: var(--primary-color);
+    }
+    
+    .timeline-item.completed::before {
+      background-color: var(--success-color);
+    }
+    
+    .timeline-item.in-progress::before {
+      background-color: var(--warning-color);
+    }
+    
+    .timeline-item.pending::before {
+      background-color: var(--secondary-color);
+    }
+    
+    .timeline-date {
+      font-size: 0.85rem;
+      color: var(--secondary-color);
+      margin-bottom: 5px;
+    }
+    
+    .timeline-content {
+      padding: 15px;
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .timeline-title {
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+    
+    .badge-pill {
+      border-radius: 50rem;
+      padding: 0.35em 0.65em;
+      font-size: 0.75em;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">
+        <i class="fas fa-tasks me-2"></i>
+        Project Tracker
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link active" href="index.html">Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="diagrams.html">UML Diagrams</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="database.html">Database</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="backend.html">Backend</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="frontend.html">Frontend</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="testing.html">Testing</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="documentation.html">Documentation</a>
+          </li>
+        </ul>
+        <a href="../../index.html" class="btn btn-outline-light" target="_blank">
+          <i class="fas fa-external-link-alt me-2"></i>
+          View Application
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container py-5">
+    <!-- Project Overview -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex align-items-center mb-3">
+              <div class="icon-container bg-primary-light">
+                <i class="fas fa-globe-americas fa-lg"></i>
+              </div>
+              <div>
+                <h2 class="mb-0">Online Booking System</h2>
+                <p class="text-muted mb-0">College Project</p>
+              </div>
+              <div class="ms-auto">
+                <span class="badge bg-success">In Progress</span>
+              </div>
+            </div>
+            <p class="mb-4">A comprehensive online booking system for trains, planes, and hotels with frontend, backend, database, UML diagrams, and project tracking documentation.</p>
+            <div class="row">
+              <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
+                <div class="d-flex align-items-center">
+                  <div class="icon-container bg-success-light">
+                    <i class="fas fa-check-circle"></i>
+                  </div>
+                  <div>
+                    <h5 class="mb-0">6</h5>
+                    <p class="text-muted mb-0">Phases Completed</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
+                <div class="d-flex align-items-center">
+                  <div class="icon-container bg-warning-light">
+                    <i class="fas fa-spinner"></i>
+                  </div>
+                  <div>
+                    <h5 class="mb-0">1</h5>
+                    <p class="text-muted mb-0">Phases In Progress</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
+                <div class="d-flex align-items-center">
+                  <div class="icon-container bg-secondary-light">
+                    <i class="fas fa-hourglass-half"></i>
+                  </div>
+                  <div>
+                    <h5 class="mb-0">1</h5>
+                    <p class="text-muted mb-0">Phases Pending</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3 col-sm-6">
+                <div class="d-flex align-items-center">
+                  <div class="icon-container bg-info-light">
+                    <i class="fas fa-calendar-alt"></i>
+                  </div>
+                  <div>
+                    <h5 class="mb-0">July 5, 2025</h5>
+                    <p class="text-muted mb-0">Last Updated</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="mt-4">
+              <div class="d-flex justify-content-between mb-1">
+                <span>Overall Progress</span>
+                <span>75%</span>
+              </div>
+              <div class="progress">
+                <div class="progress-bar bg-success" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Project Phases -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Project Phases</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <!-- Phase 1 -->
+              <div class="col-md-6 col-lg-3 mb-4">
+                <div class="card h-100 phase-complete">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between mb-3">
+                      <h5 class="card-title">Phase 1</h5>
+                      <span class="badge bg-success">Completed</span>
+                    </div>
+                    <h6>Project Planning</h6>
+                    <p class="card-text small">Technology stack selection and project setup.</p>
+                    <div class="d-flex justify-content-between mt-3">
+                      <small class="text-muted">Progress</small>
+                      <small class="text-success">100%</small>
+                    </div>
+                    <div class="progress mt-1">
+                      <div class="progress-bar bg-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Phase 2 -->
+              <div class="col-md-6 col-lg-3 mb-4">
+                <div class="card h-100 phase-complete">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between mb-3">
+                      <h5 class="card-title">Phase 2</h5>
+                      <span class="badge bg-success">Completed</span>
+                    </div>
+                    <h6>UML Diagrams</h6>
+                    <p class="card-text small">System design and UML diagrams creation.</p>
+                    <div class="d-flex justify-content-between mt-3">
+                      <small class="text-muted">Progress</small>
+                      <small class="text-success">100%</small>
+                    </div>
+                    <div class="progress mt-1">
+                      <div class="progress-bar bg-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Phase 3 -->
+              <div class="col-md-6 col-lg-3 mb-4">
+                <div class="card h-100 phase-complete">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between mb-3">
+                      <h5 class="card-title">Phase 3</h5>
+                      <span class="badge bg-success">Completed</span>
+                    </div>
+                    <h6>Database Design</h6>
+                    <p class="card-text small">Database schema design and setup.</p>
+                    <div class="d-flex justify-content-between mt-3">
+                      <small class="text-muted">Progress</small>
+                      <small class="text-success">100%</small>
+                    </div>
+                    <div class="progress mt-1">
+                      <div class="progress-bar bg-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Phase 4 -->
+              <div class="col-md-6 col-lg-3 mb-4">
+                <div class="card h-100 phase-complete">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between mb-3">
+                      <h5 class="card-title">Phase 4</h5>
+                      <span class="badge bg-success">Completed</span>
+                    </div>
+                    <h6>Backend Development</h6>
+                    <p class="card-text small">API development and database integration.</p>
+                    <div class="d-flex justify-content-between mt-3">
+                      <small class="text-muted">Progress</small>
+                      <small class="text-success">100%</small>
+                    </div>
+                    <div class="progress mt-1">
+                      <div class="progress-bar bg-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Phase 5 -->
+              <div class="col-md-6 col-lg-3 mb-4">
+                <div class="card h-100 phase-complete">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between mb-3">
+                      <h5 class="card-title">Phase 5</h5>
+                      <span class="badge bg-success">Completed</span>
+                    </div>
+                    <h6>Frontend Development</h6>
+                    <p class="card-text small">UI design and implementation.</p>
+                    <div class="d-flex justify-content-between mt-3">
+                      <small class="text-muted">Progress</small>
+                      <small class="text-success">100%</small>
+                    </div>
+                    <div class="progress mt-1">
+                      <div class="progress-bar bg-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Phase 6 -->
+              <div class="col-md-6 col-lg-3 mb-4">
+                <div class="card h-100 phase-complete">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between mb-3">
+                      <h5 class="card-title">Phase 6</h5>
+                      <span class="badge bg-success">Completed</span>
+                    </div>
+                    <h6>Testing</h6>
+                    <p class="card-text small">Unit, integration, and user acceptance testing.</p>
+                    <div class="d-flex justify-content-between mt-3">
+                      <small class="text-muted">Progress</small>
+                      <small class="text-success">100%</small>
+                    </div>
+                    <div class="progress mt-1">
+                      <div class="progress-bar bg-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Phase 7 -->
+              <div class="col-md-6 col-lg-3 mb-4">
+                <div class="card h-100 phase-in-progress">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between mb-3">
+                      <h5 class="card-title">Phase 7</h5>
+                      <span class="badge bg-primary">In Progress</span>
+                    </div>
+                    <h6>Documentation</h6>
+                    <p class="card-text small">Project tracking and documentation.</p>
+                    <div class="d-flex justify-content-between mt-3">
+                      <small class="text-muted">Progress</small>
+                      <small class="text-primary">50%</small>
+                    </div>
+                    <div class="progress mt-1">
+                      <div class="progress-bar bg-primary" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Phase 8 -->
+              <div class="col-md-6 col-lg-3 mb-4">
+                <div class="card h-100 phase-pending">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between mb-3">
+                      <h5 class="card-title">Phase 8</h5>
+                      <span class="badge bg-secondary">Pending</span>
+                    </div>
+                    <h6>Blackbook Compilation</h6>
+                    <p class="card-text small">Final PDF compilation and review.</p>
+                    <div class="d-flex justify-content-between mt-3">
+                      <small class="text-muted">Progress</small>
+                      <small class="text-secondary">0%</small>
+                    </div>
+                    <div class="progress mt-1">
+                      <div class="progress-bar bg-secondary" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Project Timeline -->
+    <div class="row">
+      <div class="col-md-6 mb-4">
+        <div class="card h-100">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Project Timeline</h5>
+          </div>
+          <div class="card-body">
+            <div class="timeline">
+              <div class="timeline-item completed">
+                <div class="timeline-date">July 5, 2025</div>
+                <div class="timeline-content">
+                  <h5 class="timeline-title">Project Planning Completed</h5>
+                  <p>Selected technology stack: HTML/CSS/JS/Bootstrap for frontend, Node.js with Express.js for backend, and MongoDB for database.</p>
+                </div>
+              </div>
+              <div class="timeline-item completed">
+                <div class="timeline-date">July 5, 2025</div>
+                <div class="timeline-content">
+                  <h5 class="timeline-title">UML Diagrams Completed</h5>
+                  <p>Created Use Case, ER, Class, and Sequence diagrams for the system.</p>
+                </div>
+              </div>
+              <div class="timeline-item completed">
+                <div class="timeline-date">July 5, 2025</div>
+                <div class="timeline-content">
+                  <h5 class="timeline-title">Database Design Completed</h5>
+                  <p>Designed MongoDB schema and set up database with sample data.</p>
+                </div>
+              </div>
+              <div class="timeline-item completed">
+                <div class="timeline-date">July 5, 2025</div>
+                <div class="timeline-content">
+                  <h5 class="timeline-title">Backend Development Completed</h5>
+                  <p>Developed RESTful API endpoints for authentication, search, and booking management.</p>
+                </div>
+              </div>
+              <div class="timeline-item completed">
+                <div class="timeline-date">July 5, 2025</div>
+                <div class="timeline-content">
+                  <h5 class="timeline-title">Frontend Development Completed</h5>
+                  <p>Created responsive UI for all pages and integrated with backend APIs.</p>
+                </div>
+              </div>
+              <div class="timeline-item completed">
+                <div class="timeline-date">July 5, 2025</div>
+                <div class="timeline-content">
+                  <h5 class="timeline-title">Testing Completed</h5>
+                  <p>Performed unit, integration, and user acceptance testing.</p>
+                </div>
+              </div>
+              <div class="timeline-item in-progress">
+                <div class="timeline-date">July 5, 2025</div>
+                <div class="timeline-content">
+                  <h5 class="timeline-title">Documentation In Progress</h5>
+                  <p>Creating project tracking system and comprehensive documentation.</p>
+                </div>
+              </div>
+              <div class="timeline-item pending">
+                <div class="timeline-date">Upcoming</div>
+                <div class="timeline-content">
+                  <h5 class="timeline-title">Blackbook Compilation Pending</h5>
+                  <p>Final compilation of all documentation into a PDF for printing.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Project Components -->
+      <div class="col-md-6 mb-4">
+        <div class="card h-100">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Project Components</h5>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Component</th>
+                    <th>Status</th>
+                    <th>Details</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <i class="fas fa-sitemap text-primary me-2"></i>
+                        UML Diagrams
+                      </div>
+                    </td>
+                    <td><span class="badge bg-success">Completed</span></td>
+                    <td><a href="diagrams.html" class="btn btn-sm btn-outline-primary">View</a></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <i class="fas fa-database text-primary me-2"></i>
+                        Database
+                      </div>
+                    </td>
+                    <td><span class="badge bg-success">Completed</span></td>
+                    <td><a href="database.html" class="btn btn-sm btn-outline-primary">View</a></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <i class="fas fa-server text-primary me-2"></i>
+                        Backend API
+                      </div>
+                    </td>
+                    <td><span class="badge bg-success">Completed</span></td>
+                    <td><a href="backend.html" class="btn btn-sm btn-outline-primary">View</a></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <i class="fas fa-desktop text-primary me-2"></i>
+                        Frontend
+                      </div>
+                    </td>
+                    <td><span class="badge bg-success">Completed</span></td>
+                    <td><a href="frontend.html" class="btn btn-sm btn-outline-primary">View</a></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <i class="fas fa-vial text-primary me-2"></i>
+                        Testing
+                      </div>
+                    </td>
+                    <td><span class="badge bg-success">Completed</span></td>
+                    <td><a href="testing.html" class="btn btn-sm btn-outline-primary">View</a></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <i class="fas fa-file-alt text-primary me-2"></i>
+                        Documentation
+                      </div>
+                    </td>
+                    <td><span class="badge bg-primary">In Progress</span></td>
+                    <td><a href="documentation.html" class="btn btn-sm btn-outline-primary">View</a></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <i class="fas fa-book text-primary me-2"></i>
+                        Blackbook
+                      </div>
+                    </td>
+                    <td><span class="badge bg-secondary">Pending</span></td>
+                    <td><button class="btn btn-sm btn-outline-secondary" disabled>View</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-white py-4">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <h5>Online Booking System</h5>
+          <p class="mb-0">A comprehensive college project for booking trains, planes, and hotels.</p>
+        </div>
+        <div class="col-md-6 text-md-end">
+          <p class="mb-0">&copy; 2025 | Created for College Project</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

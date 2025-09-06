@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Frontend - Project Tracker</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #0d6efd;
+      --secondary-color: #6c757d;
+      --success-color: #198754;
+      --info-color: #0dcaf0;
+      --warning-color: #ffc107;
+      --danger-color: #dc3545;
+      --light-color: #f8f9fa;
+      --dark-color: #212529;
+    }
+    
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #f5f5f5;
+    }
+    
+    .navbar-brand {
+      font-weight: 700;
+    }
+    
+    .card {
+      border: none;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .card-header {
+      border-radius: 10px 10px 0 0 !important;
+      font-weight: 600;
+    }
+    
+    .code-block {
+      background-color: #f8f9fa;
+      border-radius: 5px;
+      padding: 15px;
+      font-family: 'Courier New', monospace;
+      overflow-x: auto;
+    }
+    
+    .page-preview {
+      border: 1px solid #dee2e6;
+      border-radius: 5px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .page-preview img {
+      width: 100%;
+      height: auto;
+      object-fit: cover;
+    }
+    
+    .component-icon {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      margin-right: 15px;
+    }
+    
+    .bg-primary-light {
+      background-color: rgba(13, 110, 253, 0.2);
+      color: var(--primary-color);
+    }
+    
+    .bg-success-light {
+      background-color: rgba(25, 135, 84, 0.2);
+      color: var(--success-color);
+    }
+    
+    .bg-warning-light {
+      background-color: rgba(255, 193, 7, 0.2);
+      color: var(--warning-color);
+    }
+    
+    .bg-info-light {
+      background-color: rgba(13, 202, 240, 0.2);
+      color: var(--info-color);
+    }
+    
+    .bg-danger-light {
+      background-color: rgba(220, 53, 69, 0.2);
+      color: var(--danger-color);
+    }
+    
+    .bg-secondary-light {
+      background-color: rgba(108, 117, 125, 0.2);
+      color: var(--secondary-color);
+    }
+    
+    .tab-content {
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 0 0 10px 10px;
+    }
+    
+    .nav-tabs .nav-link {
+      border: none;
+      color: var(--secondary-color);
+      font-weight: 500;
+    }
+    
+    .nav-tabs .nav-link.active {
+      color: var(--primary-color);
+      border-bottom: 2px solid var(--primary-color);
+      background-color: transparent;
+    }
+    
+    .color-swatch {
+      width: 30px;
+      height: 30px;
+      border-radius: 5px;
+      display: inline-block;
+      margin-right: 10px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">
+        <i class="fas fa-tasks me-2"></i>
+        Project Tracker
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="diagrams.html">UML Diagrams</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="database.html">Database</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="backend.html">Backend</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="frontend.html">Frontend</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="testing.html">Testing</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="documentation.html">Documentation</a>
+          </li>
+        </ul>
+        <a href="../../index.html" class="btn btn-outline-light" target="_blank">
+          <i class="fas fa-external-link-alt me-2"></i>
+          View Application
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container py-5">
+    <!-- Page Header -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="bg-primary text-white p-3 rounded me-3">
+                <i class="fas fa-laptop-code fa-2x"></i>
+              </div>
+              <div>
+                <h2 class="mb-0">Frontend</h2>
+                <p class="text-muted mb-0">User interface and client-side implementation</p>
+              </div>
+              <div class="ms-auto">
+                <span class="badge bg-success">Completed</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Frontend Overview -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Frontend Overview</h5>
+          </div>
+          <div class="card-body">
+            <p>The frontend of the Online Booking System is built using <strong>HTML5</strong>, <strong>CSS3</strong>, <strong>JavaScript</strong>, and <strong>Bootstrap 5</strong>. It provides a responsive and user-friendly interface for users to search, book, and manage their travel arrangements.</p>
+            <div class="row mt-4">
+              <div class="col-md-3 col-sm-6 mb-3">
+                <div class="d-flex align-items-center">
+                  <div class="component-icon bg-success-light">
+                    <i class="fab fa-html5 fa-lg"></i>
+                  </div>
+                  <div>
+                    <h5 class="mb-0">HTML5</h5>
+                    <p class="text-muted mb-0">Structure</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3 col-sm-6 mb-3">
+                <div class="d-flex align-items-center">
+                  <div class="component-icon bg-info-light">
+                    <i class="fab fa-css3-alt fa-lg"></i>
+                  </div>
+                  <div>
+                    <h5 class="mb-0">CSS3</h5>
+                    <p class="text-muted mb-0">Styling</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3 col-sm-6 mb-3">
+                <div class="d-flex align-items-center">
+                  <div class="component-icon bg-warning-light">
+                    <i class="fab fa-js fa-lg"></i>
+                  </div>
+                  <div>
+                    <h5 class="mb-0">JavaScript</h5>
+                    <p class="text-muted mb-0">Interactivity</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3 col-sm-6 mb-3">
+                <div class="d-flex align-items-center">
+                  <div class="component-icon bg-danger-light">
+                    <i class="fab fa-bootstrap fa-lg"></i>
+                  </div>
+                  <div>
+                    <h5 class="mb-0">Bootstrap 5</h5>
+                    <p class="text-muted mb-0">UI Framework</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Design System -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Design System</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <h5>Color Palette</h5>
+                <div class="d-flex flex-wrap align-items-center mb-4">
+                  <div class="me-4 mb-3">
+                    <div class="color-swatch" style="background-color: #0d6efd;"></div>
+                    <span>Primary: #0d6efd</span>
+                  </div>
+                  <div class="me-4 mb-3">
+                    <div class="color-swatch" style="background-color: #fd7e14;"></div>
+                    <span>Accent: #fd7e14</span>
+                  </div>
+                  <div class="me-4 mb-3">
+                    <div class="color-swatch" style="background-color: #212529;"></div>
+                    <span>Text: #212529</span>
+                  </div>
+                  <div class="me-4 mb-3">
+                    <div class="color-swatch" style="background-color: #f8f9fa;"></div>
+                    <span>Background: #f8f9fa</span>
+                  </div>
+                </div>
+                
+                <h5>Typography</h5>
+                <p>The application uses the <strong>Roboto</strong> font family for all text elements:</p>
+                <ul>
+                  <li><strong>Headings:</strong> Roboto Bold (700)</li>
+                  <li><strong>Body Text:</strong> Roboto Regular (400)</li>
+                  <li><strong>Small Text:</strong> Roboto Light (300)</li>
+                </ul>
+                
+                <h5>Icons</h5>
+                <p>The application uses <strong>Font Awesome 6</strong> for icons, providing a consistent and recognizable set of icons throughout the interface.</p>
+              </div>
+              <div class="col-md-6">
+                <h5>Components</h5>
+                <p>The frontend uses several reusable components:</p>
+                <ul>
+                  <li><strong>Navigation Bar:</strong> Consistent navigation across all pages</li>
+                  <li><strong>Search Forms:</strong> Standardized forms for searching flights, trains, and hotels</li>
+                  <li><strong>Cards:</strong> Used for displaying search results and booking information</li>
+                  <li><strong>Modals:</strong> Used for login, registration, and confirmation dialogs</li>
+                  <li><strong>Buttons:</strong> Consistent styling for primary, secondary, and tertiary actions</li>
+                  <li><strong>Forms:</strong> Standardized form elements with validation</li>
+                </ul>
+                
+                <h5>Responsive Design</h5>
+                <p>The application is fully responsive and works well on all device sizes:</p>
+                <ul>
+                  <li><strong>Desktop:</strong> Optimized for large screens (1200px and above)</li>
+                  <li><strong>Tablet:</strong> Adapted for medium screens (768px to 1199px)</li>
+                  <li><strong>Mobile:</strong> Optimized for small screens (below 768px)</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pages -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Pages</h5>
+          </div>
+          <div class="card-body">
+            <ul class="nav nav-tabs" id="pagesTabs" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Home</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="flights-tab" data-bs-toggle="tab" data-bs-target="#flights" type="button" role="tab" aria-controls="flights" aria-selected="false">Flights</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="trains-tab" data-bs-toggle="tab" data-bs-target="#trains" type="button" role="tab" aria-controls="trains" aria-selected="false">Trains</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="hotels-tab" data-bs-toggle="tab" data-bs-target="#hotels" type="button" role="tab" aria-controls="hotels" aria-selected="false">Hotels</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="booking-tab" data-bs-toggle="tab" data-bs-target="#booking" type="button" role="tab" aria-controls="booking" aria-selected="false">Booking</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">Profile</button>
+              </li>
+            </ul>
+            <div class="tab-content" id="pagesTabsContent">
+              <!-- Home Page -->
+              <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                <div class="row">
+                  <div class="col-md-6">
+                    <h5>Home Page</h5>
+                    <p>The home page is the main entry point for users. It features:</p>
+                    <ul>
+                      <li><strong>Hero Section:</strong> A large banner with a search form for quick access to booking</li>
+                      <li><strong>Featured Destinations:</strong> Showcasing popular travel destinations</li>
+                      <li><strong>Quick Links:</strong> For flights, trains, and hotels</li>
+                      <li><strong>Testimonials:</strong> User reviews and ratings</li>
+                      <li><strong>Newsletter Signup:</strong> For promotional offers and updates</li>
+                    </ul>
+                    <h6>Key Components:</h6>
+                    <ul>
+                      <li>Navigation Bar</li>
+                      <li>Hero Banner with Search Form</li>
+                      <li>Destination Cards</li>
+                      <li>Testimonial Carousel</li>
+                      <li>Footer with Links</li>
+                    </ul>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="page-preview">
+                      <img src="../../screenshots/8000-ikkobm8nfwk1gt3_2025-07-05_16-16-55_9109.webp" alt="Home Page Preview">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Flights Page -->
+              <div class="tab-pane fade" id="flights" role="tabpanel" aria-labelledby="flights-tab">
+                <div class="row">
+                  <div class="col-md-6">
+                    <h5>Flights Page</h5>
+                    <p>The flights page allows users to search for and book flights. It features:</p>
+                    <ul>
+                      <li><strong>Search Form:</strong> With options for source, destination, date, and passengers</li>
+                      <li><strong>Search Results:</strong> Displaying available flights with details</li>
+                      <li><strong>Filters:</strong> For price range, airlines, departure time, etc.</li>
+                      <li><strong>Sort Options:</strong> By price, duration, departure time, etc.</li>
+                      <li><strong>Flight Details:</strong> Expandable sections for more information</li>
+                    </ul>
+                    <h6>Key Components:</h6>
+                    <ul>
+                      <li>Flight Search Form</li>
+                      <li>Filter Sidebar</li>
+                      <li>Flight Result Cards</li>
+                      <li>Pagination</li>
+                    </ul>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="page-preview">
+                      <img src="../../screenshots/8000-ikkobm8nfwk1gt3_2025-07-05_16-17-12_4321.webp" alt="Flights Page Preview">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Trains Page -->
+              <div class="tab-pane fade" id="trains" role="tabpanel" aria-labelledby="trains-tab">
+                <div class="row">
+                  <div class="col-md-6">
+                    <h5>Trains Page</h5>
+                    <p>The trains page allows users to search for and book train tickets. It features:</p>
+                    <ul>
+                      <li><strong>Search Form:</strong> With options for source, destination, date, and passengers</li>
+                      <li><strong>Search Results:</strong> Displaying available trains with details</li>
+                      <li><strong>Filters:</strong> For price range, train types, departure time, etc.</li>
+                      <li><strong>Sort Options:</strong> By price, duration, departure time, etc.</li>
+                      <li><strong>Train Details:</strong> Expandable sections for more information</li>
+                    </ul>
+                    <h6>Key Components:</h6>
+                    <ul>
+                      <li>Train Search Form</li>
+                      <li>Filter Sidebar</li>
+                      <li>Train Result Cards</li>
+                      <li>Pagination</li>
+                    </ul>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="page-preview">
+                      <p class="text-center py-5 text-muted">Similar layout to Flights page with train-specific content</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Hotels Page -->
+              <div class="tab-pane fade" id="hotels" role="tabpanel" aria-labelledby="hotels-tab">
+                <div class="row">
+                  <div class="col-md-6">
+                    <h5>Hotels Page</h5>
+                    <p>The hotels page allows users to search for and book hotel rooms. It features:</p>
+                    <ul>
+                      <li><strong>Search Form:</strong> With options for location, check-in/out dates, and guests</li>
+                      <li><strong>Search Results:</strong> Displaying available hotels with details</li>
+                      <li><strong>Filters:</strong> For price range, star rating, amenities, etc.</li>
+                      <li><strong>Sort Options:</strong> By price, rating, popularity, etc.</li>
+                      <li><strong>Hotel Details:</strong> Expandable sections for more information</li>
+                      <li><strong>Photo Gallery:</strong> Images of the hotel and rooms</li>
+                    </ul>
+                    <h6>Key Components:</h6>
+                    <ul>
+                      <li>Hotel Search Form</li>
+                      <li>Filter Sidebar</li>
+                      <li>Hotel Result Cards</li>
+                      <li>Image Carousel</li>
+                      <li>Pagination</li>
+                    </ul>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="page-preview">
+                      <p class="text-center py-5 text-muted">Similar layout to Flights page with hotel-specific content</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Booking Page -->
+              <div class="tab-pane fade" id="booking" role="tabpanel" aria-labelledby="booking-tab">
+                <div class="row">
+                  <div class="col-md-6">
+                    <h5>Booking Page</h5>
+                    <p>The booking page allows users to complete their booking. It features:</p>
+                    <ul>
+                      <li><strong>Booking Summary:</strong> Details of the selected flight, train, or hotel</li>
+                      <li><strong>Traveler Information Form:</strong> For entering passenger details</li>
+                      <li><strong>Payment Form:</strong> For entering payment information</li>
+                      <li><strong>Terms and Conditions:</strong> Checkbox for accepting terms</li>
+                      <li><strong>Confirmation:</strong> Booking confirmation with details</li>
+                    </ul>
+                    <h6>Key Components:</h6>
+                    <ul>
+                      <li>Multi-step Form</li>
+                      <li>Progress Indicator</li>
+                      <li>Summary Card</li>
+                      <li>Payment Form</li>
+                      <li>Confirmation Modal</li>
+                    </ul>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="page-preview">
+                      <p class="text-center py-5 text-muted">Multi-step booking form with traveler information and payment sections</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Profile Page -->
+              <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                <div class="row">
+                  <div class="col-md-6">
+                    <h5>Profile Page</h5>
+                    <p>The profile page allows users to manage their account and view their bookings. It features:</p>
+                    <ul>
+                      <li><strong>User Information:</strong> Name, email, phone, etc.</li>
+                      <li><strong>Edit Profile Form:</strong> For updating user information</li>
+                      <li><strong>Booking History:</strong> List of past and upcoming bookings</li>
+                      <li><strong>Booking Details:</strong> Expandable sections for more information</li>
+                      <li><strong>Cancel Booking:</strong> Option to cancel bookings</li>
+                    </ul>
+                    <h6>Key Components:</h6>
+                    <ul>
+                      <li>Profile Card</li>
+                      <li>Edit Profile Form</li>
+                      <li>Booking History Table</li>
+                      <li>Booking Detail Modal</li>
+                      <li>Cancellation Confirmation Modal</li>
+                    </ul>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="page-preview">
+                      <p class="text-center py-5 text-muted">User profile with personal information and booking history sections</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- JavaScript Implementation -->
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">JavaScript Implementation</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <h5>Core Functionality</h5>
+                <p>The frontend JavaScript handles several key functions:</p>
+                <ul>
+                  <li><strong>Form Validation:</strong> Client-side validation of all forms</li>
+                  <li><strong>API Integration:</strong> Fetching data from the backend API</li>
+                  <li><strong>Authentication:</strong> Handling user login, registration, and session management</li>
+                  <li><strong>Dynamic Content:</strong> Updating the UI based on user interactions</li>
+                  <li><strong>Search Functionality:</strong> Processing search queries and displaying results</li>
+                  <li><strong>Booking Process:</strong> Managing the multi-step booking process</li>
+                </ul>
+                
+                <h5 class="mt-4">Event Handling</h5>
+                <p>The JavaScript code uses event listeners to handle user interactions:</p>
+                <div class="code-block">
+<pre>// Example: Form Submission
+document.getElementById('searchForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  
+  // Get form data
+  const source = document.getElementById('source').value;
+  const destination = document.getElementById('destination').value;
+  const date = document.getElementById('date').value;
+  
+  // Validate form data
+  if (!source || !destination || !date) {
+    showError('Please fill in all required fields');
+    return;
+  }
+  
+  // Call search function
+  searchFlights(source, destination, date);
+});</pre>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <h5>API Integration</h5>
+                <p>The frontend communicates with the backend API using the Fetch API:</p>
+                <div class="code-block">
+<pre>// Example: Fetch Flights
+async function searchFlights(source, destination, date) {
+  try {
+    // Show loading indicator
+    showLoading();
+    
+    // Fetch data from API
+    const response = await fetch(`/api/search/flights?source=${source}&destination=${destination}&date=${date}`);
+    
+    // Check for errors
+    if (!response.ok) {
+      throw new Error('Failed to fetch flights');
+    }
+    
+    // Parse response
+    const data = await response.json();
+    
+    // Display results
+    displayFlightResults(data);
+  } catch (error) {
+    // Handle error
+    showError(error.message);
+  } finally {
+    // Hide loading indicator
+    hideLoading();
+  }
+}</pre>
+                </div>
+                
+                <h5 class="mt-4">Authentication</h5>
+                <p>The frontend handles user authentication using JWT tokens:</p>
+                <div class="code-block">
+<pre>// Example: Login Function
+async function login(email, password) {
+  try {
+    const response = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email, password })
+    });
+    
+    if (!response.ok) {
+      throw new Error('Invalid credentials');
+    }
+    
+    const data = await response.json();
+    
+    // Store token in localStorage
+    localStorage.setItem('token', data.token);
+    
+    // Redirect to home page
+    window.location.href = '/';
+  } catch (error) {
+    showError(error.message);
+  }
+}</pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-white py-4">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <h5>Online Booking System</h5>
+          <p class="mb-0">A comprehensive college project for booking trains, planes, and hotels.</p>
+        </div>
+        <div class="col-md-6 text-md-end">
+          <p class="mb-0">&copy; 2025 | Created for College Project</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

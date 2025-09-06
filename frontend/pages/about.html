@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Us - Online Booking System</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <!-- Custom CSS -->
+  <link href="../css/styles.css" rel="stylesheet">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top">
+    <div class="container">
+      <a class="navbar-brand" href="../index.html">
+        <i class="fas fa-globe-americas me-2"></i>
+        TravelEase
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="../index.html">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="flights.html">Flights</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="trains.html">Trains</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="hotels.html">Hotels</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="about.html">About</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="contact.html">Contact</a>
+          </li>
+        </ul>
+        <div id="authButtons" class="d-flex">
+          <button class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#loginModal">Login</button>
+          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#registerModal">Register</button>
+        </div>
+        <div id="userDropdown" class="dropdown d-none">
+          <button class="btn btn-outline-primary dropdown-toggle" type="button" id="userMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-user-circle me-1"></i>
+            <span id="userName">User</span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuButton">
+            <li><a class="dropdown-item" href="profile.html"><i class="fas fa-user me-2"></i>My Profile</a></li>
+            <li><a class="dropdown-item" href="bookings.html"><i class="fas fa-list me-2"></i>My Bookings</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Alert Container -->
+  <div id="mainAlert" class="container mt-3"></div>
+
+  <!-- Page Header -->
+  <section class="bg-primary text-white py-4">
+    <div class="container">
+      <h1><i class="fas fa-info-circle me-2"></i>About Us</h1>
+      <p class="lead mb-0">Learn more about TravelEase and our mission</p>
+    </div>
+  </section>
+
+  <!-- About Content -->
+  <section class="container my-5">
+    <div class="row">
+      <div class="col-lg-6 mb-4 mb-lg-0">
+        <h2>Our Story</h2>
+        <p>TravelEase was founded in 2020 with a simple mission: to make travel booking easy, affordable, and accessible to everyone. What started as a small project has grown into a comprehensive platform that serves thousands of travelers every day.</p>
+        <p>Our team of travel enthusiasts and technology experts work tirelessly to bring you the best travel booking experience. We understand that planning a trip can be stressful, which is why we've designed our platform to be intuitive and user-friendly.</p>
+        <p>At TravelEase, we believe that travel should be enjoyable from the moment you start planning. That's why we offer a seamless booking experience for flights, trains, and hotels, all in one place.</p>
+        <h2 class="mt-4">Our Mission</h2>
+        <p>Our mission is to revolutionize the way people book their travel by providing a one-stop solution for all travel needs. We aim to:</p>
+        <ul>
+          <li>Make travel booking simple and stress-free</li>
+          <li>Offer competitive prices and transparent fees</li>
+          <li>Provide excellent customer service at every step</li>
+          <li>Continuously innovate and improve our platform</li>
+          <li>Build lasting relationships with our customers</li>
+        </ul>
+      </div>
+      <div class="col-lg-6">
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-body p-4">
+            <h3 class="mb-3">Why Choose TravelEase?</h3>
+            <div class="d-flex mb-3">
+              <div class="me-3">
+                <i class="fas fa-check-circle text-primary fa-2x"></i>
+              </div>
+              <div>
+                <h5>All-in-One Platform</h5>
+                <p class="mb-0">Book flights, trains, and hotels in one place, saving you time and effort.</p>
+              </div>
+            </div>
+            <div class="d-flex mb-3">
+              <div class="me-3">
+                <i class="fas fa-check-circle text-primary fa-2x"></i>
+              </div>
+              <div>
+                <h5>Best Prices Guaranteed</h5>
+                <p class="mb-0">We offer competitive prices and regular discounts to ensure you get the best deals.</p>
+              </div>
+            </div>
+            <div class="d-flex mb-3">
+              <div class="me-3">
+                <i class="fas fa-check-circle text-primary fa-2x"></i>
+              </div>
+              <div>
+                <h5>Secure Booking</h5>
+                <p class="mb-0">Your personal and payment information is always secure with our advanced encryption.</p>
+              </div>
+            </div>
+            <div class="d-flex mb-3">
+              <div class="me-3">
+                <i class="fas fa-check-circle text-primary fa-2x"></i>
+              </div>
+              <div>
+                <h5>24/7 Customer Support</h5>
+                <p class="mb-0">Our dedicated support team is available round the clock to assist you with any queries.</p>
+              </div>
+            </div>
+            <div class="d-flex">
+              <div class="me-3">
+                <i class="fas fa-check-circle text-primary fa-2x"></i>
+              </div>
+              <div>
+                <h5>User-Friendly Interface</h5>
+                <p class="mb-0">Our platform is designed to be intuitive and easy to use, even for first-time users.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card border-0 shadow-sm">
+          <div class="card-body p-4 text-center">
+            <h3 class="mb-3">Our Numbers</h3>
+            <div class="row">
+              <div class="col-6 mb-4">
+                <div class="display-4 text-primary fw-bold">50K+</div>
+                <p class="mb-0">Happy Customers</p>
+              </div>
+              <div class="col-6 mb-4">
+                <div class="display-4 text-primary fw-bold">100+</div>
+                <p class="mb-0">Partner Airlines</p>
+              </div>
+              <div class="col-6">
+                <div class="display-4 text-primary fw-bold">500+</div>
+                <p class="mb-0">Hotel Partners</p>
+              </div>
+              <div class="col-6">
+                <div class="display-4 text-primary fw-bold">30+</div>
+                <p class="mb-0">Cities Covered</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Team Section -->
+  <section class="bg-light py-5">
+    <div class="container">
+      <h2 class="text-center mb-5">Meet Our Team</h2>
+      <div class="row">
+        <div class="col-lg-3 col-md-6 mb-4">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center p-4">
+              <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 100px; height: 100px;">
+                <span class="h1">RK</span>
+              </div>
+              <h5>Rahul Kumar</h5>
+              <p class="text-muted">Founder & CEO</p>
+              <p class="small">With over 15 years of experience in the travel industry, Rahul leads our vision and strategy.</p>
+              <div class="d-flex justify-content-center">
+                <a href="#" class="me-2"><i class="fab fa-linkedin"></i></a>
+                <a href="#" class="me-2"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fas fa-envelope"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center p-4">
+              <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 100px; height: 100px;">
+                <span class="h1">AP</span>
+              </div>
+              <h5>Ananya Patel</h5>
+              <p class="text-muted">CTO</p>
+              <p class="small">Ananya oversees our technology development and ensures a seamless user experience.</p>
+              <div class="d-flex justify-content-center">
+                <a href="#" class="me-2"><i class="fab fa-linkedin"></i></a>
+                <a href="#" class="me-2"><i class="fab fa-github"></i></a>
+                <a href="#"><i class="fas fa-envelope"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center p-4">
+              <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 100px; height: 100px;">
+                <span class="h1">VS</span>
+              </div>
+              <h5>Vikram Singh</h5>
+              <p class="text-muted">Head of Operations</p>
+              <p class="small">Vikram manages our partnerships with airlines, hotels, and train operators.</p>
+              <div class="d-flex justify-content-center">
+                <a href="#" class="me-2"><i class="fab fa-linkedin"></i></a>
+                <a href="#" class="me-2"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fas fa-envelope"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center p-4">
+              <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 100px; height: 100px;">
+                <span class="h1">PR</span>
+              </div>
+              <h5>Priya Reddy</h5>
+              <p class="text-muted">Customer Experience</p>
+              <p class="small">Priya leads our customer support team and ensures exceptional service for all users.</p>
+              <div class="d-flex justify-content-center">
+                <a href="#" class="me-2"><i class="fab fa-linkedin"></i></a>
+                <a href="#" class="me-2"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fas fa-envelope"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="container my-5">
+    <h2 class="text-center mb-5">What Our Customers Say</h2>
+    <div class="row">
+      <div class="col-md-4 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body p-4">
+            <div class="mb-3">
+              <i class="fas fa-star text-warning"></i>
+              <i class="fas fa-star text-warning"></i>
+              <i class="fas fa-star text-warning"></i>
+              <i class="fas fa-star text-warning"></i>
+              <i class="fas fa-star text-warning"></i>
+            </div>
+            <p class="mb-4">"TravelEase made booking my family vacation so simple! I was able to book flights and hotel rooms for 5 people in less than 10 minutes. The interface is intuitive and the prices were better than other sites I checked."</p>
+            <div class="d-flex align-items-center">
+              <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                <span>SM</span>
+              </div>
+              <div>
+                <h6 class="mb-0">Suresh Mehta</h6>
+                <small class="text-muted">Mumbai</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body p-4">
+            <div class="mb-3">
+              <i class="fas fa-star text-warning"></i>
+              <i class="fas fa-star text-warning"></i>
+              <i class="fas fa-star text-warning"></i>
+              <i class="fas fa-star text-warning"></i>
+              <i class="fas fa-star text-warning"></i>
+            </div>
+            <p class="mb-4">"I had to make a last-minute business trip and TravelEase came to the rescue. Their customer service was exceptional when I needed to change my flight time. I'll definitely be using this platform for all my future bookings."</p>
+            <div class="d-flex align-items-center">
+              <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                <span>AK</span>
+              </div>
+              <div>
+                <h6 class="mb-0">Aisha Khan</h6>
+                <small class="text-muted">Delhi</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body p-4">
+            <div class="mb-3">
+              <i class="fas fa-star text-warning"></i>
+              <i class="fas fa-star text-warning"></i>
+              <i class="fas fa-star text-warning"></i>
+              <i class="fas fa-star text-warning"></i>
+              <i class="fas fa-star-half-alt text-warning"></i>
+            </div>
+            <p class="mb-4">"As a frequent traveler, I've used many booking platforms, but TravelEase stands out for its ease of use and comprehensive options. I particularly appreciate the ability to book trains and flights in the same place."</p>
+            <div class="d-flex align-items-center">
+              <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                <span>RJ</span>
+              </div>
+              <div>
+                <h6 class="mb-0">Raj Joshi</h6>
+                <small class="text-muted">Bangalore</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-white">
+    <div class="container py-5">
+      <div class="row">
+        <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+          <h5>TravelEase</h5>
+          <p>Your one-stop solution for all your travel booking needs. Find the best deals on flights, trains, and hotels.</p>
+          <div class="d-flex">
+            <a href="#" class="me-3"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="me-3"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="me-3"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+          <h5>Quick Links</h5>
+          <ul class="list-unstyled">
+            <li><a href="../index.html">Home</a></li>
+            <li><a href="flights.html">Flights</a></li>
+            <li><a href="trains.html">Trains</a></li>
+            <li><a href="hotels.html">Hotels</a></li>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="contact.html">Contact Us</a></li>
+          </ul>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+          <h5>Support</h5>
+          <ul class="list-unstyled">
+            <li><a href="#">FAQs</a></li>
+            <li><a href="#">Help Center</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Refund Policy</a></li>
+          </ul>
+        </div>
+        <div class="col-lg-3 col-md-6">
+          <h5>Contact Us</h5>
+          <ul class="list-unstyled">
+            <li><i class="fas fa-map-marker-alt me-2"></i> 123 Travel Street, Mumbai, India</li>
+            <li><i class="fas fa-phone me-2"></i> +91 1234567890</li>
+            <li><i class="fas fa-envelope me-2"></i> info@travelease.com</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="bg-darker py-3">
+      <div class="container text-center">
+        <p class="mb-0">&copy; 2025 TravelEase. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Login Modal -->
+  <div class="modal fade auth-modal" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="loginModalLabel">Login to Your Account</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="loginAlert"></div>
+          <form id="loginForm">
+            <div class="mb-3">
+              <label for="loginEmail" class="form-label">Email address</label>
+              <input type="email" class="form-control" id="loginEmail" required>
+            </div>
+            <div class="mb-3">
+              <label for="loginPassword" class="form-label">Password</label>
+              <input type="password" class="form-control" id="loginPassword" required>
+            </div>
+            <div class="mb-3 form-check">
+              <input type="checkbox" class="form-check-input" id="rememberMe">
+              <label class="form-check-label" for="rememberMe">Remember me</label>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Login</button>
+          </form>
+          <div class="text-center mt-3">
+            <p>Don't have an account? <a href="#" data-bs-toggle="modal" data-bs-target="#registerModal" data-bs-dismiss="modal">Register now</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Register Modal -->
+  <div class="modal fade auth-modal" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="registerModalLabel">Create an Account</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="registerAlert"></div>
+          <form id="registerForm">
+            <div class="mb-3">
+              <label for="registerName" class="form-label">Full Name</label>
+              <input type="text" class="form-control" id="registerName" required>
+            </div>
+            <div class="mb-3">
+              <label for="registerEmail" class="form-label">Email address</label>
+              <input type="email" class="form-control" id="registerEmail" required>
+            </div>
+            <div class="mb-3">
+              <label for="registerPhone" class="form-label">Phone Number</label>
+              <input type="tel" class="form-control" id="registerPhone" required>
+            </div>
+            <div class="mb-3">
+              <label for="registerPassword" class="form-label">Password</label>
+              <input type="password" class="form-control" id="registerPassword" required>
+            </div>
+            <div class="mb-3 form-check">
+              <input type="checkbox" class="form-check-input" id="agreeTerms" required>
+              <label class="form-check-label" for="agreeTerms">I agree to the <a href="#">Terms and Conditions</a></label>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Register</button>
+          </form>
+          <div class="text-center mt-3">
+            <p>Already have an account? <a href="#" data-bs-toggle="modal" data-bs-target="#loginModal" data-bs-dismiss="modal">Login</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Custom JavaScript -->
+  <script src="../js/main.js"></script>
+</body>
+</html>
+

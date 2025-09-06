@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UML Diagrams - Project Tracker</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #0d6efd;
+      --secondary-color: #6c757d;
+      --success-color: #198754;
+      --info-color: #0dcaf0;
+      --warning-color: #ffc107;
+      --danger-color: #dc3545;
+      --light-color: #f8f9fa;
+      --dark-color: #212529;
+    }
+    
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #f5f5f5;
+    }
+    
+    .navbar-brand {
+      font-weight: 700;
+    }
+    
+    .card {
+      border: none;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .card-header {
+      border-radius: 10px 10px 0 0 !important;
+      font-weight: 600;
+    }
+    
+    .diagram-img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 5px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .diagram-card {
+      height: 100%;
+    }
+    
+    .diagram-card .card-body {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .diagram-card .card-text {
+      flex-grow: 1;
+    }
+    
+    .btn-view {
+      margin-top: auto;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">
+        <i class="fas fa-tasks me-2"></i>
+        Project Tracker
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="diagrams.html">UML Diagrams</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="database.html">Database</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="backend.html">Backend</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="frontend.html">Frontend</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="testing.html">Testing</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="documentation.html">Documentation</a>
+          </li>
+        </ul>
+        <a href="../../index.html" class="btn btn-outline-light" target="_blank">
+          <i class="fas fa-external-link-alt me-2"></i>
+          View Application
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container py-5">
+    <!-- Page Header -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="bg-primary text-white p-3 rounded me-3">
+                <i class="fas fa-sitemap fa-2x"></i>
+              </div>
+              <div>
+                <h2 class="mb-0">UML Diagrams</h2>
+                <p class="text-muted mb-0">System design and architecture documentation</p>
+              </div>
+              <div class="ms-auto">
+                <span class="badge bg-success">Completed</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Diagrams Overview -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Diagrams Overview</h5>
+          </div>
+          <div class="card-body">
+            <p>The UML (Unified Modeling Language) diagrams for the Online Booking System provide a visual representation of the system's structure, behavior, and interactions. These diagrams help in understanding the system from different perspectives and serve as a blueprint for implementation.</p>
+            <div class="row mt-4">
+              <div class="col-md-3 col-sm-6 mb-3">
+                <div class="d-flex align-items-center">
+                  <div class="bg-success-light p-2 rounded me-3">
+                    <i class="fas fa-users fa-lg text-success"></i>
+                  </div>
+                  <div>
+                    <h5 class="mb-0">Use Case Diagram</h5>
+                    <p class="text-muted mb-0">1 Diagram</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3 col-sm-6 mb-3">
+                <div class="d-flex align-items-center">
+                  <div class="bg-info-light p-2 rounded me-3">
+                    <i class="fas fa-database fa-lg text-info"></i>
+                  </div>
+                  <div>
+                    <h5 class="mb-0">ER Diagram</h5>
+                    <p class="text-muted mb-0">1 Diagram</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3 col-sm-6 mb-3">
+                <div class="d-flex align-items-center">
+                  <div class="bg-warning-light p-2 rounded me-3">
+                    <i class="fas fa-project-diagram fa-lg text-warning"></i>
+                  </div>
+                  <div>
+                    <h5 class="mb-0">Class Diagram</h5>
+                    <p class="text-muted mb-0">1 Diagram</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3 col-sm-6 mb-3">
+                <div class="d-flex align-items-center">
+                  <div class="bg-danger-light p-2 rounded me-3">
+                    <i class="fas fa-exchange-alt fa-lg text-danger"></i>
+                  </div>
+                  <div>
+                    <h5 class="mb-0">Sequence Diagrams</h5>
+                    <p class="text-muted mb-0">6 Diagrams</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Use Case Diagram -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Use Case Diagram</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-lg-8">
+                <img src="../refined_use_case_diagram.png" alt="Use Case Diagram" class="diagram-img mb-3">
+              </div>
+              <div class="col-lg-4">
+                <h5>Description</h5>
+                <p>The Use Case Diagram illustrates the interactions between users (actors) and the system. It shows what functionalities are available to different types of users.</p>
+                <h5>Key Components</h5>
+                <ul>
+                  <li><strong>Actors:</strong> User, Admin</li>
+                  <li><strong>Use Cases:</strong> Register, Login, Search Flights/Trains/Hotels, Make Booking, Make Payment, View Bookings, Cancel Booking, etc.</li>
+                  <li><strong>Relationships:</strong> Include, Extend</li>
+                </ul>
+                <h5>Purpose</h5>
+                <p>This diagram helps in understanding the system's scope and the functionalities available to different users. It serves as a high-level view of the system's capabilities.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ER Diagram -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Entity Relationship (ER) Diagram</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-lg-8">
+                <img src="../erdiagram.png" alt="ER Diagram" class="diagram-img mb-3">
+              </div>
+              <div class="col-lg-4">
+                <h5>Description</h5>
+                <p>The ER Diagram represents the data model of the system, showing entities, their attributes, and relationships between entities.</p>
+                <h5>Key Entities</h5>
+                <ul>
+                  <li><strong>User:</strong> Stores user information</li>
+                  <li><strong>Flight:</strong> Contains flight details</li>
+                  <li><strong>Train:</strong> Contains train details</li>
+                  <li><strong>Hotel:</strong> Contains hotel information</li>
+                  <li><strong>Booking:</strong> Stores booking information</li>
+                  <li><strong>Admin:</strong> Stores admin information</li>
+                </ul>
+                <h5>Purpose</h5>
+                <p>This diagram helps in understanding the data structure of the system and how different entities are related to each other. It serves as a blueprint for the database design.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Class Diagram -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Class Diagram</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-lg-8">
+                <img src="../refined_class_diagram.png" alt="Class Diagram" class="diagram-img mb-3">
+              </div>
+              <div class="col-lg-4">
+                <h5>Description</h5>
+                <p>The Class Diagram shows the structure of the system in terms of classes, their attributes, methods, and relationships between classes.</p>
+                <h5>Key Classes</h5>
+                <ul>
+                  <li><strong>User:</strong> Represents a user of the system</li>
+                  <li><strong>Flight:</strong> Represents a flight</li>
+                  <li><strong>Train:</strong> Represents a train</li>
+                  <li><strong>Hotel:</strong> Represents a hotel</li>
+                  <li><strong>Booking:</strong> Represents a booking</li>
+                  <li><strong>Admin:</strong> Represents an admin user</li>
+                </ul>
+                <h5>Purpose</h5>
+                <p>This diagram helps in understanding the object-oriented structure of the system and how different classes interact with each other. It serves as a blueprint for the implementation of the system.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sequence Diagrams -->
+    <div class="row">
+      <div class="col-12 mb-4">
+        <div class="card">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Sequence Diagrams</h5>
+          </div>
+          <div class="card-body">
+            <p>Sequence Diagrams illustrate the interactions between objects in a sequential order, showing how processes operate with one another and in what order. The following sequence diagrams have been created for the Online Booking System:</p>
+            
+            <div class="row mt-4">
+              <!-- User Authentication Sequence Diagram -->
+              <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card diagram-card">
+                  <div class="card-body">
+                    <h5 class="card-title">User Authentication</h5>
+                    <p class="card-text">This diagram illustrates the registration and login process for users.</p>
+                    <a href="../sequence_diagram_user_auth.png" class="btn btn-primary btn-view" target="_blank">View Diagram</a>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Search Trips Sequence Diagram -->
+              <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card diagram-card">
+                  <div class="card-body">
+                    <h5 class="card-title">Search Trips</h5>
+                    <p class="card-text">This diagram shows how users search for flights, trains, and hotels.</p>
+                    <a href="../sequence_diagram_search_trips.png" class="btn btn-primary btn-view" target="_blank">View Diagram</a>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Make Booking Sequence Diagram -->
+              <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card diagram-card">
+                  <div class="card-body">
+                    <h5 class="card-title">Make Booking</h5>
+                    <p class="card-text">This diagram illustrates the process of making a booking for a flight, train, or hotel.</p>
+                    <a href="../sequence_diagram_make_booking.png" class="btn btn-primary btn-view" target="_blank">View Diagram</a>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Make Payment Sequence Diagram -->
+              <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card diagram-card">
+                  <div class="card-body">
+                    <h5 class="card-title">Make Payment</h5>
+                    <p class="card-text">This diagram shows the payment process for a booking.</p>
+                    <a href="../sequence_diagram_make_payment.png" class="btn btn-primary btn-view" target="_blank">View Diagram</a>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- View Booking History Sequence Diagram -->
+              <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card diagram-card">
+                  <div class="card-body">
+                    <h5 class="card-title">View Booking History</h5>
+                    <p class="card-text">This diagram illustrates how users view their booking history.</p>
+                    <a href="../sequence_diagram_view_booking_history.png" class="btn btn-primary btn-view" target="_blank">View Diagram</a>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Cancel Booking Sequence Diagram -->
+              <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card diagram-card">
+                  <div class="card-body">
+                    <h5 class="card-title">Cancel Booking</h5>
+                    <p class="card-text">This diagram shows the process of cancelling a booking.</p>
+                    <a href="../sequence_diagram_cancel_booking.png" class="btn btn-primary btn-view" target="_blank">View Diagram</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-white py-4">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <h5>Online Booking System</h5>
+          <p class="mb-0">A comprehensive college project for booking trains, planes, and hotels.</p>
+        </div>
+        <div class="col-md-6 text-md-end">
+          <p class="mb-0">&copy; 2025 | Created for College Project</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

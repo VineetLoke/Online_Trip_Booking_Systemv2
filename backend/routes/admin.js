@@ -1,0 +1,366 @@
+const express = require('express');
+const router = express.Router();
+const mongoose = require('mongoose');
+const { authenticateAdmin, checkPermission } = require('../middleware/auth');
+const User = require('../models/User');
+const Flight = require('../models/Flight');
+const Train = require('../models/Train');
+const Hotel = require('../models/Hotel');
+const Booking = require('../models/Booking');
+
+// Get all users
+router.get('/users', authenticateAdmin, checkPermission('manage_users'), async (req, res) => {
+  try {
+    const users = await User.find().select('-passwordHash');
+    
+    res.status(200).json({
+      count: users.length,
+      users
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: {
+        message: error.message,
+        status: 500
+      }
+    });
+  }
+});
+
+// Get user by ID
+router.get('/users/:id', authenticateAdmin, checkPermission('manage_users'), async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select('-passwordHash');
+    
+    if (!user) {
+      return res.status(404).json({
+        error: {
+          message: 'User not found',
+          status: 404
+        }
+      });
+    }
+    
+    res.status(200).json({ user });
+  } catch (error) {
+    res.status(500).json({
+      error: {
+        message: error.message,
+        status: 500
+      }
+    });
+  }
+});
+
+// Get user's bookings
+router.get('/users/:id/bookings', authenticateAdmin, checkPermission('manage_users'), async (req, res) => {
+  try {
+    const bookings = await Booking.find({ userId: req.params.id })
+      .sort({ bookingDate: -1 });
+    
+    res.status(200).json({
+      count: bookings.length,
+      bookings
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: {
+        message: error.message,
+        status: 500
+      }
+    });
+  }
+});
+
+// Manage flights
+router.post('/flights', authenticateAdmin, checkPermission('manage_flights'), async (req, res) => {
+  try {
+    const flight = new Flight(req.body);
+    await flight.save();
+    
+    res.status(201).json({
+      message: 'Flight created successfully',
+      flight
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: {
+        message: error.message,
+        status: 500
+      }
+    });
+  }
+});
+
+router.put('/flights/:id', authenticateAdmin, checkPermission('manage_flights'), async (req, res) => {
+  try {
+    const flight = await Flight.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    );
+    
+    if (!flight) {
+      return res.status(404).json({
+        error: {
+          message: 'Flight not found',
+          status: 404
+        }
+      });
+    }
+    
+    res.status(200).json({
+      message: 'Flight updated successfully',
+      flight
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: {
+        message: error.message,
+        status: 500
+      }
+    });
+  }
+});
+
+router.delete('/flights/:id', authenticateAdmin, checkPermission('manage_flights'), async (req, res) => {
+  try {
+    const flight = await Flight.findByIdAndDelete(req.params.id);
+    
+    if (!flight) {
+      return res.status(404).json({
+        error: {
+          message: 'Flight not found',
+          status: 404
+        }
+      });
+    }
+    
+    res.status(200).json({
+      message: 'Flight deleted successfully'
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: {
+        message: error.message,
+        status: 500
+      }
+    });
+  }
+});
+
+// Manage trains
+router.post('/trains', authenticateAdmin, checkPermission('manage_trains'), async (req, res) => {
+  try {
+    const train = new Train(req.body);
+    await train.save();
+    
+    res.status(201).json({
+      message: 'Train created successfully',
+      train
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: {
+        message: error.message,
+        status: 500
+      }
+    });
+  }
+});
+
+router.put('/trains/:id', authenticateAdmin, checkPermission('manage_trains'), async (req, res) => {
+  try {
+    const train = await Train.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    );
+    
+    if (!train) {
+      return res.status(404).json({
+        error: {
+          message: 'Train not found',
+          status: 404
+        }
+      });
+    }
+    
+    res.status(200).json({
+      message: 'Train updated successfully',
+      train
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: {
+        message: error.message,
+        status: 500
+      }
+    });
+  }
+});
+
+router.delete('/trains/:id', authenticateAdmin, checkPermission('manage_trains'), async (req, res) => {
+  try {
+    const train = await Train.findByIdAndDelete(req.params.id);
+    
+    if (!train) {
+      return res.status(404).json({
+        error: {
+          message: 'Train not found',
+          status: 404
+        }
+      });
+    }
+    
+    res.status(200).json({
+      message: 'Train deleted successfully'
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: {
+        message: error.message,
+        status: 500
+      }
+    });
+  }
+});
+
+// Manage hotels
+router.post('/hotels', authenticateAdmin, checkPermission('manage_hotels'), async (req, res) => {
+  try {
+    const hotel = new Hotel(req.body);
+    await hotel.save();
+    
+    res.status(201).json({
+      message: 'Hotel created successfully',
+      hotel
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: {
+        message: error.message,
+        status: 500
+      }
+    });
+  }
+});
+
+router.put('/hotels/:id', authenticateAdmin, checkPermission('manage_hotels'), async (req, res) => {
+  try {
+    const hotel = await Hotel.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    );
+    
+    if (!hotel) {
+      return res.status(404).json({
+        error: {
+          message: 'Hotel not found',
+          status: 404
+        }
+      });
+    }
+    
+    res.status(200).json({
+      message: 'Hotel updated successfully',
+      hotel
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: {
+        message: error.message,
+        status: 500
+      }
+    });
+  }
+});
+
+router.delete('/hotels/:id', authenticateAdmin, checkPermission('manage_hotels'), async (req, res) => {
+  try {
+    const hotel = await Hotel.findByIdAndDelete(req.params.id);
+    
+    if (!hotel) {
+      return res.status(404).json({
+        error: {
+          message: 'Hotel not found',
+          status: 404
+        }
+      });
+    }
+    
+    res.status(200).json({
+      message: 'Hotel deleted successfully'
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: {
+        message: error.message,
+        status: 500
+      }
+    });
+  }
+});
+
+// Get booking statistics
+router.get('/reports/bookings', authenticateAdmin, checkPermission('view_reports'), async (req, res) => {
+  try {
+    // Aggregate bookings by type and status
+    const bookingStats = await Booking.aggregate([
+      { $group: {
+          _id: {
+            type: '$bookingType',
+            status: '$status'
+          },
+          count: { $sum: 1 },
+          totalAmount: { $sum: '$totalAmount' }
+        }
+      },
+      { $sort: { '_id.type': 1, '_id.status': 1 } }
+    ]);
+    
+    // Format the results
+    const stats = {
+      totalBookings: 0,
+      totalAmount: 0,
+      byType: {},
+      byStatus: {}
+    };
+    
+    bookingStats.forEach(stat => {
+      const { type, status } = stat._id;
+      const { count, totalAmount } = stat;
+      
+      // Update total counts
+      stats.totalBookings += count;
+      stats.totalAmount += totalAmount;
+      
+      // Update by type
+      if (!stats.byType[type]) {
+        stats.byType[type] = { count: 0, totalAmount: 0 };
+      }
+      stats.byType[type].count += count;
+      stats.byType[type].totalAmount += totalAmount;
+      
+      // Update by status
+      if (!stats.byStatus[status]) {
+        stats.byStatus[status] = { count: 0, totalAmount: 0 };
+      }
+      stats.byStatus[status].count += count;
+      stats.byStatus[status].totalAmount += totalAmount;
+    });
+    
+    res.status(200).json({ stats });
+  } catch (error) {
+    res.status(500).json({
+      error: {
+        message: error.message,
+        status: 500
+      }
+    });
+  }
+});
+
+module.exports = router;
+

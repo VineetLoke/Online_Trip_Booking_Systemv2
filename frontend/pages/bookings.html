@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Bookings - Online Booking System</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <!-- Custom CSS -->
+  <link href="../css/styles.css" rel="stylesheet">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top">
+    <div class="container">
+      <a class="navbar-brand" href="../index.html">
+        <i class="fas fa-globe-americas me-2"></i>
+        TravelEase
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="../index.html">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="flights.html">Flights</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="trains.html">Trains</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="hotels.html">Hotels</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="about.html">About</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="contact.html">Contact</a>
+          </li>
+        </ul>
+        <div id="authButtons" class="d-flex">
+          <button class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#loginModal">Login</button>
+          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#registerModal">Register</button>
+        </div>
+        <div id="userDropdown" class="dropdown d-none">
+          <button class="btn btn-outline-primary dropdown-toggle" type="button" id="userMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-user-circle me-1"></i>
+            <span id="userName">User</span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuButton">
+            <li><a class="dropdown-item" href="profile.html"><i class="fas fa-user me-2"></i>My Profile</a></li>
+            <li><a class="dropdown-item" href="bookings.html"><i class="fas fa-list me-2"></i>My Bookings</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Alert Container -->
+  <div id="mainAlert" class="container mt-3"></div>
+
+  <!-- Page Header -->
+  <section class="bg-primary text-white py-4">
+    <div class="container">
+      <h1><i class="fas fa-list-alt me-2"></i>My Bookings</h1>
+      <p class="lead mb-0">View and manage all your bookings in one place</p>
+    </div>
+  </section>
+
+  <!-- Bookings Content -->
+  <section class="container my-5">
+    <!-- Booking Tabs -->
+    <ul class="nav nav-tabs mb-4" id="bookingTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="upcoming-tab" data-bs-toggle="tab" data-bs-target="#upcoming" type="button" role="tab" aria-controls="upcoming" aria-selected="true">
+          <i class="fas fa-calendar me-2"></i>Upcoming
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="completed-tab" data-bs-toggle="tab" data-bs-target="#completed" type="button" role="tab" aria-controls="completed" aria-selected="false">
+          <i class="fas fa-check-circle me-2"></i>Completed
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="cancelled-tab" data-bs-toggle="tab" data-bs-target="#cancelled" type="button" role="tab" aria-controls="cancelled" aria-selected="false">
+          <i class="fas fa-times-circle me-2"></i>Cancelled
+        </button>
+      </li>
+    </ul>
+    
+    <!-- Tab Content -->
+    <div class="tab-content" id="bookingTabsContent">
+      <!-- Upcoming Bookings -->
+      <div class="tab-pane fade show active" id="upcoming" role="tabpanel" aria-labelledby="upcoming-tab">
+        <div id="upcomingBookings">
+          <!-- Content will be loaded dynamically -->
+          <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-3">Loading your upcoming bookings...</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Completed Bookings -->
+      <div class="tab-pane fade" id="completed" role="tabpanel" aria-labelledby="completed-tab">
+        <div id="completedBookings">
+          <!-- Content will be loaded dynamically -->
+          <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-3">Loading your completed bookings...</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Cancelled Bookings -->
+      <div class="tab-pane fade" id="cancelled" role="tabpanel" aria-labelledby="cancelled-tab">
+        <div id="cancelledBookings">
+          <!-- Content will be loaded dynamically -->
+          <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-3">Loading your cancelled bookings...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-white">
+    <div class="container py-5">
+      <div class="row">
+        <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+          <h5>TravelEase</h5>
+          <p>Your one-stop solution for all your travel booking needs. Find the best deals on flights, trains, and hotels.</p>
+          <div class="d-flex">
+            <a href="#" class="me-3"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="me-3"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="me-3"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+          <h5>Quick Links</h5>
+          <ul class="list-unstyled">
+            <li><a href="../index.html">Home</a></li>
+            <li><a href="flights.html">Flights</a></li>
+            <li><a href="trains.html">Trains</a></li>
+            <li><a href="hotels.html">Hotels</a></li>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="contact.html">Contact Us</a></li>
+          </ul>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+          <h5>Support</h5>
+          <ul class="list-unstyled">
+            <li><a href="#">FAQs</a></li>
+            <li><a href="#">Help Center</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Refund Policy</a></li>
+          </ul>
+        </div>
+        <div class="col-lg-3 col-md-6">
+          <h5>Contact Us</h5>
+          <ul class="list-unstyled">
+            <li><i class="fas fa-map-marker-alt me-2"></i> 123 Travel Street, Mumbai, India</li>
+            <li><i class="fas fa-phone me-2"></i> +91 1234567890</li>
+            <li><i class="fas fa-envelope me-2"></i> info@travelease.com</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="bg-darker py-3">
+      <div class="container text-center">
+        <p class="mb-0">&copy; 2025 TravelEase. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Login Modal -->
+  <div class="modal fade auth-modal" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="loginModalLabel">Login to Your Account</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="loginAlert"></div>
+          <form id="loginForm">
+            <div class="mb-3">
+              <label for="loginEmail" class="form-label">Email address</label>
+              <input type="email" class="form-control" id="loginEmail" required>
+            </div>
+            <div class="mb-3">
+              <label for="loginPassword" class="form-label">Password</label>
+              <input type="password" class="form-control" id="loginPassword" required>
+            </div>
+            <div class="mb-3 form-check">
+              <input type="checkbox" class="form-check-input" id="rememberMe">
+              <label class="form-check-label" for="rememberMe">Remember me</label>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Login</button>
+          </form>
+          <div class="text-center mt-3">
+            <p>Don't have an account? <a href="#" data-bs-toggle="modal" data-bs-target="#registerModal" data-bs-dismiss="modal">Register now</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Register Modal -->
+  <div class="modal fade auth-modal" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="registerModalLabel">Create an Account</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="registerAlert"></div>
+          <form id="registerForm">
+            <div class="mb-3">
+              <label for="registerName" class="form-label">Full Name</label>
+              <input type="text" class="form-control" id="registerName" required>
+            </div>
+            <div class="mb-3">
+              <label for="registerEmail" class="form-label">Email address</label>
+              <input type="email" class="form-control" id="registerEmail" required>
+            </div>
+            <div class="mb-3">
+              <label for="registerPhone" class="form-label">Phone Number</label>
+              <input type="tel" class="form-control" id="registerPhone" required>
+            </div>
+            <div class="mb-3">
+              <label for="registerPassword" class="form-label">Password</label>
+              <input type="password" class="form-control" id="registerPassword" required>
+            </div>
+            <div class="mb-3 form-check">
+              <input type="checkbox" class="form-check-input" id="agreeTerms" required>
+              <label class="form-check-label" for="agreeTerms">I agree to the <a href="#">Terms and Conditions</a></label>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Register</button>
+          </form>
+          <div class="text-center mt-3">
+            <p>Already have an account? <a href="#" data-bs-toggle="modal" data-bs-target="#loginModal" data-bs-dismiss="modal">Login</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Booking Details Modal -->
+  <div class="modal fade" id="bookingDetailsModal" tabindex="-1" aria-labelledby="bookingDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="bookingDetailsModalLabel">Booking Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="bookingDetailsModalContent">
+          <!-- Content will be loaded dynamically -->
+          <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-3">Loading booking details...</p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" id="downloadTicketBtn">Download Ticket</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cancel Booking Modal -->
+  <div class="modal fade" id="cancelBookingModal" tabindex="-1" aria-labelledby="cancelBookingModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="cancelBookingModalLabel">Cancel Booking</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to cancel this booking? This action cannot be undone.</p>
+          <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <span id="cancellationPolicy">Cancellation charges may apply based on the booking policy.</span>
+          </div>
+          <div class="mb-3">
+            <label for="cancellationReason" class="form-label">Reason for Cancellation</label>
+            <select class="form-select" id="cancellationReason" required>
+              <option value="">Select a reason</option>
+              <option value="Change of plans">Change of plans</option>
+              <option value="Found better option">Found better option</option>
+              <option value="Emergency">Emergency</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="mb-3 d-none" id="otherReasonField">
+            <label for="otherReason" class="form-label">Please specify</label>
+            <textarea class="form-control" id="otherReason" rows="2"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-danger" id="confirmCancelBtn">Confirm Cancellation</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- jsPDF for PDF generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- Custom JavaScript -->
+  <script src="../js/main.js"></script>
+  <script>
+    // Bookings Page JavaScript
+    document.addEventListener('DOMContentLoaded', function() {
+      // Check if user is logged in
+      if (!isLoggedIn()) {
+        // Show login modal
+        const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+        loginModal.show();
+        
+        // Show alert in modal
+        showAlert('loginAlert', 'Please login to view your bookings.', 'info');
+        return;
+      }
+      
+      // Load bookings
+      loadBookings();
+      
+      // Handle cancellation reason dropdown
+      document.getElementById('cancellationReason').addEventListener('change', function() {
+        const otherReasonField = document.getElementById('otherReasonField');
+        if (this.value === 'Other') {
+          otherReasonField.classList.remove('d-none');
+        } else {
+          otherReasonField.classList.add('d-none');
+        }
+      });
+      
+      // Handle confirm cancellation button
+      document.getElementById('confirmCancelBtn').addEventListener('click', function() {
+        const reason = document.getElementById('cancellationReason').value;
+        if (!reason) {
+          alert('Please select a reason for cancellation.');
+          return;
+        }
+        
+        // Get booking ID from button data attribute
+        const bookingId = this.getAttribute('data-booking-id');
+        
+        // Simulate API call to cancel booking
+        this.disabled = true;
+        this.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Processing...';
+        
+        setTimeout(() => {
+          // Close modal
+          const cancelModal = bootstrap.Modal.getInstance(document.getElementById('cancelBookingModal'));
+          cancelModal.hide();
+          
+          // Show success message
+          showAlert('mainAlert', 'Booking cancelled successfully. Refund will be processed within 5-7 business days.', 'success');
+          
+          // Reload bookings
+          loadBookings();
+          
+          // Reset button
+          this.disabled = false;
+          this.innerHTML = 'Confirm Cancellation';
+        }, 2000);
+      });
+      
+      // Handle download ticket button
+      document.getElementById('downloadTicketBtn').addEventListener('click', function() {
+        const modalContent = document.getElementById('bookingDetailsModalContent');
+        const bookingData = modalContent.getAttribute('data-booking');
+        
+        if (bookingData) {
+          const booking = JSON.parse(bookingData);
+          downloadBookingPDF(booking);
+        }
+      });
+    });
+    
+    // Load bookings
+   // ...existing code...
+function loadBookings() {
+  // Check if user is logged in via token
+  const token = localStorage.getItem('token');
+  if (!token) {
+    renderBookings('upcomingBookings', []);
+    renderBookings('completedBookings', []);
+    renderBookings('cancelledBookings', []);
+    return;
+  }
+
+  // Fetch bookings from backend for this user
+
+  fetch('http://localhost:3000/api/bookings/history', {
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  })
+    .then(response => response.json())
+    .then(data => {
+      const bookings = data.bookings || [];
+      
+      // Convert date strings to Date objects if needed
+      bookings.forEach(booking => {
+        booking.bookingDate = new Date(booking.bookingDate);
+        if (booking.bookingType === 'flight' && booking.trip?.flightDetails) {
+          booking.details = booking.trip.flightDetails;
+          booking.type = 'flight';
+          booking.details.departureTime = new Date(booking.details.departureTime);
+          booking.details.arrivalTime = new Date(booking.details.arrivalTime);
+        }
+        if (booking.bookingType === 'train' && booking.trip?.trainDetails) {
+          booking.details = booking.trip.trainDetails;
+          booking.type = 'train';
+          booking.details.departureTime = new Date(booking.details.departureTime);
+          booking.details.arrivalTime = new Date(booking.details.arrivalTime);
+        }
+        if (booking.bookingType === 'hotel' && booking.trip?.hotelDetails) {
+          booking.details = booking.trip.hotelDetails;
+          booking.type = 'hotel';
+          booking.details.checkInDate = new Date(booking.details.checkInDate);
+          booking.details.checkOutDate = new Date(booking.details.checkOutDate);
+        }
+      });
+
+      const upcomingBookings = bookings.filter(booking => booking.status === 'confirmed' || booking.status === 'pending');
+      const completedBookings = bookings.filter(booking => booking.status === 'completed');
+      const cancelledBookings = bookings.filter(booking => booking.status === 'cancelled');
+
+      renderBookings('upcomingBookings', upcomingBookings);
+      renderBookings('completedBookings', completedBookings);
+      renderBookings('cancelledBookings', cancelledBookings);
+
+      document.querySelectorAll('.view-details-btn').forEach(button => {
+        button.addEventListener('click', function() {
+          const bookingId = this.getAttribute('data-booking-id');
+          const booking = bookings.find(b => (b._id || b.id) === bookingId);
+          if (booking) showBookingDetails(booking);
+        });
+      });
+      document.querySelectorAll('.cancel-booking-btn').forEach(button => {
+        button.addEventListener('click', function() {
+          const bookingId = this.getAttribute('data-booking-id');
+          const booking = bookings.find(b => (b._id || b.id) === bookingId);
+          if (booking) showCancelBookingModal(booking);
+        });
+      });
+    })
+    .catch(() => {
+      renderBookings('upcomingBookings', []);
+      renderBookings('completedBookings', []);
+      renderBookings('cancelledBookings', []);
+    });
+}
+// ...existing code...
+    
+    // Render bookings
+    function renderBookings(containerId, bookings) {
+      const container = document.getElementById(containerId);
+      
+      if (bookings.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-5">
+            <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+            <p>No bookings found.</p>
+          </div>
+        `;
+        return;
+      }
+      
+      let html = '';
+      
+      bookings.forEach(booking => {
+        const isUpcoming = containerId === 'upcomingBookings';
+        
+        html += `
+          <div class="card mb-4">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+              <div>
+                <span class="badge ${getStatusBadgeClass(booking.status)}">${capitalizeFirstLetter(booking.status)}</span>
+                <span class="ms-2">Booking ID: ${booking._id || booking.id}</span>
+              </div>
+              <small>Booked on: ${booking.bookingDate.toLocaleDateString()}</small>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-8">
+                  <div class="d-flex align-items-center mb-3">
+                    <div class="me-3">
+                      <i class="${getBookingTypeIcon(booking.type)} fa-2x text-primary"></i>
+                    </div>
+                    <div>
+                      <h5 class="mb-0">${getBookingTitle(booking)}</h5>
+                      <p class="mb-0 text-muted">${getBookingSubtitle(booking)}</p>
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <p class="mb-1"><strong>Date:</strong> ${getBookingDateText(booking)}</p>
+                    <p class="mb-0"><strong>Details:</strong> ${getBookingDetailsText(booking)}</p>
+                  </div>
+                </div>
+                <div class="col-md-4 text-md-end">
+                  <div class="price mb-3">₹${booking.totalAmount}</div>
+                  <button class="btn btn-outline-primary me-2 view-details-btn" data-booking-id="${booking._id || booking.id}">
+                    <i class="fas fa-eye me-1"></i>View Details
+                  </button>
+                  ${isUpcoming ? `
+                    <button class="btn btn-outline-danger cancel-booking-btn" data-booking-id="${booking._id || booking.id}">
+                      <i class="fas fa-times me-1"></i>Cancel
+                    </button>
+                  ` : ''}
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      
+      container.innerHTML = html;
+    }
+    
+    // Show booking details modal
+    function showBookingDetails(booking) {
+      const modalTitle = document.getElementById('bookingDetailsModalLabel');
+      const modalContent = document.getElementById('bookingDetailsModalContent');
+      const downloadBtn = document.getElementById('downloadTicketBtn');
+      
+      // Update modal title
+      modalTitle.textContent = `${capitalizeFirstLetter(booking.type)} Booking Details`;
+      
+      // Store booking data for PDF download
+      modalContent.setAttribute('data-booking', JSON.stringify(booking));
+      
+      // Generate content based on booking type
+      let content = '';
+      
+      switch (booking.type) {
+        case 'flight':
+          content = generateFlightDetailsContent(booking);
+          break;
+        case 'train':
+          content = generateTrainDetailsContent(booking);
+          break;
+        case 'hotel':
+          content = generateHotelDetailsContent(booking);
+          break;
+      }
+      
+      // Update modal content
+      modalContent.innerHTML = content;
+      
+      // Show/hide download button based on status
+      if (booking.status === 'confirmed' || booking.status === 'completed') {
+        downloadBtn.classList.remove('d-none');
+      } else {
+        downloadBtn.classList.add('d-none');
+      }
+      
+      // Show modal
+      const modal = new bootstrap.Modal(document.getElementById('bookingDetailsModal'));
+      modal.show();
+    }
+    
+    // Show cancel booking modal
+    function showCancelBookingModal(booking) {
+      const confirmBtn = document.getElementById('confirmCancelBtn');
+      const policyText = document.getElementById('cancellationPolicy');
+      
+      // Set booking ID on confirm button
+      confirmBtn.setAttribute('data-booking-id', booking.id);
+      
+      // Set cancellation policy based on booking type
+      switch (booking.type) {
+        case 'flight':
+          policyText.textContent = 'Flight cancellation: 100% refund if cancelled 24 hours before departure, 50% refund if cancelled within 24 hours.';
+          break;
+        case 'train':
+          policyText.textContent = 'Train cancellation: 75% refund if cancelled 12 hours before departure, 50% refund if cancelled within 12 hours.';
+          break;
+        case 'hotel':
+          policyText.textContent = 'Hotel cancellation: 100% refund if cancelled 48 hours before check-in, no refund if cancelled within 48 hours.';
+          break;
+      }
+      
+      // Reset form
+      document.getElementById('cancellationReason').value = '';
+      document.getElementById('otherReason').value = '';
+      document.getElementById('otherReasonField').classList.add('d-none');
+      
+      // Show modal
+      const modal = new bootstrap.Modal(document.getElementById('cancelBookingModal'));
+      modal.show();
+    }
+    
+    // Generate flight details content
+    function generateFlightDetailsContent(booking) {
+      const details = booking.details;
+      const departureTime = new Date(details.departureTime);
+      const arrivalTime = new Date(details.arrivalTime);
+      
+      return `
+        <div class="card mb-4">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="mb-0">${details.airline}</h5>
+              <span class="badge bg-primary">${details.flightNumber}</span>
+            </div>
+            <div class="row">
+              <div class="col-md-5">
+                <div class="text-center">
+                  <h5 class="mb-0">${departureTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</h5>
+                  <p class="mb-0">${details.source}</p>
+                  <small>${departureTime.toLocaleDateString()}</small>
+                </div>
+              </div>
+              <div class="col-md-2 d-flex flex-column align-items-center justify-content-center">
+                <div class="text-center">
+                  <i class="fas fa-plane"></i>
+                  <div class="progress my-2" style="height: 2px;">
+                    <div class="progress-bar bg-primary" role="progressbar" style="width: 100%"></div>
+                  </div>
+                  <small>${getDurationString(departureTime, arrivalTime)}</small>
+                </div>
+              </div>
+              <div class="col-md-5">
+                <div class="text-center">
+                  <h5 class="mb-0">${arrivalTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</h5>
+                  <p class="mb-0">${details.destination}</p>
+                  <small>${arrivalTime.toLocaleDateString()}</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card mb-4">
+              <div class="card-header">
+                <h5 class="mb-0">Passenger Details</h5>
+              </div>
+              <div class="card-body">
+                <p class="mb-1"><strong>Name:</strong> John Doe</p>
+                <p class="mb-1"><strong>Age:</strong> 35</p>
+                <p class="mb-1"><strong>Gender:</strong> Male</p>
+                <p class="mb-0"><strong>Seat:</strong> 12A (Window)</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card mb-4">
+              <div class="card-header">
+                <h5 class="mb-0">Payment Details</h5>
+              </div>
+              <div class="card-body">
+                <p class="mb-1"><strong>Booking ID:</strong> ${booking.id}</p>
+                <p class="mb-1"><strong>Booking Date:</strong> ${booking.bookingDate.toLocaleDateString()}</p>
+                <p class="mb-1"><strong>Base Fare:</strong> ₹${Math.round(booking.totalAmount / 1.18)}</p>
+                <p class="mb-1"><strong>Taxes & Fees:</strong> ₹${Math.round(booking.totalAmount - (booking.totalAmount / 1.18))}</p>
+                <p class="mb-0"><strong>Total Amount:</strong> ₹${booking.totalAmount}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    
+    // Generate train details content
+    function generateTrainDetailsContent(booking) {
+      const details = booking.details;
+      const departureTime = new Date(details.departureTime);
+      const arrivalTime = new Date(details.arrivalTime);
+      
+      return `
+        <div class="card mb-4">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="mb-0">${details.trainName}</h5>
+              <span class="badge bg-primary">${details.trainNumber}</span>
+            </div>
+            <div class="row">
+              <div class="col-md-5">
+                <div class="text-center">
+                  <h5 class="mb-0">${departureTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</h5>
+                  <p class="mb-0">${details.source}</p>
+                  <small>${departureTime.toLocaleDateString()}</small>
+                </div>
+              </div>
+              <div class="col-md-2 d-flex flex-column align-items-center justify-content-center">
+                <div class="text-center">
+                  <i class="fas fa-train"></i>
+                  <div class="progress my-2" style="height: 2px;">
+                    <div class="progress-bar bg-primary" role="progressbar" style="width: 100%"></div>
+                  </div>
+                  <small>${getDurationString(departureTime, arrivalTime)}</small>
+                </div>
+              </div>
+              <div class="col-md-5">
+                <div class="text-center">
+                  <h5 class="mb-0">${arrivalTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</h5>
+                  <p class="mb-0">${details.destination}</p>
+                  <small>${arrivalTime.toLocaleDateString()}</small>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer bg-light">
+            <div class="row">
+              <div class="col-md-6">
+                <small class="text-muted">Class</small>
+                <p class="mb-0">${details.class}</p>
+              </div>
+              <div class="col-md-6 text-md-end">
+                <small class="text-muted">Journey Duration</small>
+                <p class="mb-0">${getDurationString(departureTime, arrivalTime)}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card mb-4">
+              <div class="card-header">
+                <h5 class="mb-0">Passenger Details</h5>
+              </div>
+              <div class="card-body">
+                <p class="mb-1"><strong>Name:</strong> John Doe</p>
+                <p class="mb-1"><strong>Age:</strong> 35</p>
+                <p class="mb-1"><strong>Gender:</strong> Male</p>
+                <p class="mb-0"><strong>Seat:</strong> B3, 24 (Side Lower)</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card mb-4">
+              <div class="card-header">
+                <h5 class="mb-0">Payment Details</h5>
+              </div>
+              <div class="card-body">
+                <p class="mb-1"><strong>Booking ID:</strong> ${booking.id}</p>
+                <p class="mb-1"><strong>Booking Date:</strong> ${booking.bookingDate.toLocaleDateString()}</p>
+                <p class="mb-1"><strong>Base Fare:</strong> ₹${Math.round(booking.totalAmount / 1.12)}</p>
+                <p class="mb-1"><strong>Taxes & Fees:</strong> ₹${Math.round(booking.totalAmount - (booking.totalAmount / 1.12))}</p>
+                <p class="mb-0"><strong>Total Amount:</strong> ₹${booking.totalAmount}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    
+    // Generate hotel details content
+    function generateHotelDetailsContent(booking) {
+      const details = booking.details;
+      
+      return `
+        <div class="card mb-4">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="mb-0">${details.hotelName}</h5>
+              <span class="badge bg-primary">4.5 <i class="fas fa-star"></i></span>
+            </div>
+            <p class="mb-3"><i class="fas fa-map-marker-alt text-secondary me-2"></i>${details.location}</p>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <div class="d-flex align-items-center">
+                  <div class="me-3">
+                    <i class="fas fa-calendar-check text-primary fa-2x"></i>
+                  </div>
+                  <div>
+                    <small class="text-muted">Check-in</small>
+                    <p class="mb-0">${new Date(details.checkInDate).toLocaleDateString()}</p>
+                    <small>From 2:00 PM</small>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="d-flex align-items-center">
+                  <div class="me-3">
+                    <i class="fas fa-calendar-times text-primary fa-2x"></i>
+                  </div>
+                  <div>
+                    <small class="text-muted">Check-out</small>
+                    <p class="mb-0">${new Date(details.checkOutDate).toLocaleDateString()}</p>
+                    <small>Until 12:00 PM</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="mb-3">
+              <h6>Room Type</h6>
+              <p class="mb-0">${details.roomType} Room</p>
+            </div>
+          </div>
+          <div class="card-footer bg-light">
+            <div class="row">
+              <div class="col-md-6">
+                <small class="text-muted">Duration</small>
+                <p class="mb-0">${details.nights} Night${details.nights > 1 ? 's' : ''}</p>
+              </div>
+              <div class="col-md-6 text-md-end">
+                <small class="text-muted">Price per night</small>
+                <p class="mb-0">₹${Math.round(booking.totalAmount / details.nights / 1.18)}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card mb-4">
+              <div class="card-header">
+                <h5 class="mb-0">Guest Details</h5>
+              </div>
+              <div class="card-body">
+                <p class="mb-1"><strong>Primary Guest:</strong> John Doe</p>
+                <p class="mb-1"><strong>Number of Guests:</strong> 2</p>
+                <p class="mb-0"><strong>Special Requests:</strong> Non-smoking room, High floor</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card mb-4">
+              <div class="card-header">
+                <h5 class="mb-0">Payment Details</h5>
+              </div>
+              <div class="card-body">
+                <p class="mb-1"><strong>Booking ID:</strong> ${booking.id}</p>
+                <p class="mb-1"><strong>Booking Date:</strong> ${booking.bookingDate.toLocaleDateString()}</p>
+                <p class="mb-1"><strong>Room Charges:</strong> ₹${Math.round(booking.totalAmount / 1.18)}</p>
+                <p class="mb-1"><strong>Taxes & Fees:</strong> ₹${Math.round(booking.totalAmount - (booking.totalAmount / 1.18))}</p>
+                <p class="mb-0"><strong>Total Amount:</strong> ₹${booking.totalAmount}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    
+    // Helper functions
+    function getStatusBadgeClass(status) {
+      switch (status) {
+        case 'confirmed':
+          return 'bg-success';
+        case 'completed':
+          return 'bg-info';
+        case 'cancelled':
+          return 'bg-danger';
+        default:
+          return 'bg-secondary';
+      }
+    }
+    
+    function getBookingTypeIcon(type) {
+      switch (type) {
+        case 'flight':
+          return 'fas fa-plane';
+        case 'train':
+          return 'fas fa-train';
+        case 'hotel':
+          return 'fas fa-hotel';
+        default:
+          return 'fas fa-ticket-alt';
+      }
+    }
+    
+    function getBookingTitle(booking) {
+      switch (booking.type) {
+        case 'flight':
+          return `${booking.details.airline} (${booking.details.flightNumber})`;
+        case 'train':
+          return `${booking.details.trainName} (${booking.details.trainNumber})`;
+        case 'hotel':
+          return booking.details.hotelName;
+        default:
+          return 'Booking';
+      }
+    }
+    
+    function getBookingSubtitle(booking) {
+      switch (booking.type) {
+        case 'flight':
+        case 'train':
+          return `${booking.details.source} to ${booking.details.destination}`;
+        case 'hotel':
+          return booking.details.location;
+        default:
+          return '';
+      }
+    }
+    
+    function getBookingDateText(booking) {
+      switch (booking.type) {
+        case 'flight':
+        case 'train':
+          return new Date(booking.details.departureTime).toLocaleDateString();
+        case 'hotel':
+          return `${new Date(booking.details.checkInDate).toLocaleDateString()} to ${new Date(booking.details.checkOutDate).toLocaleDateString()}`;
+        default:
+          return '';
+      }
+    }
+    
+    function getBookingDetailsText(booking) {
+      switch (booking.type) {
+        case 'flight':
+          return `Departure: ${new Date(booking.details.departureTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}, Arrival: ${new Date(booking.details.arrivalTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+        case 'train':
+          return `Class: ${booking.details.class}, Departure: ${new Date(booking.details.departureTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+        case 'hotel':
+          return `${booking.details.roomType} Room, ${booking.details.nights} Night${booking.details.nights > 1 ? 's' : ''}`;
+        default:
+          return '';
+      }
+    }
+    
+    function getDurationString(start, end) {
+      const durationMs = end - start;
+      const hours = Math.floor(durationMs / (1000 * 60 * 60));
+      const minutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
+      
+      return `${hours}h ${minutes}m`;
+    }
+    
+    function capitalizeFirstLetter(string) {
+      return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+    
+    // Download booking as PDF
+    function downloadBookingPDF(booking) {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      
+      // Set up the PDF
+      doc.setFontSize(20);
+      doc.text('TravelEase Booking Confirmation', 20, 30);
+      
+      doc.setFontSize(12);
+      doc.text(`Booking ID: ${booking._id || booking.id}`, 20, 50);
+      doc.text(`Booking Date: ${new Date(booking.bookingDate).toLocaleDateString()}`, 20, 60);
+      doc.text(`Status: ${booking.status.toUpperCase()}`, 20, 70);
+      
+      // Add booking type specific details
+      if (booking.type === 'flight') {
+        const details = booking.details;
+        doc.setFontSize(16);
+        doc.text('Flight Details', 20, 90);
+        
+        doc.setFontSize(12);
+        doc.text(`Airline: ${details.airline}`, 20, 110);
+        doc.text(`Flight Number: ${details.flightNumber}`, 20, 120);
+        doc.text(`From: ${details.source}`, 20, 130);
+        doc.text(`To: ${details.destination}`, 20, 140);
+        doc.text(`Departure: ${new Date(details.departureTime).toLocaleString()}`, 20, 150);
+        doc.text(`Arrival: ${new Date(details.arrivalTime).toLocaleString()}`, 20, 160);
+        
+        if (details.passengerDetails) {
+          doc.text('Passenger Details', 20, 180);
+          doc.text(`Name: ${details.passengerDetails.name}`, 20, 190);
+          doc.text(`Age: ${details.passengerDetails.age}`, 20, 200);
+          doc.text(`Gender: ${details.passengerDetails.gender}`, 20, 210);
+        }
+      } else if (booking.type === 'train') {
+        const details = booking.details;
+        doc.setFontSize(16);
+        doc.text('Train Details', 20, 90);
+        
+        doc.setFontSize(12);
+        doc.text(`Train: ${details.trainName}`, 20, 110);
+        doc.text(`Train Number: ${details.trainNumber}`, 20, 120);
+        doc.text(`From: ${details.source}`, 20, 130);
+        doc.text(`To: ${details.destination}`, 20, 140);
+        doc.text(`Departure: ${new Date(details.departureTime).toLocaleString()}`, 20, 150);
+        doc.text(`Arrival: ${new Date(details.arrivalTime).toLocaleString()}`, 20, 160);
+        doc.text(`Class: ${details.class}`, 20, 170);
+        
+        if (details.passengerDetails) {
+          doc.text('Passenger Details', 20, 190);
+          doc.text(`Name: ${details.passengerDetails.name}`, 20, 200);
+          doc.text(`Age: ${details.passengerDetails.age}`, 20, 210);
+          doc.text(`Gender: ${details.passengerDetails.gender}`, 20, 220);
+        }
+      } else if (booking.type === 'hotel') {
+        const details = booking.details;
+        doc.setFontSize(16);
+        doc.text('Hotel Details', 20, 90);
+        
+        doc.setFontSize(12);
+        doc.text(`Hotel: ${details.name}`, 20, 110);
+        doc.text(`Location: ${details.location}`, 20, 120);
+        doc.text(`Check-in: ${new Date(details.checkInDate).toLocaleDateString()}`, 20, 130);
+        doc.text(`Check-out: ${new Date(details.checkOutDate).toLocaleDateString()}`, 20, 140);
+        doc.text(`Room Type: ${details.roomType}`, 20, 150);
+        doc.text(`Nights: ${details.nights}`, 20, 160);
+        
+        if (details.guestDetails) {
+          doc.text('Guest Details', 20, 180);
+          doc.text(`Name: ${details.guestDetails.name}`, 20, 190);
+          doc.text(`Age: ${details.guestDetails.age}`, 20, 200);
+          doc.text(`Gender: ${details.guestDetails.gender}`, 20, 210);
+        }
+      }
+      
+      // Add payment details
+      doc.setFontSize(16);
+      doc.text('Payment Details', 20, 240);
+      doc.setFontSize(12);
+      doc.text(`Total Amount: ₹${booking.totalAmount}`, 20, 260);
+      doc.text(`Payment Status: ${booking.paymentStatus || 'Completed'}`, 20, 270);
+      
+      // Add footer
+      doc.setFontSize(10);
+      doc.text('Thank you for choosing TravelEase!', 20, 290);
+      doc.text('For support, contact: info@travelease.com', 20, 300);
+      
+      // Download the PDF
+      const fileName = `booking_${booking._id || booking.id}_${booking.type}.pdf`;
+      doc.save(fileName);
+    }
+  </script>
+</body>
+</html>
+
