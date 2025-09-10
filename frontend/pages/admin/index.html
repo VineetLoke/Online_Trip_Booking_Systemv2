@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Online Booking System</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <!-- Custom CSS -->
+  <link href="../../css/styles.css" rel="stylesheet">
+  <style>
+    .admin-sidebar {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: white;
+    }
+    
+    .admin-sidebar .nav-link {
+      color: rgba(255, 255, 255, 0.8);
+      padding: 12px 20px;
+      border-radius: 8px;
+      margin: 2px 0;
+      transition: all 0.3s ease;
+    }
+    
+    .admin-sidebar .nav-link:hover,
+    .admin-sidebar .nav-link.active {
+      color: white;
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .admin-content {
+      background-color: #f8f9fa;
+      min-height: 100vh;
+    }
+    
+    .stats-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+    
+    .stats-card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .stats-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .table-responsive {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .btn-admin {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-admin:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+      color: white;
+    }
+    
+    .content-section {
+      display: none;
+    }
+    
+    .content-section.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar -->
+      <div class="col-md-3 col-lg-2 admin-sidebar p-0">
+        <div class="p-3">
+          <h4 class="mb-4">
+            <i class="fas fa-shield-alt me-2"></i>
+            Admin Panel
+          </h4>
+          <nav class="nav flex-column">
+            <a class="nav-link active" href="#" data-section="dashboard">
+              <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+            </a>
+            <a class="nav-link" href="#" data-section="users">
+              <i class="fas fa-users me-2"></i>Users
+            </a>
+            <a class="nav-link" href="#" data-section="flights">
+              <i class="fas fa-plane me-2"></i>Flights
+            </a>
+            <a class="nav-link" href="#" data-section="trains">
+              <i class="fas fa-train me-2"></i>Trains
+            </a>
+            <a class="nav-link" href="#" data-section="hotels">
+              <i class="fas fa-hotel me-2"></i>Hotels
+            </a>
+            <a class="nav-link" href="#" data-section="bookings">
+              <i class="fas fa-list me-2"></i>Bookings
+            </a>
+            <hr class="my-3">
+            <a class="nav-link" href="#" id="logoutBtn">
+              <i class="fas fa-sign-out-alt me-2"></i>Logout
+            </a>
+          </nav>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="col-md-9 col-lg-10 admin-content p-0">
+        <!-- Header -->
+        <div class="bg-white shadow-sm p-3 mb-4">
+          <div class="d-flex justify-content-between align-items-center">
+            <h2 id="pageTitle">Dashboard</h2>
+            <div class="d-flex align-items-center">
+              <span class="me-3">Welcome, <strong id="adminName">Admin</strong></span>
+              <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                  <i class="fas fa-user-circle me-1"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li><a class="dropdown-item" href="#" id="logoutBtn2"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="dashboard" class="content-section active">
+          <div class="container-fluid">
+            <!-- Stats Cards -->
+            <div class="row mb-4">
+              <div class="col-md-3 mb-3">
+                <div class="stats-card">
+                  <div class="stats-icon bg-primary text-white">
+                    <i class="fas fa-users"></i>
+                  </div>
+                  <h3 id="totalUsers">0</h3>
+                  <p class="text-muted mb-0">Total Users</p>
+                </div>
+              </div>
+              <div class="col-md-3 mb-3">
+                <div class="stats-card">
+                  <div class="stats-icon bg-success text-white">
+                    <i class="fas fa-plane"></i>
+                  </div>
+                  <h3 id="totalFlights">0</h3>
+                  <p class="text-muted mb-0">Total Flights</p>
+                </div>
+              </div>
+              <div class="col-md-3 mb-3">
+                <div class="stats-card">
+                  <div class="stats-icon bg-info text-white">
+                    <i class="fas fa-train"></i>
+                  </div>
+                  <h3 id="totalTrains">0</h3>
+                  <p class="text-muted mb-0">Total Trains</p>
+                </div>
+              </div>
+              <div class="col-md-3 mb-3">
+                <div class="stats-card">
+                  <div class="stats-icon bg-warning text-white">
+                    <i class="fas fa-hotel"></i>
+                  </div>
+                  <h3 id="totalHotels">0</h3>
+                  <p class="text-muted mb-0">Total Hotels</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Recent Bookings -->
+            <div class="row">
+              <div class="col-12">
+                <div class="table-responsive">
+                  <div class="p-3 border-bottom">
+                    <h5 class="mb-0">Recent Bookings</h5>
+                  </div>
+                  <div class="p-3">
+<div id="recentBookings"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Users Section -->
+        <div id="users" class="content-section">
+          <div class="container-fluid">
+            <div class="table-responsive">
+              <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">User Management</h5>
+                <button class="btn btn-admin" onclick="refreshUsers()">
+                  <i class="fas fa-sync-alt me-2"></i>Refresh
+                </button>
+              </div>
+              <div class="p-3">
+<div id="usersTable"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Flights Section -->
+        <div id="flights" class="content-section">
+          <div class="container-fluid">
+            <div class="table-responsive">
+              <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Flight Management</h5>
+                <div>
+                  <button class="btn btn-outline-primary me-2" onclick="showAddFlightModal()">
+                    <i class="fas fa-plus me-2"></i>Add Flight
+                  </button>
+                  <button class="btn btn-admin" onclick="refreshFlights()">
+                    <i class="fas fa-sync-alt me-2"></i>Refresh
+                  </button>
+                </div>
+              </div>
+              <div class="p-3">
+<div id="flightsTable"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trains Section -->
+        <div id="trains" class="content-section">
+          <div class="container-fluid">
+            <div class="table-responsive">
+              <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Train Management</h5>
+                <div>
+                  <button class="btn btn-outline-primary me-2" onclick="showAddTrainModal()">
+                    <i class="fas fa-plus me-2"></i>Add Train
+                  </button>
+                  <button class="btn btn-admin" onclick="refreshTrains()">
+                    <i class="fas fa-sync-alt me-2"></i>Refresh
+                  </button>
+                </div>
+              </div>
+              <div class="p-3">
+<div id="trainsTable"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hotels Section -->
+        <div id="hotels" class="content-section">
+          <div class="container-fluid">
+            <div class="table-responsive">
+              <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Hotel Management</h5>
+                <div>
+                  <button class="btn btn-outline-primary me-2" onclick="showAddHotelModal()">
+                    <i class="fas fa-plus me-2"></i>Add Hotel
+                  </button>
+                  <button class="btn btn-admin" onclick="refreshHotels()">
+                    <i class="fas fa-sync-alt me-2"></i>Refresh
+                  </button>
+                </div>
+              </div>
+              <div class="p-3">
+<div id="hotelsTable"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bookings Section -->
+        <div id="bookings" class="content-section">
+          <div class="container-fluid">
+            <div class="table-responsive">
+              <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Booking Management</h5>
+                <button class="btn btn-admin" onclick="refreshBookings()">
+                  <i class="fas fa-sync-alt me-2"></i>Refresh
+                </button>
+              </div>
+              <div class="p-3">
+<div id="bookingsTable"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Custom JavaScript -->
+  <script src="../../js/main.js"></script>
+  <script src="admin.js"></script>
+  <!-- Toasts -->
+  <div class="toast-container position-fixed top-0 end-0 p-3">
+    <div id="logoutToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+        <strong class="me-auto">Admin</strong>
+        <small class="text-muted">now</small>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body">You have been logged out.</div>
+    </div>
+  </div>
+  <!-- Booking Details Modal -->
+  <div class="modal fade" id="bookingDetailsModal" tabindex="-1" aria-labelledby="bookingDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="bookingDetailsModalLabel">Booking Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="bookingDetailsContent">Loading...</div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

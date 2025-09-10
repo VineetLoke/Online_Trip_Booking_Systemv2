@@ -533,5 +533,107 @@ router.get("/ticket/:bookingId", authenticateUser, async (req, res) => {
   }
 });
 
+// Cancel booking
+router.put("/:id/cancel", authenticateUser, async (req, res) => {
+  try {
+    const { reason } = req.body;
+    const bookingId = req.params.id;
+
+    // Find the booking
+    const booking = await Booking.findById(bookingId);
+    
+    if (!booking) {
+      return res.status(404).json({
+        error: {
+          message: "Booking not found",
+          status: 404
+        }
+      });
+    }
+
+    // Check if user owns this booking
+    if (booking.userId.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        error: {
+          message: "Access denied. You can only cancel your own bookings.",
+          status: 403
+        }
+      });
+    }
+
+    // Check if booking can be cancelled
+    if (booking.status === 'cancelled') {
+      return res.status(400).json({
+        error: {
+          message: "Booking is already cancelled",
+          status: 400
+        }
+      });
+    }
+
+    if (booking.status === 'completed') {
+      return res.status(400).json({
+        error: {
+          message: "Cannot cancel completed booking",
+          status: 400
+        }
+      });
+    }
+
+    // Update booking status
+    booking.status = 'cancelled';
+    booking.cancellationReason = reason;
+    booking.cancelledAt = new Date();
+    
+    // If payment was completed, set to refunded
+    if (booking.paymentStatus === "completed") {
+      booking.paymentStatus = "refunded";
+    }
+    
+    await booking.save();
+
+    // Update available seats/rooms based on booking type
+    if (booking.bookingType === "flight" && booking.trip.flightDetails) {
+      const flight = await Flight.findById(booking.trip.flightDetails.flightId);
+      if (flight) {
+        flight.availableSeats += 1;
+        await flight.save();
+      }
+    } else if (booking.bookingType === "train" && booking.trip.trainDetails) {
+      const train = await Train.findById(booking.trip.trainDetails.trainId);
+      if (train) {
+        train.availableSeats += 1;
+        await train.save();
+      }
+    } else if (booking.bookingType === "hotel" && booking.trip.hotelDetails) {
+      const hotel = await Hotel.findById(booking.trip.hotelDetails.hotelId);
+      if (hotel) {
+        hotel.availableRooms += 1;
+        await hotel.save();
+      }
+    }
+
+    res.status(200).json({
+      message: "Booking cancelled successfully",
+      booking: {
+        id: booking._id,
+        status: booking.status,
+        cancellationReason: booking.cancellationReason,
+        cancelledAt: booking.cancelledAt,
+        paymentStatus: booking.paymentStatus
+      }
+    });
+
+  } catch (error) {
+    console.error('Error cancelling booking:', error);
+    res.status(500).json({
+      error: {
+        message: error.message,
+        status: 500
+      }
+    });
+  }
+});
+
 module.exports = router;
 

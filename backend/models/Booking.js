@@ -234,6 +234,13 @@ const bookingSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
+  cancellationReason: {
+    type: String,
+    trim: true
+  },
+  cancelledAt: {
+    type: Date
+  },
   trip: tripSchema
 }, {
   timestamps: true

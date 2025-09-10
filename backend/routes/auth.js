@@ -116,10 +116,10 @@ router.post('/login', async (req, res) => {
 // Admin Login
 router.post('/admin/login', async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
     
     // Check if admin exists
-    const admin = await Admin.findOne({ username });
+    const admin = await Admin.findOne({ email });
     if (!admin) {
       return res.status(401).json({
         error: {
@@ -151,6 +151,7 @@ router.post('/admin/login', async (req, res) => {
       message: 'Admin login successful',
       admin: {
         id: admin._id,
+        name: admin.name,
         username: admin.username,
         email: admin.email,
         role: admin.role,

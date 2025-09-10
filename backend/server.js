@@ -92,11 +92,65 @@ app.use('*', (req, res) => {
   });
 });
 
-// Start server
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server is running on http://0.0.0.0:${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV}`);
-});
+// Function to find available port
+const findAvailablePort = (startPort) => {
+  return new Promise((resolve, reject) => {
+    const server = app.listen(startPort, '0.0.0.0', () => {
+      const port = server.address().port;
+      server.close(() => resolve(port));
+    });
+    
+    server.on('error', (err) => {
+      if (err.code === 'EADDRINUSE') {
+        // Try next port
+        findAvailablePort(startPort + 1).then(resolve).catch(reject);
+      } else {
+        reject(err);
+      }
+    });
+  });
+};
+
+// Start server with error handling
+const startServer = async () => {
+  try {
+    const availablePort = await findAvailablePort(PORT);
+    
+    const server = app.listen(availablePort, '0.0.0.0', () => {
+      console.log(`Server is running on http://0.0.0.0:${availablePort}`);
+      console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+    });
+    
+    // Handle server errors
+    server.on('error', (err) => {
+      console.error('Server error:', err);
+      if (err.code === 'EADDRINUSE') {
+        console.error(`Port ${err.port} is already in use. Please stop the existing process or use a different port.`);
+      }
+      process.exit(1);
+    });
+    
+    // Graceful shutdown
+    process.on('SIGTERM', () => {
+      server.close(() => {
+        process.exit(0);
+      });
+    });
+    
+    process.on('SIGINT', () => {
+      server.close(() => {
+        process.exit(0);
+      });
+    });
+    
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
+};
+
+// Start the server
+startServer();
 
 module.exports = app;
 

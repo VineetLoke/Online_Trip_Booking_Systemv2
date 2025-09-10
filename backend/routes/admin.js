@@ -72,6 +72,25 @@ router.get('/users/:id/bookings', authenticateAdmin, checkPermission('manage_use
   }
 });
 
+// Get all flights
+router.get('/flights', authenticateAdmin, checkPermission('manage_flights'), async (req, res) => {
+  try {
+    const flights = await Flight.find().sort({ departureTime: 1 });
+    
+    res.status(200).json({
+      count: flights.length,
+      flights
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: {
+        message: error.message,
+        status: 500
+      }
+    });
+  }
+});
+
 // Manage flights
 router.post('/flights', authenticateAdmin, checkPermission('manage_flights'), async (req, res) => {
   try {
@@ -138,6 +157,25 @@ router.delete('/flights/:id', authenticateAdmin, checkPermission('manage_flights
     
     res.status(200).json({
       message: 'Flight deleted successfully'
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: {
+        message: error.message,
+        status: 500
+      }
+    });
+  }
+});
+
+// Get all trains
+router.get('/trains', authenticateAdmin, checkPermission('manage_trains'), async (req, res) => {
+  try {
+    const trains = await Train.find().sort({ departureTime: 1 });
+    
+    res.status(200).json({
+      count: trains.length,
+      trains
     });
   } catch (error) {
     res.status(500).json({
@@ -226,6 +264,25 @@ router.delete('/trains/:id', authenticateAdmin, checkPermission('manage_trains')
   }
 });
 
+// Get all hotels
+router.get('/hotels', authenticateAdmin, checkPermission('manage_hotels'), async (req, res) => {
+  try {
+    const hotels = await Hotel.find().sort({ name: 1 });
+    
+    res.status(200).json({
+      count: hotels.length,
+      hotels
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: {
+        message: error.message,
+        status: 500
+      }
+    });
+  }
+});
+
 // Manage hotels
 router.post('/hotels', authenticateAdmin, checkPermission('manage_hotels'), async (req, res) => {
   try {
@@ -292,6 +349,27 @@ router.delete('/hotels/:id', authenticateAdmin, checkPermission('manage_hotels')
     
     res.status(200).json({
       message: 'Hotel deleted successfully'
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: {
+        message: error.message,
+        status: 500
+      }
+    });
+  }
+});
+
+// Get all bookings
+router.get('/bookings', authenticateAdmin, checkPermission('view_reports'), async (req, res) => {
+  try {
+    const bookings = await Booking.find()
+      .populate('userId', 'name email')
+      .sort({ bookingDate: -1 });
+    
+    res.status(200).json({
+      count: bookings.length,
+      bookings
     });
   } catch (error) {
     res.status(500).json({

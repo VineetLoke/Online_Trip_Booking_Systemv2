@@ -49,29 +49,6 @@ async function setupDatabase() {
 async function insertSampleData(db) {
   console.log('Inserting sample data...');
   
-  // Sample Users
-  const users = [
-    {
-      name: "John Doe",
-      email: "john.doe@example.com",
-      phone: "+1234567890",
-      passwordHash: "$2b$10$rOOjXdL0XqKqJZ9.WvKuVeKX8YrJ9YrJ9YrJ9YrJ9YrJ9YrJ9YrJ9Y", // password: "password123"
-      createdAt: new Date(),
-      updatedAt: new Date()
-    },
-    {
-      name: "Jane Smith",
-      email: "jane.smith@example.com",
-      phone: "+1234567891",
-      passwordHash: "$2b$10$rOOjXdL0XqKqJZ9.WvKuVeKX8YrJ9YrJ9YrJ9YrJ9YrJ9YrJ9YrJ9Y",
-      createdAt: new Date(),
-      updatedAt: new Date()
-    }
-  ];
-  
-  await db.collection('users').insertMany(users);
-  console.log('Inserted sample users');
-  
   // Sample Flights
   const flights = [
     {
@@ -103,26 +80,14 @@ async function insertSampleData(db) {
       status: "active",
       createdAt: new Date(),
       updatedAt: new Date()
-    },
-    {
-      flightNumber: "SG303",
-      airline: "SpiceJet",
-      source: "Delhi",
-      destination: "Goa",
-      departureTime: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000), // 4 days from now
-      arrivalTime: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000 + 2.5 * 60 * 60 * 1000), // 2.5 hours later
-      price: 6800,
-      availableSeats: 80,
-      totalSeats: 100,
-      aircraft: "Boeing 737",
-      status: "active",
-      createdAt: new Date(),
-      updatedAt: new Date()
     }
   ];
-  
+
+  // Remove any existing flights with the same flightNumbers
+  await db.collection('flights').deleteMany({ flightNumber: { $in: flights.map(f => f.flightNumber) } });
   await db.collection('flights').insertMany(flights);
   console.log('Inserted sample flights');
+  // (flights inserted above)
   
   // Sample Trains
   const trains = [
@@ -173,6 +138,8 @@ async function insertSampleData(db) {
     }
   ];
   
+  // Remove any existing trains with the same trainNumbers
+  await db.collection('trains').deleteMany({ trainNumber: { $in: trains.map(t => t.trainNumber) } });
   await db.collection('trains').insertMany(trains);
   console.log('Inserted sample trains');
   
@@ -229,19 +196,25 @@ async function insertSampleData(db) {
   console.log('Inserted sample hotels');
   
   // Sample Admin
-  const admins = [
-    {
-      username: "admin",
-      email: "admin@bookingsystem.com",
-      passwordHash: "$2b$10$rOOjXdL0XqKqJZ9.WvKuVeKX8YrJ9YrJ9YrJ9YrJ9YrJ9YrJ9YrJ9Y", // password: "admin123"
-      role: "admin",
-      permissions: ["manage_users", "manage_flights", "manage_trains", "manage_hotels", "view_reports"],
-      createdAt: new Date(),
-      updatedAt: new Date()
-    }
-  ];
-  
-  await db.collection('admins').insertMany(admins);
+  const bcrypt = require('bcrypt');
+  const saltRounds = 10;
+  const adminPassword = "admin123";
+  const hashedPassword = await bcrypt.hash(adminPassword, saltRounds);
+
+  const admin = {
+    name: "System Administrator",
+    username: "admin",
+    email: "admin@travelease.com",
+    passwordHash: hashedPassword,
+    role: "super_admin",
+    permissions: ["manage_users", "manage_flights", "manage_trains", "manage_hotels", "view_reports"],
+    createdAt: new Date(),
+    updatedAt: new Date()
+  };
+
+  // Remove any existing admin with same email/username
+  await db.collection('admins').deleteMany({ $or: [ { email: admin.email }, { username: admin.username } ] });
+  await db.collection('admins').insertOne(admin);
   console.log('Inserted sample admin');
 }
 

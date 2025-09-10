@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login - Online Booking System</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <!-- Custom CSS -->
+  <link href="../../css/styles.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+    }
+    
+    .admin-login-card {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+    
+    .admin-login-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 2rem;
+      text-align: center;
+    }
+    
+    .admin-login-body {
+      padding: 2rem;
+    }
+    
+    .form-control:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    
+    .btn-admin {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      border-radius: 8px;
+      padding: 12px 30px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-admin:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-6 col-lg-4">
+        <div class="admin-login-card">
+          <div class="admin-login-header">
+            <i class="fas fa-shield-alt fa-3x mb-3"></i>
+            <h3 class="mb-0">Admin Portal</h3>
+            <p class="mb-0">Sign in to access the admin dashboard</p>
+          </div>
+          <div class="admin-login-body">
+            <div id="loginAlert"></div>
+            <form id="adminLoginForm">
+              <div class="mb-3">
+                <label for="adminEmail" class="form-label">Admin Email</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                  <input type="email" class="form-control" id="adminEmail" placeholder="admin@travelease.com" required>
+                </div>
+              </div>
+              <div class="mb-4">
+                <label for="adminPassword" class="form-label">Password</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                  <input type="password" class="form-control" id="adminPassword" placeholder="Enter password" required>
+                </div>
+              </div>
+              <button type="submit" class="btn btn-admin w-100">
+                <i class="fas fa-sign-in-alt me-2"></i>Sign In
+              </button>
+            </form>
+            <div class="text-center mt-4">
+              <a href="../../index.html" class="text-decoration-none">
+                <i class="fas fa-arrow-left me-2"></i>Back to Home
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Custom JavaScript -->
+  <script src="../../js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Check if admin is already logged in
+      if (localStorage.getItem('adminToken')) {
+        window.location.href = 'index.html';
+        return;
+      }
+      
+      // Handle admin login form
+      document.getElementById('adminLoginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const email = document.getElementById('adminEmail').value;
+        const password = document.getElementById('adminPassword').value;
+        
+        try {
+          const response = await fetch('http://localhost:3000/api/auth/admin/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email, password })
+          });
+          
+          const data = await response.json();
+          
+          if (response.ok) {
+            // Store admin token
+            localStorage.setItem('adminToken', data.token);
+            localStorage.setItem('adminUser', JSON.stringify(data.admin));
+            
+            // Redirect to admin dashboard
+            window.location.href = 'index.html';
+          } else {
+            const errorMessage = data.error?.message || data.message || 'Login failed';
+            showAlert('loginAlert', errorMessage, 'danger');
+          }
+        } catch (error) {
+          console.error('Login error:', error);
+          showAlert('loginAlert', 'Network error. Please try again.', 'danger');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
