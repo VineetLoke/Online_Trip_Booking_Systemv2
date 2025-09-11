@@ -381,7 +381,178 @@ router.get('/bookings', authenticateAdmin, checkPermission('view_reports'), asyn
   }
 });
 
-// Get booking statistics
+// Get analytics data
+router.get('/analytics/overview', authenticateAdmin, checkPermission('view_reports'), async (req, res) => {
+  try {
+    const totalBookings = await Booking.countDocuments();
+    const confirmedBookings = await Booking.countDocuments({ status: 'confirmed' });
+    const pendingBookings = await Booking.countDocuments({ status: 'pending' });
+    const cancelledBookings = await Booking.countDocuments({ status: 'cancelled' });
+    
+    // Get today's bookings
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    const todayBookings = await Booking.countDocuments({
+      bookingDate: { $gte: today, $lt: tomorrow }
+    });
+    
+    // Calculate total revenue
+    const revenueResult = await Booking.aggregate([
+      { $match: { status: 'confirmed' } },
+      { $group: { _id: null, totalRevenue: { $sum: '$totalAmount' } } }
+    ]);
+    const totalRevenue = revenueResult.length > 0 ? revenueResult[0].totalRevenue : 0;
+    
+    res.json({
+      totalBookings,
+      confirmedBookings,
+      pendingBookings,
+      cancelledBookings,
+      todayBookings,
+      totalRevenue
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: { message: error.message, status: 500 }
+    });
+  }
+});
+
+// Get booking types distribution
+router.get('/analytics/booking-types', authenticateAdmin, checkPermission('view_reports'), async (req, res) => {
+  try {
+    const bookingTypes = await Booking.aggregate([
+      { $group: { _id: '$bookingType', count: { $sum: 1 }, revenue: { $sum: '$totalAmount' } } },
+      { $sort: { count: -1 } }
+    ]);
+    
+    res.json({ bookingTypes });
+  } catch (error) {
+    res.status(500).json({
+      error: { message: error.message, status: 500 }
+    });
+  }
+});
+
+// Get booking status distribution
+router.get('/analytics/booking-status', authenticateAdmin, checkPermission('view_reports'), async (req, res) => {
+  try {
+    const bookingStatus = await Booking.aggregate([
+      { $group: { _id: '$status', count: { $sum: 1 }, revenue: { $sum: '$totalAmount' } } },
+      { $sort: { count: -1 } }
+    ]);
+    
+    res.json({ bookingStatus });
+  } catch (error) {
+    res.status(500).json({
+      error: { message: error.message, status: 500 }
+    });
+  }
+});
+
+// Get popular flight routes
+router.get('/analytics/flight-routes', authenticateAdmin, checkPermission('view_reports'), async (req, res) => {
+  try {
+    const flightRoutes = await Booking.aggregate([
+      { $match: { bookingType: 'flight' } },
+      { $group: {
+          _id: {
+            route: { $concat: ['$trip.flightDetails.source', ' → ', '$trip.flightDetails.destination'] }
+          },
+          count: { $sum: 1 },
+          revenue: { $sum: '$totalAmount' }
+        }
+      },
+      { $sort: { count: -1 } },
+      { $limit: 10 }
+    ]);
+    
+    res.json({ flightRoutes });
+  } catch (error) {
+    res.status(500).json({
+      error: { message: error.message, status: 500 }
+    });
+  }
+});
+
+// Get popular train routes
+router.get('/analytics/train-routes', authenticateAdmin, checkPermission('view_reports'), async (req, res) => {
+  try {
+    const trainRoutes = await Booking.aggregate([
+      { $match: { bookingType: 'train' } },
+      { $group: {
+          _id: {
+            route: { $concat: ['$trip.trainDetails.source', ' → ', '$trip.trainDetails.destination'] }
+          },
+          count: { $sum: 1 },
+          revenue: { $sum: '$totalAmount' }
+        }
+      },
+      { $sort: { count: -1 } },
+      { $limit: 10 }
+    ]);
+    
+    res.json({ trainRoutes });
+  } catch (error) {
+    res.status(500).json({
+      error: { message: error.message, status: 500 }
+    });
+  }
+});
+
+// Get hotel bookings by location
+router.get('/analytics/hotel-locations', authenticateAdmin, checkPermission('view_reports'), async (req, res) => {
+  try {
+    const hotelLocations = await Booking.aggregate([
+      { $match: { bookingType: 'hotel' } },
+      { $group: {
+          _id: '$trip.hotelDetails.location',
+          count: { $sum: 1 },
+          revenue: { $sum: '$totalAmount' }
+        }
+      },
+      { $sort: { count: -1 } },
+      { $limit: 10 }
+    ]);
+    
+    res.json({ hotelLocations });
+  } catch (error) {
+    res.status(500).json({
+      error: { message: error.message, status: 500 }
+    });
+  }
+});
+
+// Get monthly revenue trend
+router.get('/analytics/monthly-revenue', authenticateAdmin, checkPermission('view_reports'), async (req, res) => {
+  try {
+    const monthlyRevenue = await Booking.aggregate([
+      { $match: { status: 'confirmed' } },
+      { $group: {
+          _id: {
+            year: { $year: '$bookingDate' },
+            month: { $month: '$bookingDate' }
+          },
+          revenue: { $sum: '$totalAmount' },
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { '_id.year': 1, '_id.month': 1 } },
+      { $limit: 12 }
+    ]);
+    
+    res.json({ monthlyRevenue });
+  } catch (error) {
+    res.status(500).json({
+      error: { message: error.message, status: 500 }
+    });
+  }
+});
+
+// Get booking statistics (legacy endpoint)
 router.get('/reports/bookings', authenticateAdmin, checkPermission('view_reports'), async (req, res) => {
   try {
     // Aggregate bookings by type and status

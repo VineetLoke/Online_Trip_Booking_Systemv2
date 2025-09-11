@@ -38,8 +38,8 @@ window.adminLogout = function(e) {
 // Mark this as an admin page so site-wide scripts can avoid interfering
 window.isAdminPage = true;
 
-// Use the shared API base URL exposed by main.js (avoid redeclaring)
-const API_BASE_URL = window.API_BASE_URL || 'http://localhost:3000/api';
+// Use the shared API base URL exposed by main.js (defined in frontend/js/main.js)
+// Do not redeclare API_BASE_URL here to avoid SyntaxError when main.js already defines it.
 
 document.addEventListener('DOMContentLoaded', function() {
   // Check if admin is logged in
@@ -62,6 +62,10 @@ document.addEventListener('DOMContentLoaded', function() {
   loadTrains();
   loadHotels();
   loadBookings();
+  loadReports();
+
+  // Start real-time event stream for admin logs
+  startAdminEventStream();
 
   // Handle navigation
   document.querySelectorAll('.nav-link[data-section]').forEach(link => {
@@ -137,11 +141,12 @@ function showSection(sectionName) {
   // Update page title
   const titles = {
     dashboard: 'Dashboard',
-    users: 'User Management',
-    flights: 'Flight Management',
-    trains: 'Train Management',
-    hotels: 'Hotel Management',
-    bookings: 'Booking Management'
+    users: 'User Information',
+    flights: 'Flight Information',
+    trains: 'Train Information',
+    hotels: 'Hotel Information',
+    bookings: 'Booking Management',
+    reports: 'Reports & Analytics'
   };
   document.getElementById('pageTitle').textContent = titles[sectionName] || 'Admin Panel';
 }
@@ -249,7 +254,7 @@ function displayUsers(users) {
   const container = document.getElementById('usersTable');
   
   if (users.length === 0) {
-    container.innerHTML = '<p class="text-muted text-center">No users found</p>';
+    container.innerHTML = '<p class="text-muted text-center py-4">No users found</p>';
     return;
   }
 
@@ -262,7 +267,7 @@ function displayUsers(users) {
             <th>Email</th>
             <th>Phone</th>
             <th>Joined</th>
-            <th>Actions</th>
+            <th>Status</th>
           </tr>
         </thead>
         <tbody>
@@ -272,11 +277,7 @@ function displayUsers(users) {
               <td>${user.email}</td>
               <td>${user.phone || 'N/A'}</td>
               <td>${new Date(user.createdAt).toLocaleDateString()}</td>
-              <td>
-                <button class="btn btn-sm btn-outline-danger" onclick="deleteUser('${user._id}')">
-                  <i class="fas fa-trash"></i>
-                </button>
-              </td>
+              <td><span class="badge bg-success">Active</span></td>
             </tr>
           `).join('')}
         </tbody>
@@ -309,7 +310,7 @@ function displayFlights(flights) {
   const container = document.getElementById('flightsTable');
   
   if (flights.length === 0) {
-    container.innerHTML = '<p class="text-muted text-center">No flights found</p>';
+    container.innerHTML = '<p class="text-muted text-center py-4">No flights found</p>';
     return;
   }
 
@@ -323,7 +324,8 @@ function displayFlights(flights) {
             <th>Route</th>
             <th>Departure</th>
             <th>Price</th>
-            <th>Actions</th>
+            <th>Available Seats</th>
+            <th>Status</th>
           </tr>
         </thead>
         <tbody>
@@ -334,14 +336,8 @@ function displayFlights(flights) {
               <td>${flight.source} → ${flight.destination}</td>
               <td>${new Date(flight.departureTime).toLocaleString()}</td>
               <td>₹${flight.price}</td>
-              <td>
-                <button class="btn btn-sm btn-outline-primary me-1" onclick="editFlight('${flight._id}')">
-                  <i class="fas fa-edit"></i>
-                </button>
-                <button class="btn btn-sm btn-outline-danger" onclick="deleteFlight('${flight._id}')">
-                  <i class="fas fa-trash"></i>
-                </button>
-              </td>
+              <td>${flight.availableSeats || 'N/A'}</td>
+              <td><span class="badge bg-${flight.status === 'active' ? 'success' : 'secondary'}">${flight.status || 'Active'}</span></td>
             </tr>
           `).join('')}
         </tbody>
@@ -374,7 +370,7 @@ function displayTrains(trains) {
   const container = document.getElementById('trainsTable');
   
   if (trains.length === 0) {
-    container.innerHTML = '<p class="text-muted text-center">No trains found</p>';
+    container.innerHTML = '<p class="text-muted text-center py-4">No trains found</p>';
     return;
   }
 
@@ -388,7 +384,8 @@ function displayTrains(trains) {
             <th>Route</th>
             <th>Departure</th>
             <th>Price</th>
-            <th>Actions</th>
+            <th>Available Seats</th>
+            <th>Status</th>
           </tr>
         </thead>
         <tbody>
@@ -399,14 +396,8 @@ function displayTrains(trains) {
               <td>${train.source} → ${train.destination}</td>
               <td>${new Date(train.departureTime).toLocaleString()}</td>
               <td>₹${train.price}</td>
-              <td>
-                <button class="btn btn-sm btn-outline-primary me-1" onclick="editTrain('${train._id}')">
-                  <i class="fas fa-edit"></i>
-                </button>
-                <button class="btn btn-sm btn-outline-danger" onclick="deleteTrain('${train._id}')">
-                  <i class="fas fa-trash"></i>
-                </button>
-              </td>
+              <td>${train.availableSeats || 'N/A'}</td>
+              <td><span class="badge bg-${train.status === 'active' ? 'success' : 'secondary'}">${train.status || 'Active'}</span></td>
             </tr>
           `).join('')}
         </tbody>
@@ -439,7 +430,7 @@ function displayHotels(hotels) {
   const container = document.getElementById('hotelsTable');
   
   if (hotels.length === 0) {
-    container.innerHTML = '<p class="text-muted text-center">No hotels found</p>';
+    container.innerHTML = '<p class="text-muted text-center py-4">No hotels found</p>';
     return;
   }
 
@@ -452,8 +443,10 @@ function displayHotels(hotels) {
             <th>Location</th>
             <th>Room Type</th>
             <th>Price</th>
-            <th>Rooms</th>
-            <th>Actions</th>
+            <th>Available Rooms</th>
+            <th>Total Rooms</th>
+            <th>Rating</th>
+            <th>Status</th>
           </tr>
         </thead>
         <tbody>
@@ -463,15 +456,10 @@ function displayHotels(hotels) {
               <td>${hotel.location}</td>
               <td>${hotel.roomType}</td>
               <td>₹${hotel.price}</td>
+              <td>${hotel.availableRooms || 'N/A'}</td>
               <td>${hotel.totalRooms}</td>
-              <td>
-                <button class="btn btn-sm btn-outline-primary me-1" onclick="editHotel('${hotel._id}')">
-                  <i class="fas fa-edit"></i>
-                </button>
-                <button class="btn btn-sm btn-outline-danger" onclick="deleteHotel('${hotel._id}')">
-                  <i class="fas fa-trash"></i>
-                </button>
-              </td>
+              <td>${hotel.rating ? '★'.repeat(Math.floor(hotel.rating)) + ' (' + hotel.rating + ')' : 'N/A'}</td>
+              <td><span class="badge bg-${hotel.status === 'active' ? 'success' : 'secondary'}">${hotel.status || 'Active'}</span></td>
             </tr>
           `).join('')}
         </tbody>
@@ -589,6 +577,94 @@ async function showBookingDetails(bookingId) {
   }
 }
 
+// Real-time event stream (SSE)
+function startAdminEventStream() {
+  try {
+    // Avoid using admin token for SSE; EventSource doesn't send custom headers. Our server allows CORS and public stream.
+    const source = new EventSource(`${API_BASE_URL}/admin/stream`);
+    source.addEventListener('open', () => console.log('[SSE] connected'));
+    source.addEventListener('error', (e) => console.warn('[SSE] error', e));
+
+    const logContainer = ensureLogContainer();
+
+    const renderLog = (entry) => {
+      const el = document.createElement('div');
+      el.className = 'border-bottom py-2';
+      el.innerHTML = `
+        <div class="d-flex justify-content-between">
+          <div>
+            <span class="badge bg-secondary me-2">${entry.event}</span>
+            <strong>${entry.title}</strong>
+            <div class="small text-muted">${entry.subtitle || ''}</div>
+          </div>
+          <small class="text-muted">${new Date(entry.timestamp).toLocaleTimeString()}</small>
+        </div>`;
+      logContainer.prepend(el);
+    };
+
+    // User registrations
+    source.addEventListener('user:registered', (ev) => {
+      const data = JSON.parse(ev.data);
+      const p = data.payload;
+      renderLog({
+        event: 'User',
+        title: `${p.name} registered`,
+        subtitle: p.email,
+        timestamp: data.timestamp
+      });
+      // Optionally refresh counts
+      refreshUsers();
+      loadDashboardData();
+    });
+
+    // Bookings
+    source.addEventListener('booking:created', (ev) => {
+      const data = JSON.parse(ev.data);
+      const p = data.payload;
+      renderLog({
+        event: 'Booking',
+        title: `${p.type.toUpperCase()} booking - ₹${p.amount}`,
+        subtitle: `${p.user.name} (${p.user.email})`,
+        timestamp: data.timestamp
+      });
+      // Update UI sections
+      refreshBookings();
+      loadDashboardData();
+    });
+  } catch (err) {
+    console.warn('SSE not supported or failed:', err);
+  }
+}
+
+function ensureLogContainer() {
+  // Create a lightweight log panel at the end of dashboard section if not present
+  let container = document.getElementById('adminLiveLogs');
+  if (!container) {
+    const dashboard = document.getElementById('dashboard');
+    if (dashboard) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'container-fluid mt-4';
+      wrapper.innerHTML = `
+        <div class="row">
+          <div class="col-12">
+            <div class="table-responsive" id="adminLiveLogs">
+              <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Live Activity</h5>
+                <span class="text-muted small">Real-time user registrations and bookings</span>
+              </div>
+              <div class="p-3" id="adminLiveLogsBody"></div>
+            </div>
+          </div>
+        </div>`;
+      dashboard.appendChild(wrapper);
+      container = document.getElementById('adminLiveLogsBody');
+    }
+  } else {
+    container = document.getElementById('adminLiveLogsBody') || container;
+  }
+  return container;
+}
+
 // Utility functions
 function getAuthHeaders() {
   const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
@@ -633,68 +709,326 @@ function refreshBookings() {
   loadBookings();
 }
 
-// CRUD operations (placeholder functions)
-function deleteUser(userId) {
-  if (confirm('Are you sure you want to delete this user?')) {
-    // Implement delete user API call
-    console.log('Delete user:', userId);
+function refreshReports() {
+  loadReports();
+}
+
+// Analytics functions
+async function loadReports() {
+  try {
+    // Load overview stats
+    await loadOverviewStats();
+    
+    // Load all charts
+    await Promise.all([
+      loadBookingTypesChart(),
+      loadBookingStatusChart(),
+      loadFlightRoutesChart(),
+      loadTrainRoutesChart(),
+      loadHotelLocationsChart(),
+      loadRevenueChart()
+    ]);
+  } catch (error) {
+    console.error('Error loading reports:', error);
   }
 }
 
-function editFlight(flightId) {
-  // Implement edit flight modal
-  console.log('Edit flight:', flightId);
-}
-
-function deleteFlight(flightId) {
-  if (confirm('Are you sure you want to delete this flight?')) {
-    // Implement delete flight API call
-    console.log('Delete flight:', flightId);
+async function loadOverviewStats() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/admin/analytics/overview`, { 
+      headers: getAuthHeaders() 
+    });
+    handleAuthResponse(response);
+    const data = await response.json();
+    
+    // Update stats cards
+    document.getElementById('totalRevenue').textContent = `₹${data.totalRevenue.toLocaleString()}`;
+    document.getElementById('confirmedBookings').textContent = data.confirmedBookings;
+    document.getElementById('pendingBookings').textContent = data.pendingBookings;
+    document.getElementById('todayBookings').textContent = data.todayBookings;
+  } catch (error) {
+    console.error('Error loading overview stats:', error);
   }
 }
 
-function editTrain(trainId) {
-  // Implement edit train modal
-  console.log('Edit train:', trainId);
-}
-
-function deleteTrain(trainId) {
-  if (confirm('Are you sure you want to delete this train?')) {
-    // Implement delete train API call
-    console.log('Delete train:', trainId);
+async function loadBookingTypesChart() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/admin/analytics/booking-types`, { 
+      headers: getAuthHeaders() 
+    });
+    handleAuthResponse(response);
+    const data = await response.json();
+    
+    const ctx = document.getElementById('bookingTypesChart').getContext('2d');
+    
+    // Destroy existing chart if it exists
+    if (window.bookingTypesChart) {
+      window.bookingTypesChart.destroy();
+    }
+    
+    window.bookingTypesChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: data.bookingTypes.map(item => item._id.charAt(0).toUpperCase() + item._id.slice(1)),
+        datasets: [{
+          data: data.bookingTypes.map(item => item.count),
+          backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
+          hoverBackgroundColor: ['#FF6384CC', '#36A2EBCC', '#FFCE56CC', '#4BC0C0CC']
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom'
+          }
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Error loading booking types chart:', error);
   }
 }
 
-function editHotel(hotelId) {
-  // Implement edit hotel modal
-  console.log('Edit hotel:', hotelId);
-}
-
-function deleteHotel(hotelId) {
-  if (confirm('Are you sure you want to delete this hotel?')) {
-    // Implement delete hotel API call
-    console.log('Delete hotel:', hotelId);
+async function loadBookingStatusChart() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/admin/analytics/booking-status`, { 
+      headers: getAuthHeaders() 
+    });
+    handleAuthResponse(response);
+    const data = await response.json();
+    
+    const ctx = document.getElementById('bookingStatusChart').getContext('2d');
+    
+    // Destroy existing chart if it exists
+    if (window.bookingStatusChart) {
+      window.bookingStatusChart.destroy();
+    }
+    
+    const statusColors = {
+      'confirmed': '#28a745',
+      'pending': '#ffc107',
+      'cancelled': '#dc3545',
+      'failed': '#6c757d'
+    };
+    
+    window.bookingStatusChart = new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: data.bookingStatus.map(item => item._id.charAt(0).toUpperCase() + item._id.slice(1)),
+        datasets: [{
+          data: data.bookingStatus.map(item => item.count),
+          backgroundColor: data.bookingStatus.map(item => statusColors[item._id] || '#6c757d')
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom'
+          }
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Error loading booking status chart:', error);
   }
 }
 
-function cancelBooking(bookingId) {
-  if (confirm('Are you sure you want to cancel this booking?')) {
-    // Implement cancel booking API call
-    console.log('Cancel booking:', bookingId);
+async function loadFlightRoutesChart() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/admin/analytics/flight-routes`, { 
+      headers: getAuthHeaders() 
+    });
+    handleAuthResponse(response);
+    const data = await response.json();
+    
+    const ctx = document.getElementById('flightRoutesChart').getContext('2d');
+    
+    // Destroy existing chart if it exists
+    if (window.flightRoutesChart) {
+      window.flightRoutesChart.destroy();
+    }
+    
+    window.flightRoutesChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: data.flightRoutes.map(item => item._id.route),
+        datasets: [{
+          label: 'Bookings',
+          data: data.flightRoutes.map(item => item.count),
+          backgroundColor: '#36A2EB',
+          borderColor: '#36A2EB',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        },
+        plugins: {
+          legend: {
+            display: false
+          }
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Error loading flight routes chart:', error);
   }
 }
 
-function showAddFlightModal() {
-  // Implement add flight modal
-  console.log('Show add flight modal');
+async function loadTrainRoutesChart() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/admin/analytics/train-routes`, { 
+      headers: getAuthHeaders() 
+    });
+    handleAuthResponse(response);
+    const data = await response.json();
+    
+    const ctx = document.getElementById('trainRoutesChart').getContext('2d');
+    
+    // Destroy existing chart if it exists
+    if (window.trainRoutesChart) {
+      window.trainRoutesChart.destroy();
+    }
+    
+    window.trainRoutesChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: data.trainRoutes.map(item => item._id.route),
+        datasets: [{
+          label: 'Bookings',
+          data: data.trainRoutes.map(item => item.count),
+          backgroundColor: '#4BC0C0',
+          borderColor: '#4BC0C0',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        },
+        plugins: {
+          legend: {
+            display: false
+          }
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Error loading train routes chart:', error);
+  }
 }
 
-function showAddTrainModal() {
-  // Implement add train modal
-  console.log('Show add train modal');
+async function loadHotelLocationsChart() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/admin/analytics/hotel-locations`, { 
+      headers: getAuthHeaders() 
+    });
+    handleAuthResponse(response);
+    const data = await response.json();
+    
+    const ctx = document.getElementById('hotelLocationsChart').getContext('2d');
+    
+    // Destroy existing chart if it exists
+    if (window.hotelLocationsChart) {
+      window.hotelLocationsChart.destroy();
+    }
+    
+    window.hotelLocationsChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: data.hotelLocations.map(item => item._id),
+        datasets: [{
+          data: data.hotelLocations.map(item => item.count),
+          backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'],
+          hoverBackgroundColor: ['#FF6384CC', '#36A2EBCC', '#FFCE56CC', '#4BC0C0CC', '#9966FFCC', '#FF9F40CC']
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom'
+          }
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Error loading hotel locations chart:', error);
+  }
 }
 
-function showAddHotelModal() {
-  // Implement add hotel modal
-  console.log('Show add hotel modal');
+async function loadRevenueChart() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/admin/analytics/monthly-revenue`, { 
+      headers: getAuthHeaders() 
+    });
+    handleAuthResponse(response);
+    const data = await response.json();
+    
+    const ctx = document.getElementById('revenueChart').getContext('2d');
+    
+    // Destroy existing chart if it exists
+    if (window.revenueChart) {
+      window.revenueChart.destroy();
+    }
+    
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    
+    window.revenueChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: data.monthlyRevenue.map(item => 
+          `${monthNames[item._id.month - 1]} ${item._id.year}`
+        ),
+        datasets: [{
+          label: 'Revenue (₹)',
+          data: data.monthlyRevenue.map(item => item.revenue),
+          borderColor: '#28a745',
+          backgroundColor: '#28a74520',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: function(value) {
+                return '₹' + value.toLocaleString();
+              }
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            display: false
+          }
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Error loading revenue chart:', error);
+  }
 }
+
+// Note: Admin panel is now read-only for data viewing and booking management only
+// No CRUD operations are available for flights, trains, hotels, or users

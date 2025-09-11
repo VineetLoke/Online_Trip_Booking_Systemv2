@@ -8,6 +8,8 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Font Awesome -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
   <!-- Custom CSS -->
@@ -120,6 +122,9 @@
             <a class="nav-link" href="#" data-section="bookings">
               <i class="fas fa-list me-2"></i>Bookings
             </a>
+            <a class="nav-link" href="#" data-section="reports">
+              <i class="fas fa-chart-bar me-2"></i>Reports & Analytics
+            </a>
             <hr class="my-3">
             <a class="nav-link" href="#" id="logoutBtn">
               <i class="fas fa-sign-out-alt me-2"></i>Logout
@@ -137,7 +142,7 @@
             <div class="d-flex align-items-center">
               <span class="me-3">Welcome, <strong id="adminName">Admin</strong></span>
               <div class="dropdown">
-                <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+<button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-label="Admin menu" title="Admin menu">
                   <i class="fas fa-user-circle me-1"></i>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
@@ -212,7 +217,7 @@
           <div class="container-fluid">
             <div class="table-responsive">
               <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">User Management</h5>
+                <h5 class="mb-0">User Information</h5>
                 <button class="btn btn-admin" onclick="refreshUsers()">
                   <i class="fas fa-sync-alt me-2"></i>Refresh
                 </button>
@@ -229,15 +234,10 @@
           <div class="container-fluid">
             <div class="table-responsive">
               <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Flight Management</h5>
-                <div>
-                  <button class="btn btn-outline-primary me-2" onclick="showAddFlightModal()">
-                    <i class="fas fa-plus me-2"></i>Add Flight
-                  </button>
-                  <button class="btn btn-admin" onclick="refreshFlights()">
-                    <i class="fas fa-sync-alt me-2"></i>Refresh
-                  </button>
-                </div>
+                <h5 class="mb-0">Flight Information</h5>
+                <button class="btn btn-admin" onclick="refreshFlights()">
+                  <i class="fas fa-sync-alt me-2"></i>Refresh
+                </button>
               </div>
               <div class="p-3">
 <div id="flightsTable"></div>
@@ -251,15 +251,10 @@
           <div class="container-fluid">
             <div class="table-responsive">
               <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Train Management</h5>
-                <div>
-                  <button class="btn btn-outline-primary me-2" onclick="showAddTrainModal()">
-                    <i class="fas fa-plus me-2"></i>Add Train
-                  </button>
-                  <button class="btn btn-admin" onclick="refreshTrains()">
-                    <i class="fas fa-sync-alt me-2"></i>Refresh
-                  </button>
-                </div>
+                <h5 class="mb-0">Train Information</h5>
+                <button class="btn btn-admin" onclick="refreshTrains()">
+                  <i class="fas fa-sync-alt me-2"></i>Refresh
+                </button>
               </div>
               <div class="p-3">
 <div id="trainsTable"></div>
@@ -273,15 +268,10 @@
           <div class="container-fluid">
             <div class="table-responsive">
               <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Hotel Management</h5>
-                <div>
-                  <button class="btn btn-outline-primary me-2" onclick="showAddHotelModal()">
-                    <i class="fas fa-plus me-2"></i>Add Hotel
-                  </button>
-                  <button class="btn btn-admin" onclick="refreshHotels()">
-                    <i class="fas fa-sync-alt me-2"></i>Refresh
-                  </button>
-                </div>
+                <h5 class="mb-0">Hotel Information</h5>
+                <button class="btn btn-admin" onclick="refreshHotels()">
+                  <i class="fas fa-sync-alt me-2"></i>Refresh
+                </button>
               </div>
               <div class="p-3">
 <div id="hotelsTable"></div>
@@ -301,7 +291,133 @@
                 </button>
               </div>
               <div class="p-3">
-<div id="bookingsTable"></div>
+                <div id="bookingsTable"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reports Section -->
+        <div id="reports" class="content-section">
+          <div class="container-fluid">
+            <!-- Overview Stats -->
+            <div class="row mb-4">
+              <div class="col-md-3">
+                <div class="stats-card">
+                  <div class="stats-icon bg-primary text-white">
+                    <i class="fas fa-chart-line"></i>
+                  </div>
+                  <h3 id="totalRevenue">₹0</h3>
+                  <p class="text-muted mb-0">Total Revenue</p>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="stats-card">
+                  <div class="stats-icon bg-success text-white">
+                    <i class="fas fa-check-circle"></i>
+                  </div>
+                  <h3 id="confirmedBookings">0</h3>
+                  <p class="text-muted mb-0">Confirmed Bookings</p>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="stats-card">
+                  <div class="stats-icon bg-warning text-white">
+                    <i class="fas fa-clock"></i>
+                  </div>
+                  <h3 id="pendingBookings">0</h3>
+                  <p class="text-muted mb-0">Pending Bookings</p>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="stats-card">
+                  <div class="stats-icon bg-info text-white">
+                    <i class="fas fa-calendar-day"></i>
+                  </div>
+                  <h3 id="todayBookings">0</h3>
+                  <p class="text-muted mb-0">Today's Bookings</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Charts Row 1 -->
+            <div class="row mb-4">
+              <div class="col-md-6">
+                <div class="table-responsive">
+                  <div class="p-3 border-bottom">
+                    <h5 class="mb-0">Booking Types Distribution</h5>
+                  </div>
+                  <div class="p-3">
+                    <canvas id="bookingTypesChart" width="400" height="300"></canvas>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="table-responsive">
+                  <div class="p-3 border-bottom">
+                    <h5 class="mb-0">Booking Status Overview</h5>
+                  </div>
+                  <div class="p-3">
+                    <canvas id="bookingStatusChart" width="400" height="300"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Charts Row 2 -->
+            <div class="row mb-4">
+              <div class="col-md-6">
+                <div class="table-responsive">
+                  <div class="p-3 border-bottom">
+                    <h5 class="mb-0">Popular Flight Routes</h5>
+                  </div>
+                  <div class="p-3">
+                    <canvas id="flightRoutesChart" width="400" height="300"></canvas>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="table-responsive">
+                  <div class="p-3 border-bottom">
+                    <h5 class="mb-0">Popular Train Routes</h5>
+                  </div>
+                  <div class="p-3">
+                    <canvas id="trainRoutesChart" width="400" height="300"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Charts Row 3 -->
+            <div class="row mb-4">
+              <div class="col-md-6">
+                <div class="table-responsive">
+                  <div class="p-3 border-bottom">
+                    <h5 class="mb-0">Hotel Bookings by Location</h5>
+                  </div>
+                  <div class="p-3">
+                    <canvas id="hotelLocationsChart" width="400" height="300"></canvas>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="table-responsive">
+                  <div class="p-3 border-bottom">
+                    <h5 class="mb-0">Monthly Revenue Trend</h5>
+                  </div>
+                  <div class="p-3">
+                    <canvas id="revenueChart" width="400" height="300"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Refresh Button -->
+            <div class="row">
+              <div class="col-12 text-center">
+                <button class="btn btn-admin" onclick="refreshReports()">
+                  <i class="fas fa-sync-alt me-2"></i>Refresh Reports
+                </button>
               </div>
             </div>
           </div>
@@ -327,7 +443,7 @@
     </div>
   </div>
   <!-- Booking Details Modal -->
-  <div class="modal fade" id="bookingDetailsModal" tabindex="-1" aria-labelledby="bookingDetailsModalLabel" aria-hidden="true">
+<div class="modal fade" id="bookingDetailsModal" tabindex="-1" aria-labelledby="bookingDetailsModalLabel" role="dialog" aria-modal="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">

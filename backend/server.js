@@ -12,6 +12,46 @@ const adminRoutes = require('./routes/admin');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Simple in-memory SSE client registry
+const sseClients = new Set();
+const eventHistory = [];
+const EVENT_HISTORY_LIMIT = 100;
+
+// SSE endpoint for admin panel to receive real-time logs
+app.get('/api/admin/stream', (req, res) => {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  // Allow CORS for SSE explicitly (some browsers are picky on EventSource)
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.flushHeaders && res.flushHeaders();
+
+  // Keep connection alive
+  const keepAlive = setInterval(() => {
+    try { res.write(': ping\n\n'); } catch (e) {}
+  }, 15000);
+
+  // Send a connected comment
+  try { res.write(': connected\n\n'); } catch (e) {}
+
+  // Register client
+  sseClients.add(res);
+
+  // Optional: send recent history so the admin sees recent activity on connect
+  for (const entry of eventHistory) {
+    try {
+      res.write(`event: ${entry.event}\n`);
+      res.write(`data: ${JSON.stringify(entry)}\n\n`);
+    } catch (e) {}
+  }
+
+  // Cleanup on disconnect
+  req.on('close', () => {
+    clearInterval(keepAlive);
+    sseClients.delete(res);
+  });
+});
+
 // Middleware
 app.use(cors({
   origin: '*', // Allow all origins for development
@@ -45,6 +85,34 @@ app.use('/api/search', searchRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
+
+// Wire the event bus to broadcast to SSE clients
+const eventBus = require('./utils/eventBus');
+const broadcast = (event, payload) => {
+  const entry = { event, payload, timestamp: new Date().toISOString() };
+  const data = JSON.stringify(entry);
+
+  // Add to history buffer
+  eventHistory.push(entry);
+  if (eventHistory.length > EVENT_HISTORY_LIMIT) {
+    eventHistory.shift();
+  }
+
+  for (const client of sseClients) {
+    try {
+      client.write(`event: ${event}\n`);
+      client.write(`data: ${data}\n\n`);
+    } catch (e) {
+      // Drop broken connections
+      sseClients.delete(client);
+    }
+  }
+};
+
+// Events we care about
+['user:registered', 'booking:created'].forEach((evt) => {
+  eventBus.on(evt, (payload) => broadcast(evt, payload));
+});
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

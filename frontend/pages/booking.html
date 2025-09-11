@@ -646,14 +646,10 @@
             apiUrl = `${API_BASE_URL}/bookings/hotels`;
             requestBody = {
               hotelId: itemId,
-              checkInDate: new Date().toISOString().split('T')[0], // Use current date as default
-              checkOutDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Next day
+              checkInDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Tomorrow
+              checkOutDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Day after tomorrow
               guestDetails: {
-                name: bookingData.travelerInfo.name,
-                age: parseInt(bookingData.travelerInfo.age),
-                gender: bookingData.travelerInfo.gender,
-                idType: bookingData.travelerInfo.idType,
-                idNumber: bookingData.travelerInfo.idNumber,
+                primaryGuest: bookingData.travelerInfo.name,
                 numberOfGuests: parseInt(bookingData.hotelInfo?.numberOfGuests || 1),
                 specialRequests: bookingData.hotelInfo?.specialRequests || ''
               }

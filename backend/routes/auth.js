@@ -6,6 +6,8 @@ const User = require('../models/User');
 const Admin = require('../models/Admin');
 const { authenticateUser } = require('../middleware/auth');
 
+const eventBus = require('../utils/eventBus');
+
 // User Registration
 router.post('/register', async (req, res) => {
   try {
@@ -31,6 +33,15 @@ router.post('/register', async (req, res) => {
     });
     
     await user.save();
+
+    // Emit real-time event for admin logs
+    eventBus.emit('user:registered', {
+      id: user._id.toString(),
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      createdAt: user.createdAt
+    });
     
     // Generate JWT token
     const token = jwt.sign(

@@ -6,6 +6,7 @@ const Flight = require("../models/Flight");
 const Train = require("../models/Train");
 const Hotel = require("../models/Hotel");
 const { authenticateUser } = require("../middleware/auth"); // Correctly import the authenticateUser function
+const eventBus = require("../utils/eventBus");
 
 // Create flight booking
 router.post("/flights", authenticateUser, async (req, res) => {
@@ -59,6 +60,20 @@ router.post("/flights", authenticateUser, async (req, res) => {
     });
 
     await booking.save();
+
+    // Emit real-time event
+    eventBus.emit('booking:created', {
+      id: booking._id.toString(),
+      type: 'flight',
+      user: { id: req.user._id.toString(), name: req.user.name, email: req.user.email },
+      amount: booking.totalAmount,
+      createdAt: booking.createdAt,
+      details: {
+        flightNumber: flight.flightNumber,
+        airline: flight.airline,
+        route: `${flight.source} -> ${flight.destination}`
+      }
+    });
 
     // Update flight available seats
     flight.availableSeats -= 1;
@@ -132,6 +147,20 @@ router.post("/trains", authenticateUser, async (req, res) => {
 
     await booking.save();
 
+    // Emit real-time event
+    eventBus.emit('booking:created', {
+      id: booking._id.toString(),
+      type: 'train',
+      user: { id: req.user._id.toString(), name: req.user.name, email: req.user.email },
+      amount: booking.totalAmount,
+      createdAt: booking.createdAt,
+      details: {
+        trainNumber: train.trainNumber,
+        trainName: train.trainName,
+        route: `${train.source} -> ${train.destination}`
+      }
+    });
+
     // Update train available seats
     train.availableSeats -= 1;
     await train.save();
@@ -154,6 +183,13 @@ router.post("/trains", authenticateUser, async (req, res) => {
 router.post("/hotels", authenticateUser, async (req, res) => {
   try {
     const { hotelId, checkInDate, checkOutDate, guestDetails } = req.body;
+
+    // Normalize guest details to match schema
+    const normalizedGuestDetails = {
+      primaryGuest: (guestDetails && (guestDetails.primaryGuest || guestDetails.name)) || (req.user && req.user.name) || 'Primary Guest',
+      numberOfGuests: parseInt((guestDetails && guestDetails.numberOfGuests) || 1, 10),
+      specialRequests: (guestDetails && guestDetails.specialRequests) || ''
+    };
 
     // Check if hotel exists and has available rooms
     const hotel = await Hotel.findById(hotelId);
@@ -213,12 +249,25 @@ router.post("/hotels", authenticateUser, async (req, res) => {
           checkOutDate: checkOut,
           nights,
           roomType: hotel.roomType,
-          guestDetails,
+          guestDetails: normalizedGuestDetails,
         },
       },
     });
 
     await booking.save();
+
+    // Emit real-time event
+    eventBus.emit('booking:created', {
+      id: booking._id.toString(),
+      type: 'hotel',
+      user: { id: req.user._id.toString(), name: req.user.name, email: req.user.email },
+      amount: booking.totalAmount,
+      createdAt: booking.createdAt,
+      details: {
+        hotelName: hotel.name,
+        location: hotel.location
+      }
+    });
 
     // Update hotel available rooms
     hotel.availableRooms -= 1;
