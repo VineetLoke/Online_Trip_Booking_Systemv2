@@ -134,60 +134,30 @@
         <!-- Traveler Information -->
         <div class="booking-details mb-4">
           <h3 class="mb-4">Traveler Information</h3>
-          <form id="travelerForm">
+          
+          <!-- Number of Passengers Selection -->
+          <div class="mb-4">
+            <label for="numberOfPassengers" class="form-label">Number of Passengers</label>
+            <select class="form-select" id="numberOfPassengers">
+              <option value="1">1 Passenger</option>
+              <option value="2" selected>2 Passengers</option>
+              <option value="3">3 Passengers</option>
+              <option value="4">4 Passengers</option>
+            </select>
+          </div>
+
+          <!-- Passenger Details Container -->
+          <div id="passengersContainer">
+            <!-- Passenger forms will be dynamically generated here -->
+          </div>
+
+          <!-- Hotel-specific fields -->
+          <div id="hotelGuestFields" class="d-none">
             <div class="mb-3">
-              <label for="travelerName" class="form-label">Full Name</label>
-              <input type="text" class="form-control" id="travelerName" required>
+              <label for="specialRequests" class="form-label">Special Requests</label>
+              <textarea class="form-control" id="specialRequests" rows="3" placeholder="Any special requests for your stay?"></textarea>
             </div>
-            <div class="row mb-3">
-              <div class="col-md-6">
-                <label for="travelerAge" class="form-label">Age</label>
-                <input type="number" class="form-control" id="travelerAge" min="1" max="120" required>
-              </div>
-              <div class="col-md-6">
-                <label for="travelerGender" class="form-label">Gender</label>
-                <select class="form-select" id="travelerGender" required>
-                  <option value="">Select Gender</option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-            </div>
-            <div class="row mb-3">
-              <div class="col-md-6">
-                <label for="travelerIdType" class="form-label">ID Type</label>
-                <select class="form-select" id="travelerIdType" required>
-                  <option value="">Select ID Type</option>
-                  <option value="Passport">Passport</option>
-                  <option value="Driving License">Driving License</option>
-                  <option value="Aadhar">Aadhar</option>
-                  <option value="Voter ID">Voter ID</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-              <div class="col-md-6">
-                <label for="travelerIdNumber" class="form-label">ID Number</label>
-                <input type="text" class="form-control" id="travelerIdNumber" required>
-              </div>
-            </div>
-            <div id="hotelGuestFields" class="d-none">
-              <div class="mb-3">
-                <label for="numberOfGuests" class="form-label">Number of Guests</label>
-                <select class="form-select" id="numberOfGuests">
-                  <option value="1">1 Guest</option>
-                  <option value="2" selected>2 Guests</option>
-                  <option value="3">3 Guests</option>
-                  <option value="4">4 Guests</option>
-                  <option value="5">5 Guests</option>
-                </select>
-              </div>
-              <div class="mb-3">
-                <label for="specialRequests" class="form-label">Special Requests</label>
-                <textarea class="form-control" id="specialRequests" rows="3" placeholder="Any special requests for your stay?"></textarea>
-              </div>
-            </div>
-          </form>
+          </div>
         </div>
 
         <!-- Payment Information -->
@@ -513,6 +483,9 @@
       // Load booking details
       loadBookingDetails(bookingType, itemId);
       
+      // Initialize passenger management
+      initializePassengerManagement();
+      
       // Show/hide hotel guest fields based on booking type
       if (bookingType === 'hotel') {
         document.getElementById('hotelGuestFields').classList.remove('d-none');
@@ -548,11 +521,9 @@
 
       // Handle confirm booking button
       document.getElementById('confirmBookingBtn').addEventListener('click', function() {
-        // Validate forms
-        const travelerForm = document.getElementById('travelerForm');
-        
-        if (!travelerForm.checkValidity()) {
-          travelerForm.reportValidity();
+        // Validate all passenger forms
+        if (!validateAllPassengerForms()) {
+          alert('Please fill in all passenger details');
           return;
         }
         
@@ -565,34 +536,98 @@
         this.disabled = true;
         this.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Processing...';
         
-        // Create booking data
+        // Get all passenger data
+        const passengers = getAllPassengerData();
+        
+        // Create booking data for multiple passengers
         const bookingData = {
           type: bookingType,
           itemId: itemId,
-          travelerInfo: {
-            name: document.getElementById('travelerName').value,
-            age: document.getElementById('travelerAge').value,
-            gender: document.getElementById('travelerGender').value,
-            idType: document.getElementById('travelerIdType').value,
-            idNumber: document.getElementById('travelerIdNumber').value
-          },
+          passengers: passengers,
           paymentInfo: getPaymentInfo()
         };
         
         // Add hotel-specific fields if applicable
         if (bookingType === 'hotel') {
           bookingData.hotelInfo = {
-            numberOfGuests: document.getElementById('numberOfGuests').value,
+            numberOfGuests: document.getElementById('numberOfPassengers').value,
             specialRequests: document.getElementById('specialRequests').value
           };
         }
         
         // Create real booking via API
-        createBooking(bookingData, bookingType, itemId);
+        createMultipleBookings(bookingData, bookingType, itemId);
       });
     });
     
-    // Create booking via API
+    // Create multiple bookings for all passengers using bulk endpoint
+    async function createMultipleBookings(bookingData, bookingType, itemId) {
+      const API_BASE_URL = 'http://localhost:3000/api';
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        alert('Please login to make a booking');
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      try {
+        const requestBody = {
+          bookingType: bookingType,
+          itemId: itemId,
+          passengers: bookingData.passengers
+        };
+        
+        // Add hotel-specific info if applicable
+        if (bookingType === 'hotel' && bookingData.hotelInfo) {
+          requestBody.hotelInfo = {
+            checkInDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Tomorrow
+            checkOutDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Day after tomorrow
+            numberOfGuests: bookingData.hotelInfo.numberOfGuests,
+            specialRequests: bookingData.hotelInfo.specialRequests
+          };
+        }
+        
+        const response = await fetch(`${API_BASE_URL}/bookings/bulk`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(requestBody)
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error?.message || 'Booking failed');
+        }
+        
+        const result = await response.json();
+        const bookingIds = result.bookings.map(booking => booking.id);
+        
+        // Show success message with all booking IDs
+        showSuccessMessage(bookingIds, bookingData.passengers.length);
+        
+      } catch (error) {
+        console.error('Booking error:', error);
+        alert(`Booking failed: ${error.message}`);
+        
+        // Re-enable button
+        const confirmBtn = document.getElementById('confirmBookingBtn');
+        confirmBtn.disabled = false;
+        confirmBtn.innerHTML = '<i class="fas fa-lock me-2"></i>Confirm & Pay';
+      }
+    }
+    
+    function showSuccessMessage(bookingIds, numberOfPassengers) {
+      const bookingIdsText = bookingIds.join(', ');
+      alert(`Booking successful! ${numberOfPassengers} booking(s) created with IDs: ${bookingIdsText}`);
+      
+      // Redirect to bookings page
+      window.location.href = 'bookings.html';
+    }
+
+    // Create booking via API (legacy function - keeping for compatibility)
     async function createBooking(bookingData, bookingType, itemId) {
       const API_BASE_URL = 'http://localhost:3000/api';
       const token = localStorage.getItem('token');
@@ -769,6 +804,10 @@ async function loadBookingDetails(bookingType, itemId) {
         throw new Error('Invalid booking type');
     }
 
+    // Store booking data globally for pricing updates
+    window.currentBookingType = bookingType;
+    window.currentBookingItem = item;
+    
     // Render details and summary
     renderItemDetails(bookingType, item, detailsContainer, summaryContainer);
   } catch (err) {
@@ -781,7 +820,9 @@ async function loadBookingDetails(bookingType, itemId) {
 function renderItemDetails(type, item, detailsContainer, summaryContainer) {
   let detailsHtml = '';
   let summaryHtml = '';
-  let basePrice = item.price || item.totalAmount || 0;
+  let numberOfPassengers = parseInt(document.getElementById('numberOfPassengers').value) || 1;
+  let basePricePerPerson = item.price || item.totalAmount || 0;
+  let basePrice = basePricePerPerson * numberOfPassengers;
   let taxesAndFees = Math.round(basePrice * (type === 'flight' ? 0.18 : type === 'train' ? 0.12 : 0.18));
 
   if (type === 'flight') {
@@ -1084,6 +1125,131 @@ function isValidExpiryDate(expiry) {
 function isValidUpiId(upiId) {
   const regex = /^[a-zA-Z0-9.\-_]{2,}@([a-zA-Z]{2,})$/;
   return regex.test(upiId);
+}
+
+// Passenger Management Functions
+function initializePassengerManagement() {
+  const numberOfPassengersSelect = document.getElementById('numberOfPassengers');
+  const passengersContainer = document.getElementById('passengersContainer');
+  
+  // Generate initial passenger forms
+  generatePassengerForms();
+  
+  // Add event listener for passenger count changes
+  numberOfPassengersSelect.addEventListener('change', function() {
+    generatePassengerForms();
+    updatePricing();
+  });
+}
+
+function generatePassengerForms() {
+  const numberOfPassengers = parseInt(document.getElementById('numberOfPassengers').value);
+  const passengersContainer = document.getElementById('passengersContainer');
+  
+  // Clear existing forms
+  passengersContainer.innerHTML = '';
+  
+  // Generate forms for each passenger
+  for (let i = 1; i <= numberOfPassengers; i++) {
+    const passengerForm = createPassengerForm(i, numberOfPassengers);
+    passengersContainer.appendChild(passengerForm);
+  }
+}
+
+function createPassengerForm(passengerNumber, totalPassengers) {
+  const formDiv = document.createElement('div');
+  formDiv.className = 'passenger-form mb-4 p-3 border rounded';
+  formDiv.innerHTML = `
+    <h5 class="mb-3">
+      <i class="fas fa-user me-2"></i>
+      Passenger ${passengerNumber} ${passengerNumber === 1 ? '(Primary)' : ''}
+    </h5>
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="passengerName${passengerNumber}" class="form-label">Full Name</label>
+        <input type="text" class="form-control" id="passengerName${passengerNumber}" required>
+      </div>
+      <div class="col-md-6">
+        <label for="passengerAge${passengerNumber}" class="form-label">Age</label>
+        <input type="number" class="form-control" id="passengerAge${passengerNumber}" min="1" max="120" required>
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="passengerGender${passengerNumber}" class="form-label">Gender</label>
+        <select class="form-select" id="passengerGender${passengerNumber}" required>
+          <option value="">Select Gender</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label for="passengerIdType${passengerNumber}" class="form-label">ID Type</label>
+        <select class="form-select" id="passengerIdType${passengerNumber}" required>
+          <option value="">Select ID Type</option>
+          <option value="Passport">Passport</option>
+          <option value="Driving License">Driving License</option>
+          <option value="Aadhar">Aadhar</option>
+          <option value="Voter ID">Voter ID</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <label for="passengerIdNumber${passengerNumber}" class="form-label">ID Number</label>
+        <input type="text" class="form-control" id="passengerIdNumber${passengerNumber}" required>
+      </div>
+    </div>
+  `;
+  
+  return formDiv;
+}
+
+function getAllPassengerData() {
+  const numberOfPassengers = parseInt(document.getElementById('numberOfPassengers').value);
+  const passengers = [];
+  
+  for (let i = 1; i <= numberOfPassengers; i++) {
+    const passenger = {
+      name: document.getElementById(`passengerName${i}`).value,
+      age: parseInt(document.getElementById(`passengerAge${i}`).value),
+      gender: document.getElementById(`passengerGender${i}`).value,
+      idType: document.getElementById(`passengerIdType${i}`).value,
+      idNumber: document.getElementById(`passengerIdNumber${i}`).value
+    };
+    passengers.push(passenger);
+  }
+  
+  return passengers;
+}
+
+function validateAllPassengerForms() {
+  const numberOfPassengers = parseInt(document.getElementById('numberOfPassengers').value);
+  
+  for (let i = 1; i <= numberOfPassengers; i++) {
+    const nameField = document.getElementById(`passengerName${i}`);
+    const ageField = document.getElementById(`passengerAge${i}`);
+    const genderField = document.getElementById(`passengerGender${i}`);
+    const idTypeField = document.getElementById(`passengerIdType${i}`);
+    const idNumberField = document.getElementById(`passengerIdNumber${i}`);
+    
+    if (!nameField.value || !ageField.value || !genderField.value || !idTypeField.value || !idNumberField.value) {
+      return false;
+    }
+  }
+  
+  return true;
+}
+
+function updatePricing() {
+  // Get current booking details from global variables
+  if (typeof window.currentBookingItem !== 'undefined' && typeof window.currentBookingType !== 'undefined') {
+    const detailsContainer = document.getElementById('bookingDetailsContent');
+    const summaryContainer = document.getElementById('bookingSummaryContent');
+    renderItemDetails(window.currentBookingType, window.currentBookingItem, detailsContainer, summaryContainer);
+  }
 }
   </script>
 </body>

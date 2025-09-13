@@ -287,6 +287,215 @@ router.post("/hotels", authenticateUser, async (req, res) => {
   }
 });
 
+// Create multiple bookings for multiple passengers
+router.post("/bulk", authenticateUser, async (req, res) => {
+  try {
+    const { bookingType, itemId, passengers, hotelInfo } = req.body;
+    
+    if (!bookingType || !itemId || !passengers || !Array.isArray(passengers)) {
+      return res.status(400).json({
+        error: {
+          message: "Invalid request data",
+          status: 400,
+        },
+      });
+    }
+
+    const numberOfPassengers = passengers.length;
+    const bookings = [];
+    
+    // Check availability for all passengers first
+    let item;
+    switch (bookingType) {
+      case 'flight':
+        item = await Flight.findById(itemId);
+        if (!item) {
+          return res.status(404).json({
+            error: { message: "Flight not found", status: 404 }
+          });
+        }
+        if (item.availableSeats < numberOfPassengers) {
+          return res.status(409).json({
+            error: { 
+              message: `Only ${item.availableSeats} seats available, but ${numberOfPassengers} passengers requested`, 
+              status: 409 
+            }
+          });
+        }
+        break;
+      case 'train':
+        item = await Train.findById(itemId);
+        if (!item) {
+          return res.status(404).json({
+            error: { message: "Train not found", status: 404 }
+          });
+        }
+        if (item.availableSeats < numberOfPassengers) {
+          return res.status(409).json({
+            error: { 
+              message: `Only ${item.availableSeats} seats available, but ${numberOfPassengers} passengers requested`, 
+              status: 409 
+            }
+          });
+        }
+        break;
+      case 'hotel':
+        item = await Hotel.findById(itemId);
+        if (!item) {
+          return res.status(404).json({
+            error: { message: "Hotel not found", status: 404 }
+          });
+        }
+        if (item.availableRooms < 1) {
+          return res.status(409).json({
+            error: { 
+              message: "No available rooms for this hotel", 
+              status: 409 
+            }
+          });
+        }
+        break;
+      default:
+        return res.status(400).json({
+          error: { message: "Invalid booking type", status: 400 }
+        });
+    }
+
+    // Create bookings for each passenger
+    for (let i = 0; i < numberOfPassengers; i++) {
+      const passenger = passengers[i];
+      let bookingData = {
+        userId: req.user._id,
+        bookingType: bookingType,
+        totalAmount: item.price,
+        status: "confirmed",
+        paymentStatus: "completed"
+      };
+
+      // Set up trip details based on booking type
+      switch (bookingType) {
+        case 'flight':
+          bookingData.trip = {
+            type: "flight",
+            destination: item.destination,
+            startDate: item.departureTime,
+            endDate: item.arrivalTime,
+            flightDetails: {
+              flightId: item._id,
+              flightNumber: item.flightNumber,
+              airline: item.airline,
+              source: item.source,
+              destination: item.destination,
+              departureTime: item.departureTime,
+              arrivalTime: item.arrivalTime,
+              passengerDetails: passenger
+            }
+          };
+          break;
+        case 'train':
+          bookingData.trip = {
+            type: "train",
+            destination: item.destination,
+            startDate: item.departureTime,
+            endDate: item.arrivalTime,
+            trainDetails: {
+              trainId: item._id,
+              trainNumber: item.trainNumber,
+              trainName: item.trainName,
+              source: item.source,
+              destination: item.destination,
+              departureTime: item.departureTime,
+              arrivalTime: item.arrivalTime,
+              class: item.class,
+              passengerDetails: passenger
+            }
+          };
+          break;
+        case 'hotel':
+          const checkIn = new Date(hotelInfo.checkInDate);
+          const checkOut = new Date(hotelInfo.checkOutDate);
+          const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+          bookingData.totalAmount = item.price * nights;
+          bookingData.trip = {
+            type: "hotel",
+            destination: item.location,
+            startDate: checkIn,
+            endDate: checkOut,
+            hotelDetails: {
+              hotelId: item._id,
+              name: item.name,
+              location: item.location,
+              checkInDate: checkIn,
+              checkOutDate: checkOut,
+              nights: nights,
+              roomType: item.roomType || "Standard",
+              guestDetails: {
+                primaryGuest: passenger.name,
+                numberOfGuests: parseInt(hotelInfo.numberOfGuests || 1),
+                specialRequests: hotelInfo.specialRequests || ''
+              }
+            }
+          };
+          break;
+      }
+
+      const booking = new Booking(bookingData);
+      await booking.save();
+      bookings.push(booking);
+
+      // Emit real-time event for each booking
+      eventBus.emit('booking:created', {
+        id: booking._id.toString(),
+        type: bookingType,
+        user: { id: req.user._id.toString(), name: req.user.name, email: req.user.email },
+        amount: booking.totalAmount,
+        createdAt: booking.createdAt,
+        details: bookingType === 'flight' ? {
+          flightNumber: item.flightNumber,
+          airline: item.airline,
+          route: `${item.source} -> ${item.destination}`
+        } : bookingType === 'train' ? {
+          trainNumber: item.trainNumber,
+          trainName: item.trainName,
+          route: `${item.source} -> ${item.destination}`
+        } : {
+          hotelName: item.name,
+          location: item.location,
+          nights: bookingData.trip.hotelDetails.nights
+        }
+      });
+    }
+
+    // Update availability
+    if (bookingType === 'flight' || bookingType === 'train') {
+      item.availableSeats -= numberOfPassengers;
+      await item.save();
+    } else if (bookingType === 'hotel') {
+      item.availableRooms -= 1;
+      await item.save();
+    }
+
+    res.status(201).json({
+      message: `${numberOfPassengers} booking(s) created successfully`,
+      bookings: bookings.map(booking => ({
+        id: booking._id,
+        type: booking.bookingType,
+        amount: booking.totalAmount,
+        status: booking.status
+      }))
+    });
+
+  } catch (error) {
+    console.error('Bulk booking error:', error);
+    res.status(500).json({
+      error: {
+        message: error.message,
+        status: 500,
+      },
+    });
+  }
+});
+
 // Process payment for booking
 router.post("/:id/payment", authenticateUser, async (req, res) => {
   try {

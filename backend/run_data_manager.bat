@@ -66,3 +66,4 @@ if "%action%"=="setup" (
 
 echo.
 pause
+

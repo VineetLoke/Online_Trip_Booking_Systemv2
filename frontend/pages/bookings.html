@@ -487,20 +487,20 @@
             }
           });
 
-          // Filter bookings by status with explicit logging for debugging
-          const upcomingBookings = bookings.filter(booking => {
-            const isUpcoming = booking.status === 'confirmed' || booking.status === 'pending';
-            return isUpcoming;
+          // Group related bookings together
+          const groupedBookings = groupRelatedBookings(bookings);
+          
+          // Filter grouped bookings by status
+          const upcomingBookings = groupedBookings.filter(group => {
+            return group.bookings.some(booking => booking.status === 'confirmed' || booking.status === 'pending');
           });
           
-          const completedBookings = bookings.filter(booking => {
-            const isCompleted = booking.status === 'completed';
-            return isCompleted;
+          const completedBookings = groupedBookings.filter(group => {
+            return group.bookings.every(booking => booking.status === 'completed');
           });
           
-          const cancelledBookings = bookings.filter(booking => {
-            const isCancelled = booking.status === 'cancelled';
-            return isCancelled;
+          const cancelledBookings = groupedBookings.filter(group => {
+            return group.bookings.every(booking => booking.status === 'cancelled');
           });
           
           // Log filtering results for debugging
@@ -537,11 +537,73 @@
         });
     }
     
-    // Render bookings
-    function renderBookings(containerId, bookings) {
+    // Group related bookings together
+    function groupRelatedBookings(bookings) {
+      const groups = [];
+      const processed = new Set();
+      
+      bookings.forEach(booking => {
+        if (processed.has(booking._id || booking.id)) return;
+        
+        const group = {
+          id: `group_${booking._id || booking.id}`,
+          bookings: [booking],
+          totalAmount: booking.totalAmount,
+          bookingDate: booking.bookingDate,
+          type: booking.type,
+          status: booking.status
+        };
+        
+        // Find related bookings (same trip details, booked within 5 minutes)
+        bookings.forEach(otherBooking => {
+          if (processed.has(otherBooking._id || otherBooking.id)) return;
+          if ((otherBooking._id || otherBooking.id) === (booking._id || booking.id)) return;
+          
+          if (areBookingsRelated(booking, otherBooking)) {
+            group.bookings.push(otherBooking);
+            group.totalAmount += otherBooking.totalAmount;
+            processed.add(otherBooking._id || otherBooking.id);
+          }
+        });
+        
+        processed.add(booking._id || booking.id);
+        groups.push(group);
+      });
+      
+      return groups;
+    }
+    
+    // Check if two bookings are related (same trip, similar booking time)
+    function areBookingsRelated(booking1, booking2) {
+      // Must be same type
+      if (booking1.type !== booking2.type) return false;
+      
+      // Must be booked within 5 minutes of each other
+      const timeDiff = Math.abs(booking1.bookingDate - booking2.bookingDate);
+      if (timeDiff > 5 * 60 * 1000) return false; // 5 minutes in milliseconds
+      
+      // Check trip-specific details
+      switch (booking1.type) {
+        case 'flight':
+          return booking1.details.flightNumber === booking2.details.flightNumber &&
+                 booking1.details.departureTime.getTime() === booking2.details.departureTime.getTime();
+        case 'train':
+          return booking1.details.trainNumber === booking2.details.trainNumber &&
+                 booking1.details.departureTime.getTime() === booking2.details.departureTime.getTime();
+        case 'hotel':
+          return booking1.details.hotelId === booking2.details.hotelId &&
+                 booking1.details.checkInDate.getTime() === booking2.details.checkInDate.getTime() &&
+                 booking1.details.checkOutDate.getTime() === booking2.details.checkOutDate.getTime();
+        default:
+          return false;
+      }
+    }
+    
+    // Render bookings (updated to handle grouped bookings)
+    function renderBookings(containerId, bookingGroups) {
       const container = document.getElementById(containerId);
       
-      if (bookings.length === 0) {
+      if (bookingGroups.length === 0) {
         container.innerHTML = `
           <div class="text-center py-5">
             <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
@@ -553,42 +615,71 @@
       
       let html = '';
       
-      bookings.forEach(booking => {
+      bookingGroups.forEach(group => {
         const isUpcoming = containerId === 'upcomingBookings';
+        const isGroupBooking = group.bookings.length > 1;
+        const primaryBooking = group.bookings[0];
         
         html += `
           <div class="card mb-4">
             <div class="card-header bg-light d-flex justify-content-between align-items-center">
               <div>
-                <span class="badge ${getStatusBadgeClass(booking.status)}">${capitalizeFirstLetter(booking.status)}</span>
-                <span class="ms-2">Booking ID: ${booking._id || booking.id}</span>
+                <span class="badge ${getStatusBadgeClass(primaryBooking.status)}">${capitalizeFirstLetter(primaryBooking.status)}</span>
+                ${isGroupBooking ? `
+                  <span class="badge bg-info ms-2">Group Booking (${group.bookings.length} passengers)</span>
+                ` : ''}
+                <span class="ms-2">Booking ID${isGroupBooking ? 's' : ''}: ${group.bookings.map(b => b._id || b.id).join(', ')}</span>
               </div>
-              <small>Booked on: ${booking.bookingDate.toLocaleDateString()}</small>
+              <small>Booked on: ${group.bookingDate.toLocaleDateString()}</small>
             </div>
             <div class="card-body">
               <div class="row">
                 <div class="col-md-8">
                   <div class="d-flex align-items-center mb-3">
                     <div class="me-3">
-                      <i class="${getBookingTypeIcon(booking.type)} fa-2x text-primary"></i>
+                      <i class="${getBookingTypeIcon(primaryBooking.type)} fa-2x text-primary"></i>
                     </div>
                     <div>
-                      <h5 class="mb-0">${getBookingTitle(booking)}</h5>
-                      <p class="mb-0 text-muted">${getBookingSubtitle(booking)}</p>
+                      <h5 class="mb-0">${getBookingTitle(primaryBooking)}</h5>
+                      <p class="mb-0 text-muted">${getBookingSubtitle(primaryBooking)}</p>
+                      ${isGroupBooking ? `
+                        <p class="mb-0 text-info small">
+                          <i class="fas fa-users me-1"></i>
+                          ${group.bookings.length} passenger${group.bookings.length > 1 ? 's' : ''}
+                        </p>
+                      ` : ''}
                     </div>
                   </div>
                   <div class="mb-3">
-                    <p class="mb-1"><strong>Date:</strong> ${getBookingDateText(booking)}</p>
-                    <p class="mb-0"><strong>Details:</strong> ${getBookingDetailsText(booking)}</p>
+                    <p class="mb-1"><strong>Date:</strong> ${getBookingDateText(primaryBooking)}</p>
+                    <p class="mb-0"><strong>Details:</strong> ${getBookingDetailsText(primaryBooking)}</p>
                   </div>
+                  ${isGroupBooking ? `
+                    <div class="passenger-list">
+                      <h6 class="mb-2">Passengers:</h6>
+                      <div class="row">
+                        ${group.bookings.map((booking, index) => `
+                          <div class="col-md-6 mb-2">
+                            <div class="d-flex align-items-center">
+                              <i class="fas fa-user me-2 text-muted"></i>
+                              <span>${booking.details.passengerDetails?.name || booking.details.guestDetails?.primaryGuest || `Passenger ${index + 1}`}</span>
+                            </div>
+                          </div>
+                        `).join('')}
+                      </div>
+                    </div>
+                  ` : ''}
                 </div>
                 <div class="col-md-4 text-md-end">
-                  <div class="price mb-3">₹${booking.totalAmount}</div>
-                  <button class="btn btn-outline-primary me-2 view-details-btn" data-booking-id="${booking._id || booking.id}">
+                  <div class="price mb-3">
+                    ₹${group.totalAmount}
+                    ${isGroupBooking ? `<small class="text-muted d-block">(₹${Math.round(group.totalAmount / group.bookings.length)} per person)</small>` : ''}
+                  </div>
+                  <button class="btn btn-outline-primary me-2 view-details-btn" data-booking-id="${primaryBooking._id || primaryBooking.id}">
                     <i class="fas fa-eye me-1"></i>View Details
                   </button>
                   ${isUpcoming ? `
-                    <button class="btn btn-outline-danger cancel-booking-btn" data-booking-id="${booking._id || booking.id}">
+                    <button class="btn btn-outline-danger cancel-booking-btn" data-booking-id="${primaryBooking._id || primaryBooking.id}">
                       <i class="fas fa-times me-1"></i>Cancel
                     </button>
                   ` : ''}

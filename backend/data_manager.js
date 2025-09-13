@@ -57,16 +57,75 @@ const HOTEL_TEMPLATES = [
   { name: "City Center", location: "Chennai", basePrice: 3200, roomType: "Standard", amenities: ["WiFi", "Restaurant", "Room Service"] }
 ];
 
-const ROUTES = [
-  { source: "Delhi", destination: "Mumbai", duration: 2.5 },
-  { source: "Mumbai", destination: "Bangalore", duration: 1.5 },
-  { source: "Delhi", destination: "Goa", duration: 2.5 },
-  { source: "Bangalore", destination: "Chennai", duration: 1.0 },
-  { source: "Mumbai", destination: "Delhi", duration: 2.5 },
-  { source: "Delhi", destination: "Chennai", duration: 3.0 },
-  { source: "Goa", destination: "Mumbai", duration: 1.5 },
-  { source: "Chennai", destination: "Bangalore", duration: 1.0 }
-];
+// Comprehensive Indian destinations with their regions
+const DESTINATIONS = {
+  'North India': ['Delhi', 'Jaipur', 'Agra', 'Chandigarh', 'Amritsar', 'Shimla', 'Manali', 'Dehradun'],
+  'West India': ['Mumbai', 'Pune', 'Ahmedabad', 'Surat', 'Goa', 'Nagpur', 'Indore', 'Bhopal'],
+  'South India': ['Bangalore', 'Chennai', 'Hyderabad', 'Kochi', 'Mysore', 'Coimbatore', 'Trivandrum', 'Mangalore'],
+  'East India': ['Kolkata', 'Bhubaneswar', 'Patna', 'Ranchi', 'Guwahati', 'Siliguri', 'Jamshedpur', 'Cuttack'],
+  'Central India': ['Bhopal', 'Indore', 'Gwalior', 'Jabalpur', 'Raipur', 'Bilaspur', 'Ujjain', 'Sagar']
+};
+
+// Generate all possible routes between destinations
+function generateAllRoutes() {
+  const routes = [];
+  const allDestinations = Object.values(DESTINATIONS).flat();
+  
+  // Create bidirectional routes between all major destinations
+  for (let i = 0; i < allDestinations.length; i++) {
+    for (let j = i + 1; j < allDestinations.length; j++) {
+      const source = allDestinations[i];
+      const destination = allDestinations[j];
+      
+      // Calculate approximate duration based on distance
+      const duration = calculateDuration(source, destination);
+      
+      // Add both directions
+      routes.push({
+        source: source,
+        destination: destination,
+        duration: duration,
+        distance: calculateDistance(source, destination)
+      });
+      
+      routes.push({
+        source: destination,
+        destination: source,
+        duration: duration,
+        distance: calculateDistance(destination, source)
+      });
+    }
+  }
+  
+  return routes;
+}
+
+// Calculate approximate flight duration based on distance
+function calculateDuration(source, destination) {
+  const distances = {
+    'Delhi': { 'Mumbai': 2.5, 'Bangalore': 3.0, 'Chennai': 3.5, 'Kolkata': 2.0, 'Hyderabad': 2.5, 'Goa': 2.5, 'Jaipur': 1.0, 'Agra': 0.5, 'Chandigarh': 1.0, 'Amritsar': 1.5, 'Shimla': 1.5, 'Manali': 2.0, 'Dehradun': 1.0, 'Pune': 2.0, 'Ahmedabad': 2.0, 'Surat': 2.5, 'Nagpur': 2.0, 'Indore': 1.5, 'Bhopal': 1.5, 'Kochi': 3.5, 'Mysore': 3.0, 'Coimbatore': 3.5, 'Trivandrum': 4.0, 'Mangalore': 3.0, 'Bhubaneswar': 2.5, 'Patna': 1.5, 'Ranchi': 2.0, 'Guwahati': 2.5, 'Siliguri': 2.0, 'Jamshedpur': 2.0, 'Cuttack': 2.5, 'Gwalior': 1.0, 'Jabalpur': 2.0, 'Raipur': 2.5, 'Bilaspur': 2.5, 'Ujjain': 1.5, 'Sagar': 1.5 },
+    'Mumbai': { 'Bangalore': 1.5, 'Chennai': 2.0, 'Kolkata': 3.0, 'Hyderabad': 1.5, 'Goa': 1.0, 'Pune': 0.5, 'Ahmedabad': 1.0, 'Surat': 0.5, 'Nagpur': 1.5, 'Indore': 1.0, 'Bhopal': 1.5, 'Kochi': 2.0, 'Mysore': 1.5, 'Coimbatore': 2.0, 'Trivandrum': 2.5, 'Mangalore': 1.5, 'Bhubaneswar': 2.5, 'Patna': 2.5, 'Ranchi': 2.5, 'Guwahati': 3.5, 'Siliguri': 3.0, 'Jamshedpur': 2.5, 'Cuttack': 2.5, 'Gwalior': 1.5, 'Jabalpur': 2.0, 'Raipur': 2.0, 'Bilaspur': 2.0, 'Ujjain': 1.0, 'Sagar': 1.5 },
+    'Bangalore': { 'Chennai': 1.0, 'Kolkata': 3.0, 'Hyderabad': 1.5, 'Goa': 1.5, 'Kochi': 1.5, 'Mysore': 0.5, 'Coimbatore': 1.0, 'Trivandrum': 2.0, 'Mangalore': 1.0, 'Bhubaneswar': 2.5, 'Patna': 3.0, 'Ranchi': 2.5, 'Guwahati': 3.5, 'Siliguri': 3.0, 'Jamshedpur': 2.5, 'Cuttack': 2.5, 'Gwalior': 2.5, 'Jabalpur': 2.5, 'Raipur': 2.0, 'Bilaspur': 2.0, 'Ujjain': 2.0, 'Sagar': 2.0 },
+    'Chennai': { 'Kolkata': 2.5, 'Hyderabad': 1.5, 'Goa': 2.0, 'Kochi': 1.5, 'Mysore': 1.0, 'Coimbatore': 1.0, 'Trivandrum': 1.5, 'Mangalore': 1.5, 'Bhubaneswar': 2.0, 'Patna': 2.5, 'Ranchi': 2.0, 'Guwahati': 3.0, 'Siliguri': 2.5, 'Jamshedpur': 2.0, 'Cuttack': 2.0, 'Gwalior': 2.5, 'Jabalpur': 2.5, 'Raipur': 2.5, 'Bilaspur': 2.5, 'Ujjain': 2.5, 'Sagar': 2.5 },
+    'Kolkata': { 'Hyderabad': 2.5, 'Goa': 3.0, 'Bhubaneswar': 1.0, 'Patna': 1.5, 'Ranchi': 1.0, 'Guwahati': 1.5, 'Siliguri': 1.0, 'Jamshedpur': 0.5, 'Cuttack': 1.0, 'Gwalior': 2.0, 'Jabalpur': 2.0, 'Raipur': 2.0, 'Bilaspur': 2.0, 'Ujjain': 2.5, 'Sagar': 2.0 },
+    'Hyderabad': { 'Goa': 2.0, 'Kochi': 2.0, 'Mysore': 1.5, 'Coimbatore': 1.5, 'Trivandrum': 2.5, 'Mangalore': 1.5, 'Bhubaneswar': 2.0, 'Patna': 2.5, 'Ranchi': 2.0, 'Guwahati': 3.0, 'Siliguri': 2.5, 'Jamshedpur': 2.0, 'Cuttack': 2.0, 'Gwalior': 2.0, 'Jabalpur': 2.0, 'Raipur': 1.5, 'Bilaspur': 1.5, 'Ujjain': 1.5, 'Sagar': 1.5 },
+    'Goa': { 'Kochi': 1.5, 'Mysore': 1.5, 'Coimbatore': 1.5, 'Trivandrum': 2.0, 'Mangalore': 1.0, 'Bhubaneswar': 2.5, 'Patna': 3.0, 'Ranchi': 2.5, 'Guwahati': 3.5, 'Siliguri': 3.0, 'Jamshedpur': 2.5, 'Cuttack': 2.5, 'Gwalior': 2.0, 'Jabalpur': 2.5, 'Raipur': 2.0, 'Bilaspur': 2.0, 'Ujjain': 1.5, 'Sagar': 2.0 }
+  };
+  
+  return distances[source]?.[destination] || 2.0; // Default 2 hours
+}
+
+// Calculate approximate distance (simplified)
+function calculateDistance(source, destination) {
+  const distances = {
+    'Delhi': { 'Mumbai': 1400, 'Bangalore': 2100, 'Chennai': 2200, 'Kolkata': 1500, 'Hyderabad': 1600, 'Goa': 1800, 'Jaipur': 280, 'Agra': 200, 'Chandigarh': 250, 'Amritsar': 450, 'Shimla': 350, 'Manali': 550, 'Dehradun': 250, 'Pune': 1200, 'Ahmedabad': 900, 'Surat': 1100, 'Nagpur': 1000, 'Indore': 800, 'Bhopal': 750, 'Kochi': 2400, 'Mysore': 2000, 'Coimbatore': 2200, 'Trivandrum': 2500, 'Mangalore': 2100, 'Bhubaneswar': 1800, 'Patna': 1000, 'Ranchi': 1200, 'Guwahati': 1800, 'Siliguri': 1500, 'Jamshedpur': 1200, 'Cuttack': 1800, 'Gwalior': 400, 'Jabalpur': 800, 'Raipur': 1200, 'Bilaspur': 1200, 'Ujjain': 700, 'Sagar': 600 },
+    'Mumbai': { 'Bangalore': 850, 'Chennai': 1300, 'Kolkata': 2000, 'Hyderabad': 700, 'Goa': 600, 'Pune': 150, 'Ahmedabad': 530, 'Surat': 300, 'Nagpur': 800, 'Indore': 600, 'Bhopal': 800, 'Kochi': 1400, 'Mysore': 1000, 'Coimbatore': 1200, 'Trivandrum': 1500, 'Mangalore': 900, 'Bhubaneswar': 1800, 'Patna': 1800, 'Ranchi': 1800, 'Guwahati': 2400, 'Siliguri': 2100, 'Jamshedpur': 1800, 'Cuttack': 1800, 'Gwalior': 1000, 'Jabalpur': 1200, 'Raipur': 1000, 'Bilaspur': 1000, 'Ujjain': 500, 'Sagar': 800 }
+  };
+  
+  return distances[source]?.[destination] || 1000; // Default 1000 km
+}
+
+const ROUTES = generateAllRoutes();
 
 class DataManager {
   constructor() {
@@ -242,15 +301,29 @@ class DataManager {
     for (let date = new Date(startDate); date <= endDate; date.setDate(date.getDate() + 1)) {
       const currentDate = new Date(date);
       
-      // Generate 2-4 flights per day
-      const numFlights = 2 + Math.floor(Math.random() * 3);
-      
-      for (let i = 0; i < numFlights; i++) {
+      // Generate flights for each route (but not all routes every day)
+      for (const route of ROUTES) {
+        // Skip some routes randomly to avoid too many flights
+        if (Math.random() > 0.3) continue;
+        
         const template = FLIGHT_TEMPLATES[Math.floor(Math.random() * FLIGHT_TEMPLATES.length)];
-        const route = ROUTES[Math.floor(Math.random() * ROUTES.length)];
+        const flightNumber = `${template.flightNumber}${String(Math.floor(Math.random() * 900) + 100)}`;
+        
+        // Check for duplicates
+        const existingFlight = await this.recordExists('flights', {
+          flightNumber: flightNumber,
+          source: route.source,
+          destination: route.destination,
+          departureTime: {
+            $gte: new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate()),
+            $lt: new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 1)
+          }
+        });
+        
+        if (existingFlight) continue;
         
         const departureTime = new Date(currentDate);
-        departureTime.setHours(6 + i * 4 + Math.floor(Math.random() * 2), Math.floor(Math.random() * 60), 0, 0);
+        departureTime.setHours(6 + Math.floor(Math.random() * 16), Math.floor(Math.random() * 60), 0, 0);
         
         const arrivalTime = new Date(departureTime);
         arrivalTime.setHours(arrivalTime.getHours() + route.duration + Math.floor(Math.random() * 2));
@@ -260,7 +333,7 @@ class DataManager {
         const availableSeats = Math.floor(totalSeats * (0.6 + Math.random() * 0.3));
         
         flights.push({
-          flightNumber: `${template.flightNumber}${String(Math.floor(Math.random() * 900) + 100)}`,
+          flightNumber: flightNumber,
           airline: template.airline,
           source: route.source,
           destination: route.destination,
@@ -288,25 +361,39 @@ class DataManager {
     for (let date = new Date(startDate); date <= endDate; date.setDate(date.getDate() + 1)) {
       const currentDate = new Date(date);
       
-      // Generate 1-3 trains per day
-      const numTrains = 1 + Math.floor(Math.random() * 3);
-      
-      for (let i = 0; i < numTrains; i++) {
+      // Generate trains for each route (but not all routes every day)
+      for (const route of ROUTES) {
+        // Skip some routes randomly to avoid too many trains
+        if (Math.random() > 0.2) continue;
+        
         const template = TRAIN_TEMPLATES[Math.floor(Math.random() * TRAIN_TEMPLATES.length)];
-        const route = ROUTES[Math.floor(Math.random() * ROUTES.length)];
+        const trainNumber = `${template.trainNumber}${String(Math.floor(Math.random() * 90) + 10)}`;
+        
+        // Check for duplicates
+        const existingTrain = await this.recordExists('trains', {
+          trainNumber: trainNumber,
+          source: route.source,
+          destination: route.destination,
+          departureTime: {
+            $gte: new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate()),
+            $lt: new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 1)
+          }
+        });
+        
+        if (existingTrain) continue;
         
         const departureTime = new Date(currentDate);
-        departureTime.setHours(14 + i * 4 + Math.floor(Math.random() * 2), Math.floor(Math.random() * 60), 0, 0);
+        departureTime.setHours(8 + Math.floor(Math.random() * 12), Math.floor(Math.random() * 60), 0, 0);
         
         const arrivalTime = new Date(departureTime);
-        arrivalTime.setHours(arrivalTime.getHours() + route.duration * 2 + Math.floor(Math.random() * 8));
+        arrivalTime.setHours(arrivalTime.getHours() + route.duration * 2 + Math.floor(Math.random() * 4)); // Trains take longer
         
         const price = template.basePrice + Math.floor(Math.random() * 1000);
-        const totalSeats = 200 + Math.floor(Math.random() * 100);
-        const availableSeats = Math.floor(totalSeats * (0.5 + Math.random() * 0.4));
+        const totalSeats = 300 + Math.floor(Math.random() * 200);
+        const availableSeats = Math.floor(totalSeats * (0.7 + Math.random() * 0.2));
         
         trains.push({
-          trainNumber: `${template.trainNumber}${String(Math.floor(Math.random() * 10))}`,
+          trainNumber: trainNumber,
           trainName: template.trainName,
           source: route.source,
           destination: route.destination,
@@ -535,6 +622,12 @@ class DataManager {
       const batch = data.slice(i, i + BATCH_SIZE);
       await this.db.collection(collection).insertMany(batch);
     }
+  }
+
+  async recordExists(collectionName, query) {
+    const collection = this.db.collection(collectionName);
+    const count = await collection.countDocuments(query);
+    return count > 0;
   }
 
   async askConfirmation(question) {
