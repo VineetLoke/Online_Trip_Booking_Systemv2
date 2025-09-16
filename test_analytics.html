@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-button { padding: 10px 15px; margin: 5px; background: #007bff; color: white; border: none; cursor: pointer; }
+        .test-button:hover { background: #0056b3; }
+        .results { margin-top: 20px; padding: 15px; border: 1px solid #ddd; background: #f9f9f9; }
+        .error { color: red; }
+        .success { color: green; }
+        .info { color: blue; }
+    </style>
+</head>
+<body>
+    <h1>Analytics Endpoints Test</h1>
+    
+    <div>
+        <button class="test-button" onclick="testEndpoint('/admin/analytics/overview')">Test Overview</button>
+        <button class="test-button" onclick="testEndpoint('/admin/analytics/booking-types')">Test Booking Types</button>
+        <button class="test-button" onclick="testEndpoint('/admin/analytics/booking-status')">Test Booking Status</button>
+        <button class="test-button" onclick="testEndpoint('/admin/analytics/flight-routes')">Test Flight Routes</button>
+        <button class="test-button" onclick="testEndpoint('/admin/analytics/train-routes')">Test Train Routes</button>
+        <button class="test-button" onclick="testEndpoint('/admin/analytics/hotel-locations')">Test Hotel Locations</button>
+        <button class="test-button" onclick="testEndpoint('/admin/analytics/monthly-revenue')">Test Monthly Revenue</button>
+    </div>
+    
+    <button class="test-button" onclick="testAllEndpoints()">Test All Endpoints</button>
+    <button class="test-button" onclick="clearResults()">Clear Results</button>
+    
+    <div id="results" class="results">
+        <h3>Test Results:</h3>
+        <div id="output">Click a button to test an endpoint...</div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3000/api';
+        
+        function log(message, type = 'info') {
+            const output = document.getElementById('output');
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'error' ? 'error' : type === 'success' ? 'success' : 'info';
+            output.innerHTML += `<div class="${className}">[${timestamp}] ${message}</div>`;
+        }
+        
+        function clearResults() {
+            document.getElementById('output').innerHTML = 'Results cleared...';
+        }
+        
+        async function testEndpoint(endpoint) {
+            try {
+                log(`Testing ${endpoint}...`, 'info');
+                
+                const adminToken = localStorage.getItem('adminToken');
+                if (!adminToken) {
+                    log('❌ No admin token found. Please login to admin panel first.', 'error');
+                    return;
+                }
+                
+                const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+                    headers: {
+                        'Authorization': `Bearer ${adminToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    log(`✅ ${endpoint}: Status ${response.status}`, 'success');
+                    log(`📊 Data: ${JSON.stringify(data, null, 2)}`, 'info');
+                } else {
+                    log(`❌ ${endpoint}: Status ${response.status} - ${data.error?.message || data.message}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ ${endpoint}: Network error - ${error.message}`, 'error');
+            }
+        }
+        
+        async function testAllEndpoints() {
+            clearResults();
+            log('🚀 Testing all analytics endpoints...', 'info');
+            
+            const endpoints = [
+                '/admin/analytics/overview',
+                '/admin/analytics/booking-types',
+                '/admin/analytics/booking-status',
+                '/admin/analytics/flight-routes',
+                '/admin/analytics/train-routes',
+                '/admin/analytics/hotel-locations',
+                '/admin/analytics/monthly-revenue'
+            ];
+            
+            for (const endpoint of endpoints) {
+                await testEndpoint(endpoint);
+                await new Promise(resolve => setTimeout(resolve, 500)); // Small delay between requests
+            }
+            
+            log('✅ All endpoint tests completed!', 'success');
+        }
+        
+        // Check if admin token exists on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            const adminToken = localStorage.getItem('adminToken');
+            if (adminToken) {
+                log('✅ Admin token found. Ready to test endpoints.', 'success');
+            } else {
+                log('⚠️ No admin token found. Please login to admin panel first to test endpoints.', 'error');
+            }
+        });
+    </script>
+</body>
+</html>

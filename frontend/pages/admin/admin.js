@@ -149,6 +149,11 @@ function showSection(sectionName) {
     reports: 'Reports & Analytics'
   };
   document.getElementById('pageTitle').textContent = titles[sectionName] || 'Admin Panel';
+  
+  // Load section-specific data
+  if (sectionName === 'reports') {
+    loadReports();
+  }
 }
 
 async function loadDashboardData() {
@@ -267,7 +272,6 @@ function displayUsers(users) {
             <th>Email</th>
             <th>Phone</th>
             <th>Joined</th>
-            <th>Status</th>
           </tr>
         </thead>
         <tbody>
@@ -277,7 +281,6 @@ function displayUsers(users) {
               <td>${user.email}</td>
               <td>${user.phone || 'N/A'}</td>
               <td>${new Date(user.createdAt).toLocaleDateString()}</td>
-              <td><span class="badge bg-success">Active</span></td>
             </tr>
           `).join('')}
         </tbody>
@@ -542,29 +545,71 @@ function displayBookings(bookings) {
 // Show booking details modal
 async function showBookingDetails(bookingId) {
   try {
-    // Try cache first (admin bookings endpoint already returns full booking objects)
-    let booking = window.adminBookingsCache && window.adminBookingsCache[bookingId];
-    if (!booking) {
-      // Fallback: call user booking endpoint (may be restricted) and extract booking
-      const response = await fetch(`${API_BASE_URL}/bookings/${bookingId}`, { headers: getAuthHeaders() });
-      handleAuthResponse(response);
-      if (!response.ok) throw new Error('Failed to fetch booking details');
-      const payload = await response.json();
-      booking = payload.booking || payload;
-    }
+    // Use the new admin endpoint to get booking details with all related passengers
+    const response = await fetch(`${API_BASE_URL}/admin/bookings/${bookingId}/details`, { headers: getAuthHeaders() });
+    handleAuthResponse(response);
+    if (!response.ok) throw new Error('Failed to fetch booking details');
+    
+    const data = await response.json();
+    const { mainBooking, relatedBookings, isGroupBooking, passengerCount, totalAmount } = data;
 
     const content = document.getElementById('bookingDetailsContent');
-  const html = `
-      <dl class="row">
-        <dt class="col-sm-4">Booking ID</dt><dd class="col-sm-8">${booking._id}</dd>
-        <dt class="col-sm-4">Type</dt><dd class="col-sm-8">${booking.bookingType}</dd>
-        <dt class="col-sm-4">User</dt><dd class="col-sm-8">${booking.userId?.name || 'N/A'} (${booking.userId?.email || ''})</dd>
-        <dt class="col-sm-4">Total Amount</dt><dd class="col-sm-8">₹${booking.totalAmount}</dd>
-        <dt class="col-sm-4">Status</dt><dd class="col-sm-8">${booking.status}</dd>
-        <dt class="col-sm-4">Booking Date</dt><dd class="col-sm-8">${new Date(booking.bookingDate).toLocaleString()}</dd>
-    <dt class="col-sm-4">Details</dt><dd class="col-sm-8"><pre>${JSON.stringify(booking.trip || booking, null, 2)}</pre></dd>
-      </dl>
+    
+    // Format booking details in a user-friendly way
+    let detailsHtml = '';
+    
+    if (mainBooking.trip) {
+      switch (mainBooking.bookingType) {
+        case 'flight':
+          detailsHtml = formatFlightDetailsWithAllPassengers(mainBooking, relatedBookings, isGroupBooking);
+          break;
+        case 'train':
+          detailsHtml = formatTrainDetailsWithAllPassengers(mainBooking, relatedBookings, isGroupBooking);
+          break;
+        case 'hotel':
+          detailsHtml = formatHotelDetailsWithAllPassengers(mainBooking, relatedBookings, isGroupBooking);
+          break;
+        default:
+          detailsHtml = formatGenericDetails(mainBooking);
+      }
+    } else {
+      detailsHtml = formatGenericDetails(mainBooking);
+    }
+    
+    const html = `
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <h6 class="text-primary"><i class="fas fa-user me-2"></i>User Information</h6>
+          <table class="table table-sm table-borderless">
+            <tr><td class="fw-bold">Name:</td><td>${mainBooking.userId?.name || 'N/A'}</td></tr>
+            <tr><td class="fw-bold">Email:</td><td>${mainBooking.userId?.email || 'N/A'}</td></tr>
+            <tr><td class="fw-bold">Phone:</td><td>${mainBooking.userId?.phone || 'N/A'}</td></tr>
+          </table>
+        </div>
+        <div class="col-md-6">
+          <h6 class="text-primary"><i class="fas fa-receipt me-2"></i>Booking Information</h6>
+          <table class="table table-sm table-borderless">
+            <tr><td class="fw-bold">Booking ID:</td><td>${mainBooking._id}</td></tr>
+            <tr><td class="fw-bold">Type:</td><td><span class="badge bg-primary">${mainBooking.bookingType}</span></td></tr>
+            <tr><td class="fw-bold">Status:</td><td><span class="badge bg-${getStatusColor(mainBooking.status)}">${mainBooking.status}</span></td></tr>
+            ${isGroupBooking ? `
+              <tr><td class="fw-bold">Group Booking:</td><td><span class="badge bg-info">${passengerCount} passengers</span></td></tr>
+              <tr><td class="fw-bold">Total Amount:</td><td class="fw-bold text-success">₹${totalAmount}</td></tr>
+              <tr><td class="fw-bold">Per Person:</td><td class="fw-bold text-info">₹${mainBooking.totalAmount}</td></tr>
+            ` : `
+              <tr><td class="fw-bold">Total Amount:</td><td class="fw-bold text-success">₹${mainBooking.totalAmount}</td></tr>
+            `}
+            <tr><td class="fw-bold">Booking Date:</td><td>${new Date(mainBooking.bookingDate).toLocaleString()}</td></tr>
+            <tr><td class="fw-bold">Payment Status:</td><td><span class="badge ${getPaymentStatusColor(mainBooking.paymentStatus)}">${mainBooking.paymentStatus || 'N/A'}</span></td></tr>
+          </table>
+        </div>
+      </div>
+      
+      <hr>
+      
+      ${detailsHtml}
     `;
+    
     content.innerHTML = html;
 
     const modalEl = document.getElementById('bookingDetailsModal');
@@ -575,6 +620,329 @@ async function showBookingDetails(bookingId) {
     const content = document.getElementById('bookingDetailsContent');
     content.innerHTML = '<p class="text-danger">Unable to load booking details.</p>';
   }
+}
+
+// Helper function to get payment status color
+function getPaymentStatusColor(status) {
+  switch (status) {
+    case 'completed': return 'bg-success';
+    case 'pending': return 'bg-warning';
+    case 'failed': return 'bg-danger';
+    case 'refunded': return 'bg-info';
+    default: return 'bg-secondary';
+  }
+}
+
+// Format flight booking details
+function formatFlightDetails(booking) {
+  const flight = booking.trip.flightDetails;
+  if (!flight) return formatGenericDetails(booking);
+  
+  return `
+    <h6 class="text-primary"><i class="fas fa-plane me-2"></i>Flight Details</h6>
+    <div class="row">
+      <div class="col-md-6">
+        <table class="table table-sm table-borderless">
+          <tr><td class="fw-bold">Flight Number:</td><td>${flight.flightNumber || 'N/A'}</td></tr>
+          <tr><td class="fw-bold">Airline:</td><td>${flight.airline || 'N/A'}</td></tr>
+          <tr><td class="fw-bold">Route:</td><td>${flight.source || 'N/A'} → ${flight.destination || 'N/A'}</td></tr>
+          <tr><td class="fw-bold">Departure:</td><td>${flight.departureTime ? new Date(flight.departureTime).toLocaleString() : 'N/A'}</td></tr>
+          <tr><td class="fw-bold">Arrival:</td><td>${flight.arrivalTime ? new Date(flight.arrivalTime).toLocaleString() : 'N/A'}</td></tr>
+        </table>
+      </div>
+      <div class="col-md-6">
+        <h6 class="text-secondary"><i class="fas fa-user-friends me-2"></i>Passenger Details</h6>
+        <table class="table table-sm table-borderless">
+          <tr><td class="fw-bold">Name:</td><td>${flight.passengerDetails?.name || 'N/A'}</td></tr>
+          <tr><td class="fw-bold">Age:</td><td>${flight.passengerDetails?.age || 'N/A'}</td></tr>
+          <tr><td class="fw-bold">Gender:</td><td>${flight.passengerDetails?.gender || 'N/A'}</td></tr>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+// Format train booking details
+function formatTrainDetails(booking) {
+  const train = booking.trip.trainDetails;
+  if (!train) return formatGenericDetails(booking);
+  
+  return `
+    <h6 class="text-primary"><i class="fas fa-train me-2"></i>Train Details</h6>
+    <div class="row">
+      <div class="col-md-6">
+        <table class="table table-sm table-borderless">
+          <tr><td class="fw-bold">Train Number:</td><td>${train.trainNumber || 'N/A'}</td></tr>
+          <tr><td class="fw-bold">Train Name:</td><td>${train.trainName || 'N/A'}</td></tr>
+          <tr><td class="fw-bold">Route:</td><td>${train.source || 'N/A'} → ${train.destination || 'N/A'}</td></tr>
+          <tr><td class="fw-bold">Class:</td><td>${train.class || 'N/A'}</td></tr>
+          <tr><td class="fw-bold">Departure:</td><td>${train.departureTime ? new Date(train.departureTime).toLocaleString() : 'N/A'}</td></tr>
+          <tr><td class="fw-bold">Arrival:</td><td>${train.arrivalTime ? new Date(train.arrivalTime).toLocaleString() : 'N/A'}</td></tr>
+        </table>
+      </div>
+      <div class="col-md-6">
+        <h6 class="text-secondary"><i class="fas fa-user-friends me-2"></i>Passenger Details</h6>
+        <table class="table table-sm table-borderless">
+          <tr><td class="fw-bold">Name:</td><td>${train.passengerDetails?.name || 'N/A'}</td></tr>
+          <tr><td class="fw-bold">Age:</td><td>${train.passengerDetails?.age || 'N/A'}</td></tr>
+          <tr><td class="fw-bold">Gender:</td><td>${train.passengerDetails?.gender || 'N/A'}</td></tr>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+// Format hotel booking details
+function formatHotelDetails(booking) {
+  const hotel = booking.trip.hotelDetails;
+  if (!hotel) return formatGenericDetails(booking);
+  
+  const checkIn = hotel.checkInDate ? new Date(hotel.checkInDate) : null;
+  const checkOut = hotel.checkOutDate ? new Date(hotel.checkOutDate) : null;
+  
+  return `
+    <h6 class="text-primary"><i class="fas fa-hotel me-2"></i>Hotel Details</h6>
+    <div class="row">
+      <div class="col-md-6">
+        <table class="table table-sm table-borderless">
+          <tr><td class="fw-bold">Hotel Name:</td><td>${hotel.name || 'N/A'}</td></tr>
+          <tr><td class="fw-bold">Location:</td><td>${hotel.location || 'N/A'}</td></tr>
+          <tr><td class="fw-bold">Room Type:</td><td>${hotel.roomType || 'N/A'}</td></tr>
+          <tr><td class="fw-bold">Check-in:</td><td>${checkIn ? checkIn.toLocaleDateString() : 'N/A'}</td></tr>
+          <tr><td class="fw-bold">Check-out:</td><td>${checkOut ? checkOut.toLocaleDateString() : 'N/A'}</td></tr>
+          <tr><td class="fw-bold">Nights:</td><td>${hotel.nights || 'N/A'}</td></tr>
+        </table>
+      </div>
+      <div class="col-md-6">
+        <h6 class="text-secondary"><i class="fas fa-users me-2"></i>Guest Details</h6>
+        <table class="table table-sm table-borderless">
+          <tr><td class="fw-bold">Primary Guest:</td><td>${hotel.guestDetails?.primaryGuest || 'N/A'}</td></tr>
+          <tr><td class="fw-bold">Number of Guests:</td><td>${hotel.guestDetails?.numberOfGuests || 'N/A'}</td></tr>
+          ${hotel.guestDetails?.specialRequests ? `<tr><td class="fw-bold">Special Requests:</td><td>${hotel.guestDetails.specialRequests}</td></tr>` : ''}
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+// Format flight booking details with all passengers
+function formatFlightDetailsWithAllPassengers(mainBooking, relatedBookings, isGroupBooking) {
+  const flight = mainBooking.trip.flightDetails;
+  if (!flight) return formatGenericDetails(mainBooking);
+  
+  let passengersHtml = '';
+  
+  if (isGroupBooking) {
+    passengersHtml = `
+      <div class="col-md-12 mt-3">
+        <h6 class="text-secondary"><i class="fas fa-users me-2"></i>All Passengers (${relatedBookings.length})</h6>
+        <div class="row">
+          ${relatedBookings.map((booking, index) => {
+            const passenger = booking.trip.flightDetails?.passengerDetails;
+            return passenger ? `
+              <div class="col-md-6 mb-2">
+                <div class="card border-light">
+                  <div class="card-body py-2">
+                    <h6 class="card-title mb-1">
+                      <i class="fas fa-user me-1"></i>Passenger ${index + 1}
+                      <small class="text-muted">(${booking._id.substring(0, 8)}...)</small>
+                    </h6>
+                    <div class="small">
+                      <strong>Name:</strong> ${passenger.name || 'N/A'}<br>
+                      <strong>Age:</strong> ${passenger.age || 'N/A'}<br>
+                      <strong>Gender:</strong> ${passenger.gender || 'N/A'}<br>
+                      <strong>Seat:</strong> ${passenger.seat || passenger.seatNumber || 'N/A'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ` : '';
+          }).join('')}
+        </div>
+      </div>
+    `;
+  } else {
+    const passenger = flight.passengerDetails;
+    passengersHtml = `
+      <div class="col-md-6">
+        <h6 class="text-secondary"><i class="fas fa-user me-2"></i>Passenger Details</h6>
+        <table class="table table-sm table-borderless">
+          <tr><td class="fw-bold">Name:</td><td>${passenger?.name || 'N/A'}</td></tr>
+          <tr><td class="fw-bold">Age:</td><td>${passenger?.age || 'N/A'}</td></tr>
+          <tr><td class="fw-bold">Gender:</td><td>${passenger?.gender || 'N/A'}</td></tr>
+          <tr><td class="fw-bold">Seat:</td><td>${passenger?.seat || passenger?.seatNumber || 'N/A'}</td></tr>
+        </table>
+      </div>
+    `;
+  }
+  
+  return `
+    <h6 class="text-primary"><i class="fas fa-plane me-2"></i>Flight Details</h6>
+    <div class="row">
+      <div class="col-md-6">
+        <table class="table table-sm table-borderless">
+          <tr><td class="fw-bold">Flight Number:</td><td>${flight.flightNumber || 'N/A'}</td></tr>
+          <tr><td class="fw-bold">Airline:</td><td>${flight.airline || 'N/A'}</td></tr>
+          <tr><td class="fw-bold">Route:</td><td>${flight.source || 'N/A'} → ${flight.destination || 'N/A'}</td></tr>
+          <tr><td class="fw-bold">Departure:</td><td>${flight.departureTime ? new Date(flight.departureTime).toLocaleString() : 'N/A'}</td></tr>
+          <tr><td class="fw-bold">Arrival:</td><td>${flight.arrivalTime ? new Date(flight.arrivalTime).toLocaleString() : 'N/A'}</td></tr>
+        </table>
+      </div>
+      ${passengersHtml}
+    </div>
+  `;
+}
+
+// Format train booking details with all passengers
+function formatTrainDetailsWithAllPassengers(mainBooking, relatedBookings, isGroupBooking) {
+  const train = mainBooking.trip.trainDetails;
+  if (!train) return formatGenericDetails(mainBooking);
+  
+  let passengersHtml = '';
+  
+  if (isGroupBooking) {
+    passengersHtml = `
+      <div class="col-md-12 mt-3">
+        <h6 class="text-secondary"><i class="fas fa-users me-2"></i>All Passengers (${relatedBookings.length})</h6>
+        <div class="row">
+          ${relatedBookings.map((booking, index) => {
+            const passenger = booking.trip.trainDetails?.passengerDetails;
+            return passenger ? `
+              <div class="col-md-6 mb-2">
+                <div class="card border-light">
+                  <div class="card-body py-2">
+                    <h6 class="card-title mb-1">
+                      <i class="fas fa-user me-1"></i>Passenger ${index + 1}
+                      <small class="text-muted">(${booking._id.substring(0, 8)}...)</small>
+                    </h6>
+                    <div class="small">
+                      <strong>Name:</strong> ${passenger.name || 'N/A'}<br>
+                      <strong>Age:</strong> ${passenger.age || 'N/A'}<br>
+                      <strong>Gender:</strong> ${passenger.gender || 'N/A'}<br>
+                      <strong>Berth:</strong> ${passenger.seat || passenger.seatNumber || 'N/A'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ` : '';
+          }).join('')}
+        </div>
+      </div>
+    `;
+  } else {
+    const passenger = train.passengerDetails;
+    passengersHtml = `
+      <div class="col-md-6">
+        <h6 class="text-secondary"><i class="fas fa-user me-2"></i>Passenger Details</h6>
+        <table class="table table-sm table-borderless">
+          <tr><td class="fw-bold">Name:</td><td>${passenger?.name || 'N/A'}</td></tr>
+          <tr><td class="fw-bold">Age:</td><td>${passenger?.age || 'N/A'}</td></tr>
+          <tr><td class="fw-bold">Gender:</td><td>${passenger?.gender || 'N/A'}</td></tr>
+          <tr><td class="fw-bold">Berth:</td><td>${passenger?.seat || passenger?.seatNumber || 'N/A'}</td></tr>
+        </table>
+      </div>
+    `;
+  }
+  
+  return `
+    <h6 class="text-primary"><i class="fas fa-train me-2"></i>Train Details</h6>
+    <div class="row">
+      <div class="col-md-6">
+        <table class="table table-sm table-borderless">
+          <tr><td class="fw-bold">Train Number:</td><td>${train.trainNumber || 'N/A'}</td></tr>
+          <tr><td class="fw-bold">Train Name:</td><td>${train.trainName || 'N/A'}</td></tr>
+          <tr><td class="fw-bold">Route:</td><td>${train.source || 'N/A'} → ${train.destination || 'N/A'}</td></tr>
+          <tr><td class="fw-bold">Class:</td><td>${train.class || 'N/A'}</td></tr>
+          <tr><td class="fw-bold">Departure:</td><td>${train.departureTime ? new Date(train.departureTime).toLocaleString() : 'N/A'}</td></tr>
+          <tr><td class="fw-bold">Arrival:</td><td>${train.arrivalTime ? new Date(train.arrivalTime).toLocaleString() : 'N/A'}</td></tr>
+        </table>
+      </div>
+      ${passengersHtml}
+    </div>
+  `;
+}
+
+// Format hotel booking details with all guests
+function formatHotelDetailsWithAllPassengers(mainBooking, relatedBookings, isGroupBooking) {
+  const hotel = mainBooking.trip.hotelDetails;
+  if (!hotel) return formatGenericDetails(mainBooking);
+  
+  const checkIn = hotel.checkInDate ? new Date(hotel.checkInDate) : null;
+  const checkOut = hotel.checkOutDate ? new Date(hotel.checkOutDate) : null;
+  
+  let guestsHtml = '';
+  
+  if (isGroupBooking) {
+    guestsHtml = `
+      <div class="col-md-12 mt-3">
+        <h6 class="text-secondary"><i class="fas fa-users me-2"></i>All Guests (${relatedBookings.length} rooms)</h6>
+        <div class="row">
+          ${relatedBookings.map((booking, index) => {
+            const guest = booking.trip.hotelDetails?.guestDetails;
+            return guest ? `
+              <div class="col-md-6 mb-2">
+                <div class="card border-light">
+                  <div class="card-body py-2">
+                    <h6 class="card-title mb-1">
+                      <i class="fas fa-bed me-1"></i>Room ${index + 1}
+                      <small class="text-muted">(${booking._id.substring(0, 8)}...)</small>
+                    </h6>
+                    <div class="small">
+                      <strong>Primary Guest:</strong> ${guest.primaryGuest || 'N/A'}<br>
+                      <strong>Number of Guests:</strong> ${guest.numberOfGuests || 'N/A'}<br>
+                      ${guest.specialRequests ? `<strong>Special Requests:</strong> ${guest.specialRequests}<br>` : ''}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ` : '';
+          }).join('')}
+        </div>
+      </div>
+    `;
+  } else {
+    const guest = hotel.guestDetails;
+    guestsHtml = `
+      <div class="col-md-6">
+        <h6 class="text-secondary"><i class="fas fa-users me-2"></i>Guest Details</h6>
+        <table class="table table-sm table-borderless">
+          <tr><td class="fw-bold">Primary Guest:</td><td>${guest?.primaryGuest || 'N/A'}</td></tr>
+          <tr><td class="fw-bold">Number of Guests:</td><td>${guest?.numberOfGuests || 'N/A'}</td></tr>
+          ${guest?.specialRequests ? `<tr><td class="fw-bold">Special Requests:</td><td>${guest.specialRequests}</td></tr>` : ''}
+        </table>
+      </div>
+    `;
+  }
+  
+  return `
+    <h6 class="text-primary"><i class="fas fa-hotel me-2"></i>Hotel Details</h6>
+    <div class="row">
+      <div class="col-md-6">
+        <table class="table table-sm table-borderless">
+          <tr><td class="fw-bold">Hotel Name:</td><td>${hotel.name || 'N/A'}</td></tr>
+          <tr><td class="fw-bold">Location:</td><td>${hotel.location || 'N/A'}</td></tr>
+          <tr><td class="fw-bold">Room Type:</td><td>${hotel.roomType || 'N/A'}</td></tr>
+          <tr><td class="fw-bold">Check-in:</td><td>${checkIn ? checkIn.toLocaleDateString() : 'N/A'}</td></tr>
+          <tr><td class="fw-bold">Check-out:</td><td>${checkOut ? checkOut.toLocaleDateString() : 'N/A'}</td></tr>
+          <tr><td class="fw-bold">Nights:</td><td>${hotel.nights || 'N/A'}</td></tr>
+        </table>
+      </div>
+      ${guestsHtml}
+    </div>
+  `;
+}
+
+// Format generic booking details (fallback)
+function formatGenericDetails(booking) {
+  return `
+    <h6 class="text-primary"><i class="fas fa-info-circle me-2"></i>Trip Details</h6>
+    <div class="alert alert-info">
+      <strong>Destination:</strong> ${booking.trip?.destination || 'N/A'}<br>
+      <strong>Start Date:</strong> ${booking.trip?.startDate ? new Date(booking.trip.startDate).toLocaleString() : 'N/A'}<br>
+      <strong>End Date:</strong> ${booking.trip?.endDate ? new Date(booking.trip.endDate).toLocaleString() : 'N/A'}<br>
+      <strong>Type:</strong> ${booking.trip?.type || 'N/A'}
+    </div>
+  `;
 }
 
 // Real-time event stream (SSE)
@@ -716,10 +1084,12 @@ function refreshReports() {
 // Analytics functions
 async function loadReports() {
   try {
+    console.log('Loading reports and analytics...');
     // Load overview stats
     await loadOverviewStats();
     
     // Load all charts
+    console.log('Loading all analytics charts...');
     await Promise.all([
       loadBookingTypesChart(),
       loadBookingStatusChart(),
@@ -728,6 +1098,7 @@ async function loadReports() {
       loadHotelLocationsChart(),
       loadRevenueChart()
     ]);
+    console.log('All analytics charts loaded successfully');
   } catch (error) {
     console.error('Error loading reports:', error);
   }
@@ -735,35 +1106,64 @@ async function loadReports() {
 
 async function loadOverviewStats() {
   try {
+    console.log('Loading overview stats...');
     const response = await fetch(`${API_BASE_URL}/admin/analytics/overview`, { 
       headers: getAuthHeaders() 
     });
+    console.log('Overview stats response status:', response.status);
     handleAuthResponse(response);
-    const data = await response.json();
     
-    // Update stats cards
-    document.getElementById('totalRevenue').textContent = `₹${data.totalRevenue.toLocaleString()}`;
-    document.getElementById('confirmedBookings').textContent = data.confirmedBookings;
-    document.getElementById('pendingBookings').textContent = data.pendingBookings;
-    document.getElementById('todayBookings').textContent = data.todayBookings;
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    console.log('Overview stats data:', data);
+    
+    // Update stats cards with default values if data is missing
+    document.getElementById('totalRevenue').textContent = `₹${(data.totalRevenue || 0).toLocaleString()}`;
+    document.getElementById('confirmedBookings').textContent = data.confirmedBookings || 0;
+    document.getElementById('pendingBookings').textContent = data.pendingBookings || 0;
+    document.getElementById('todayBookings').textContent = data.todayBookings || 0;
+    console.log('Overview stats updated successfully');
   } catch (error) {
     console.error('Error loading overview stats:', error);
+    // Show default values on error
+    document.getElementById('totalRevenue').textContent = '₹0';
+    document.getElementById('confirmedBookings').textContent = '0';
+    document.getElementById('pendingBookings').textContent = '0';
+    document.getElementById('todayBookings').textContent = '0';
   }
 }
 
 async function loadBookingTypesChart() {
   try {
+    console.log('Loading booking types chart...');
     const response = await fetch(`${API_BASE_URL}/admin/analytics/booking-types`, { 
       headers: getAuthHeaders() 
     });
+    console.log('Booking types response status:', response.status);
     handleAuthResponse(response);
     const data = await response.json();
+    console.log('Booking types data:', data);
     
     const ctx = document.getElementById('bookingTypesChart').getContext('2d');
     
     // Destroy existing chart if it exists
     if (window.bookingTypesChart) {
       window.bookingTypesChart.destroy();
+    }
+    
+    // Check if we have data
+    if (!data.bookingTypes || data.bookingTypes.length === 0) {
+      console.log('No booking types data available');
+      // Show message in chart area
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      ctx.font = '16px Arial';
+      ctx.fillStyle = '#666';
+      ctx.textAlign = 'center';
+      ctx.fillText('No booking data available', ctx.canvas.width / 2, ctx.canvas.height / 2);
+      return;
     }
     
     window.bookingTypesChart = new Chart(ctx, {
@@ -786,24 +1186,52 @@ async function loadBookingTypesChart() {
         }
       }
     });
+    console.log('Booking types chart created successfully');
   } catch (error) {
     console.error('Error loading booking types chart:', error);
+    // Show error in chart
+    const ctx = document.getElementById('bookingTypesChart').getContext('2d');
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.font = '14px Arial';
+    ctx.fillStyle = '#dc3545';
+    ctx.textAlign = 'center';
+    ctx.fillText('Error loading chart data', ctx.canvas.width / 2, ctx.canvas.height / 2);
   }
 }
 
 async function loadBookingStatusChart() {
   try {
+    console.log('Loading booking status chart...');
     const response = await fetch(`${API_BASE_URL}/admin/analytics/booking-status`, { 
       headers: getAuthHeaders() 
     });
+    console.log('Booking status response status:', response.status);
     handleAuthResponse(response);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    
     const data = await response.json();
+    console.log('Booking status data:', data);
     
     const ctx = document.getElementById('bookingStatusChart').getContext('2d');
     
     // Destroy existing chart if it exists
     if (window.bookingStatusChart) {
       window.bookingStatusChart.destroy();
+    }
+    
+    // Check if we have data
+    if (!data.bookingStatus || data.bookingStatus.length === 0) {
+      console.log('No booking status data available');
+      // Show message in chart area
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      ctx.font = '16px Arial';
+      ctx.fillStyle = '#666';
+      ctx.textAlign = 'center';
+      ctx.fillText('No booking status data available', ctx.canvas.width / 2, ctx.canvas.height / 2);
+      return;
     }
     
     const statusColors = {
@@ -832,24 +1260,52 @@ async function loadBookingStatusChart() {
         }
       }
     });
+    console.log('Booking status chart created successfully');
   } catch (error) {
     console.error('Error loading booking status chart:', error);
+    // Show error in chart
+    const ctx = document.getElementById('bookingStatusChart').getContext('2d');
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.font = '14px Arial';
+    ctx.fillStyle = '#dc3545';
+    ctx.textAlign = 'center';
+    ctx.fillText('Error loading chart data', ctx.canvas.width / 2, ctx.canvas.height / 2);
   }
 }
 
 async function loadFlightRoutesChart() {
   try {
+    console.log('Loading flight routes chart...');
     const response = await fetch(`${API_BASE_URL}/admin/analytics/flight-routes`, { 
       headers: getAuthHeaders() 
     });
+    console.log('Flight routes response status:', response.status);
     handleAuthResponse(response);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    
     const data = await response.json();
+    console.log('Flight routes data:', data);
     
     const ctx = document.getElementById('flightRoutesChart').getContext('2d');
     
     // Destroy existing chart if it exists
     if (window.flightRoutesChart) {
       window.flightRoutesChart.destroy();
+    }
+    
+    // Check if we have data
+    if (!data.flightRoutes || data.flightRoutes.length === 0) {
+      console.log('No flight routes data available');
+      // Show message in chart area
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      ctx.font = '16px Arial';
+      ctx.fillStyle = '#666';
+      ctx.textAlign = 'center';
+      ctx.fillText('No flight routes data available', ctx.canvas.width / 2, ctx.canvas.height / 2);
+      return;
     }
     
     window.flightRoutesChart = new Chart(ctx, {
@@ -879,24 +1335,52 @@ async function loadFlightRoutesChart() {
         }
       }
     });
+    console.log('Flight routes chart created successfully');
   } catch (error) {
     console.error('Error loading flight routes chart:', error);
+    // Show error in chart
+    const ctx = document.getElementById('flightRoutesChart').getContext('2d');
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.font = '14px Arial';
+    ctx.fillStyle = '#dc3545';
+    ctx.textAlign = 'center';
+    ctx.fillText('Error loading chart data', ctx.canvas.width / 2, ctx.canvas.height / 2);
   }
 }
 
 async function loadTrainRoutesChart() {
   try {
+    console.log('Loading train routes chart...');
     const response = await fetch(`${API_BASE_URL}/admin/analytics/train-routes`, { 
       headers: getAuthHeaders() 
     });
+    console.log('Train routes response status:', response.status);
     handleAuthResponse(response);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    
     const data = await response.json();
+    console.log('Train routes data:', data);
     
     const ctx = document.getElementById('trainRoutesChart').getContext('2d');
     
     // Destroy existing chart if it exists
     if (window.trainRoutesChart) {
       window.trainRoutesChart.destroy();
+    }
+    
+    // Check if we have data
+    if (!data.trainRoutes || data.trainRoutes.length === 0) {
+      console.log('No train routes data available');
+      // Show message in chart area
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      ctx.font = '16px Arial';
+      ctx.fillStyle = '#666';
+      ctx.textAlign = 'center';
+      ctx.fillText('No train routes data available', ctx.canvas.width / 2, ctx.canvas.height / 2);
+      return;
     }
     
     window.trainRoutesChart = new Chart(ctx, {
@@ -926,24 +1410,52 @@ async function loadTrainRoutesChart() {
         }
       }
     });
+    console.log('Train routes chart created successfully');
   } catch (error) {
     console.error('Error loading train routes chart:', error);
+    // Show error in chart
+    const ctx = document.getElementById('trainRoutesChart').getContext('2d');
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.font = '14px Arial';
+    ctx.fillStyle = '#dc3545';
+    ctx.textAlign = 'center';
+    ctx.fillText('Error loading chart data', ctx.canvas.width / 2, ctx.canvas.height / 2);
   }
 }
 
 async function loadHotelLocationsChart() {
   try {
+    console.log('Loading hotel locations chart...');
     const response = await fetch(`${API_BASE_URL}/admin/analytics/hotel-locations`, { 
       headers: getAuthHeaders() 
     });
+    console.log('Hotel locations response status:', response.status);
     handleAuthResponse(response);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    
     const data = await response.json();
+    console.log('Hotel locations data:', data);
     
     const ctx = document.getElementById('hotelLocationsChart').getContext('2d');
     
     // Destroy existing chart if it exists
     if (window.hotelLocationsChart) {
       window.hotelLocationsChart.destroy();
+    }
+    
+    // Check if we have data
+    if (!data.hotelLocations || data.hotelLocations.length === 0) {
+      console.log('No hotel locations data available');
+      // Show message in chart area
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      ctx.font = '16px Arial';
+      ctx.fillStyle = '#666';
+      ctx.textAlign = 'center';
+      ctx.fillText('No hotel locations data available', ctx.canvas.width / 2, ctx.canvas.height / 2);
+      return;
     }
     
     window.hotelLocationsChart = new Chart(ctx, {
@@ -966,24 +1478,52 @@ async function loadHotelLocationsChart() {
         }
       }
     });
+    console.log('Hotel locations chart created successfully');
   } catch (error) {
     console.error('Error loading hotel locations chart:', error);
+    // Show error in chart
+    const ctx = document.getElementById('hotelLocationsChart').getContext('2d');
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.font = '14px Arial';
+    ctx.fillStyle = '#dc3545';
+    ctx.textAlign = 'center';
+    ctx.fillText('Error loading chart data', ctx.canvas.width / 2, ctx.canvas.height / 2);
   }
 }
 
 async function loadRevenueChart() {
   try {
+    console.log('Loading revenue chart...');
     const response = await fetch(`${API_BASE_URL}/admin/analytics/monthly-revenue`, { 
       headers: getAuthHeaders() 
     });
+    console.log('Revenue chart response status:', response.status);
     handleAuthResponse(response);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    
     const data = await response.json();
+    console.log('Revenue chart data:', data);
     
     const ctx = document.getElementById('revenueChart').getContext('2d');
     
     // Destroy existing chart if it exists
     if (window.revenueChart) {
       window.revenueChart.destroy();
+    }
+    
+    // Check if we have data
+    if (!data.monthlyRevenue || data.monthlyRevenue.length === 0) {
+      console.log('No revenue data available');
+      // Show message in chart area
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      ctx.font = '16px Arial';
+      ctx.fillStyle = '#666';
+      ctx.textAlign = 'center';
+      ctx.fillText('No revenue data available', ctx.canvas.width / 2, ctx.canvas.height / 2);
+      return;
     }
     
     const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
@@ -1025,8 +1565,16 @@ async function loadRevenueChart() {
         }
       }
     });
+    console.log('Revenue chart created successfully');
   } catch (error) {
     console.error('Error loading revenue chart:', error);
+    // Show error in chart
+    const ctx = document.getElementById('revenueChart').getContext('2d');
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.font = '14px Arial';
+    ctx.fillStyle = '#dc3545';
+    ctx.textAlign = 'center';
+    ctx.fillText('Error loading chart data', ctx.canvas.width / 2, ctx.canvas.height / 2);
   }
 }
 

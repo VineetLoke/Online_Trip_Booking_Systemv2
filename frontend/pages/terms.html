@@ -4,16 +4,228 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Terms & Conditions - TravelEase</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../css/styles.css">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="../css/styles.css" rel="stylesheet">
 </head>
 <body>
-    <!-- Navbar and Footer as above -->
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="../index.html">
+                <i class="fas fa-globe-americas me-2"></i>
+                TravelEase
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="../index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="flights.html">Flights</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="trains.html">Trains</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="hotels.html">Hotels</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="about.html">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="contact.html">Contact</a>
+                    </li>
+                </ul>
+                <div id="authButtons" class="d-flex">
+                    <button class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#loginModal">Login</button>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#registerModal">Register</button>
+                </div>
+                <div id="userDropdown" class="dropdown d-none">
+                    <button class="btn btn-outline-primary dropdown-toggle" type="button" id="userMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-user-circle me-1"></i>
+                        <span id="userName">User</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuButton">
+                        <li><a class="dropdown-item" href="profile.html"><i class="fas fa-user me-2"></i>My Profile</a></li>
+                        <li><a class="dropdown-item" href="bookings.html"><i class="fas fa-list me-2"></i>My Bookings</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="bg-primary text-white py-4">
+        <div class="container">
+            <h1><i class="fas fa-file-contract me-2"></i>Terms & Conditions</h1>
+            <p class="lead mb-0">Please read these terms carefully before using TravelEase</p>
+        </div>
+    </section>
+
+    <!-- Terms Content -->
     <div class="container my-5">
-        <h1 class="text-center mb-4">Terms & Conditions</h1>
-        <p>Content for Terms & Conditions goes here...</p>
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow-sm">
+                    <div class="card-body p-5">
+                        <p class="text-muted mb-4"><strong>Last updated:</strong> January 1, 2025</p>
+                        
+                        <h2 class="h4 text-primary mb-3">1. Acceptance of Terms</h2>
+                        <p>By accessing and using TravelEase, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.</p>
+                        
+                        <h2 class="h4 text-primary mb-3">2. Service Description</h2>
+                        <p>TravelEase is an online travel booking platform that allows users to search, compare, and book flights, trains, and hotels. We act as an intermediary between travelers and travel service providers.</p>
+                        
+                        <h2 class="h4 text-primary mb-3">3. User Accounts</h2>
+                        <ul>
+                            <li>You must be at least 18 years old to create an account</li>
+                            <li>You are responsible for maintaining the confidentiality of your account</li>
+                            <li>You agree to provide accurate, current, and complete information</li>
+                            <li>You are responsible for all activities that occur under your account</li>
+                        </ul>
+                        
+                        <h2 class="h4 text-primary mb-3">4. Booking and Payment</h2>
+                        <ul>
+                            <li>All bookings are subject to availability and confirmation</li>
+                            <li>Prices are subject to change until booking is confirmed</li>
+                            <li>Payment must be made in full at the time of booking</li>
+                            <li>We accept major credit cards and secure payment methods</li>
+                            <li>Additional fees may apply for certain services</li>
+                        </ul>
+                        
+                        <h2 class="h4 text-primary mb-3">5. Cancellation and Refunds</h2>
+                        <ul>
+                            <li>Cancellation policies vary by service provider</li>
+                            <li>Cancellation fees may apply as per provider policies</li>
+                            <li>Refunds are processed according to the original payment method</li>
+                            <li>Processing time for refunds may vary (typically 5-10 business days)</li>
+                        </ul>
+                        
+                        <h2 class="h4 text-primary mb-3">6. User Responsibilities</h2>
+                        <ul>
+                            <li>Ensure all travel documents are valid and up-to-date</li>
+                            <li>Comply with all applicable laws and regulations</li>
+                            <li>Arrive at departure points with adequate time</li>
+                            <li>Report any issues or concerns promptly</li>
+                        </ul>
+                        
+                        <h2 class="h4 text-primary mb-3">7. Limitation of Liability</h2>
+                        <p>TravelEase acts as an intermediary and is not liable for:</p>
+                        <ul>
+                            <li>Flight delays, cancellations, or schedule changes</li>
+                            <li>Hotel service quality or amenities</li>
+                            <li>Train service disruptions</li>
+                            <li>Force majeure events beyond our control</li>
+                            <li>Third-party service provider actions or omissions</li>
+                        </ul>
+                        
+                        <h2 class="h4 text-primary mb-3">8. Privacy and Data Protection</h2>
+                        <p>We are committed to protecting your privacy. Please review our <a href="privacy.html" class="text-decoration-none">Privacy Policy</a> to understand how we collect, use, and protect your personal information.</p>
+                        
+                        <h2 class="h4 text-primary mb-3">9. Intellectual Property</h2>
+                        <p>All content, trademarks, and intellectual property on TravelEase are owned by us or our licensors. You may not reproduce, distribute, or create derivative works without written permission.</p>
+                        
+                        <h2 class="h4 text-primary mb-3">10. Prohibited Activities</h2>
+                        <p>You agree not to:</p>
+                        <ul>
+                            <li>Use the service for any illegal or unauthorized purpose</li>
+                            <li>Attempt to gain unauthorized access to our systems</li>
+                            <li>Submit false or misleading information</li>
+                            <li>Interfere with the proper functioning of the website</li>
+                            <li>Engage in any activity that could harm our reputation</li>
+                        </ul>
+                        
+                        <h2 class="h4 text-primary mb-3">11. Modifications to Terms</h2>
+                        <p>We reserve the right to modify these terms at any time. Changes will be posted on this page with an updated "Last modified" date. Continued use of the service constitutes acceptance of modified terms.</p>
+                        
+                        <h2 class="h4 text-primary mb-3">12. Governing Law</h2>
+                        <p>These terms are governed by the laws of India. Any disputes shall be resolved in the courts of Mumbai, Maharashtra.</p>
+                        
+                        <h2 class="h4 text-primary mb-3">13. Contact Information</h2>
+                        <p>If you have any questions about these Terms & Conditions, please contact us:</p>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-envelope me-2"></i>Email: legal@travelease.com</li>
+                            <li><i class="fas fa-phone me-2"></i>Phone: +91 1234567890</li>
+                            <li><i class="fas fa-map-marker-alt me-2"></i>Address: 123 Travel Street, Mumbai, India</li>
+                        </ul>
+                        
+                        <div class="alert alert-info mt-4">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Important:</strong> By using TravelEase, you acknowledge that you have read, understood, and agree to be bound by these Terms & Conditions.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+
     <!-- Footer -->
+    <footer class="bg-dark text-white">
+        <div class="container py-5">
+            <div class="row">
+                <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+                    <h5>TravelEase</h5>
+                    <p>Your one-stop solution for all your travel booking needs. Find the best deals on flights, trains, and hotels.</p>
+                    <div class="d-flex">
+                        <a href="#" class="me-3"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="me-3"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="me-3"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="../index.html">Home</a></li>
+                        <li><a href="flights.html">Flights</a></li>
+                        <li><a href="trains.html">Trains</a></li>
+                        <li><a href="hotels.html">Hotels</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+                    <h5>Support</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="faq.html">FAQs</a></li>
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="terms.html">Terms of Service</a></li>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="#">Refund Policy</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h5>Contact Us</h5>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-map-marker-alt me-2"></i>123 Travel Street, Mumbai, India</li>
+                        <li><i class="fas fa-phone me-2"></i>+91 1234567890</li>
+                        <li><i class="fas fa-envelope me-2"></i>info@travelease.com</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="mb-0">&copy; 2025 TravelEase. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0">Made with <i class="fas fa-heart text-danger"></i> for travelers</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/main.js"></script>
 </body>

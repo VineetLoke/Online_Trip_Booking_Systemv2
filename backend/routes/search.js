@@ -16,15 +16,25 @@ router.get('/flights', async (req, res) => {
     if (destination) query.destination = new RegExp(destination, 'i');
     if (airline) query.airline = new RegExp(airline, 'i');
     
-    // Handle date query
+    // Handle date query with future time filter
+    const now = new Date();
+    const bufferMinutes = 60; // 60 minutes buffer
+    const cutoffTime = new Date(now.getTime() + bufferMinutes * 60 * 1000);
+    
     if (date) {
       const searchDate = new Date(date);
       const nextDay = new Date(searchDate);
       nextDay.setDate(nextDay.getDate() + 1);
       
+      // Ensure departure time is in the future with buffer
       query.departureTime = {
-        $gte: searchDate,
+        $gte: new Date(Math.max(searchDate.getTime(), cutoffTime.getTime())),
         $lt: nextDay
+      };
+    } else {
+      // If no date specified, only show flights departing after the cutoff time
+      query.departureTime = {
+        $gt: cutoffTime
       };
     }
     

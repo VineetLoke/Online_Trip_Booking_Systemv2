@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Debug Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+        pre { background: #f5f5f5; padding: 10px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Analytics Debug Test</h1>
+    
+    <div class="test-section">
+        <h2>Step 1: Admin Login</h2>
+        <button onclick="testAdminLogin()">Test Admin Login</button>
+        <div id="loginResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Step 2: Test Analytics Endpoints</h2>
+        <button onclick="testAnalyticsEndpoints()">Test All Analytics Endpoints</button>
+        <div id="analyticsResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Step 3: Check Sample Data</h2>
+        <button onclick="checkSampleData()">Check if Sample Data Exists</button>
+        <div id="dataResult"></div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3000/api';
+        let adminToken = null;
+
+        function log(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type;
+            element.innerHTML += `<div class="${className}">[${timestamp}] ${message}</div>`;
+        }
+
+        function clearLog(elementId) {
+            document.getElementById(elementId).innerHTML = '';
+        }
+
+        async function testAdminLogin() {
+            clearLog('loginResult');
+            log('loginResult', 'Testing admin login...', 'info');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/admin/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'admin@travelease.com',
+                        password: 'admin123'
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    adminToken = data.token;
+                    log('loginResult', `✅ Login successful! Admin: ${data.admin.name}`, 'success');
+                    log('loginResult', `Token: ${adminToken.substring(0, 50)}...`, 'info');
+                    localStorage.setItem('adminToken', adminToken);
+                    localStorage.setItem('adminUser', JSON.stringify(data.admin));
+                } else {
+                    const error = await response.json();
+                    log('loginResult', `❌ Login failed: ${error.message}`, 'error');
+                }
+            } catch (error) {
+                log('loginResult', `❌ Login error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testAnalyticsEndpoints() {
+            clearLog('analyticsResult');
+            
+            if (!adminToken) {
+                log('analyticsResult', '❌ No admin token - login first', 'error');
+                return;
+            }
+
+            const endpoints = [
+                'analytics/overview',
+                'analytics/booking-types',
+                'analytics/booking-status',
+                'analytics/flight-routes',
+                'analytics/train-routes',
+                'analytics/hotel-locations',
+                'analytics/monthly-revenue'
+            ];
+
+            log('analyticsResult', 'Testing analytics endpoints...', 'info');
+
+            for (const endpoint of endpoints) {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/admin/${endpoint}`, {
+                        headers: {
+                            'Authorization': `Bearer ${adminToken}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        log('analyticsResult', `✅ ${endpoint}: SUCCESS`, 'success');
+                        log('analyticsResult', `<pre>${JSON.stringify(data, null, 2)}</pre>`, 'info');
+                    } else {
+                        const error = await response.json();
+                        log('analyticsResult', `❌ ${endpoint}: ${response.status} - ${error.message}`, 'error');
+                    }
+                } catch (error) {
+                    log('analyticsResult', `❌ ${endpoint}: ${error.message}`, 'error');
+                }
+            }
+        }
+
+        async function checkSampleData() {
+            clearLog('dataResult');
+            
+            if (!adminToken) {
+                log('dataResult', '❌ No admin token - login first', 'error');
+                return;
+            }
+
+            const endpoints = [
+                'bookings',
+                'users',
+                'flights',
+                'trains',
+                'hotels'
+            ];
+
+            log('dataResult', 'Checking sample data...', 'info');
+
+            for (const endpoint of endpoints) {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/admin/${endpoint}`, {
+                        headers: {
+                            'Authorization': `Bearer ${adminToken}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        const count = data[endpoint]?.length || 0;
+                        log('dataResult', `✅ ${endpoint}: ${count} records`, count > 0 ? 'success' : 'error');
+                        if (count === 0) {
+                            log('dataResult', `   ⚠️ No ${endpoint} found - this will cause empty charts`, 'error');
+                        }
+                    } else {
+                        const error = await response.json();
+                        log('dataResult', `❌ ${endpoint}: ${response.status} - ${error.message}`, 'error');
+                    }
+                } catch (error) {
+                    log('dataResult', `❌ ${endpoint}: ${error.message}`, 'error');
+                }
+            }
+        }
+
+        // Auto-load token if available
+        window.onload = function() {
+            const savedToken = localStorage.getItem('adminToken');
+            if (savedToken) {
+                adminToken = savedToken;
+                log('loginResult', '✅ Admin token loaded from localStorage', 'success');
+            }
+        };
+    </script>
+</body>
+</html>

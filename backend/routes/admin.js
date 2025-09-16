@@ -381,6 +381,95 @@ router.get('/bookings', authenticateAdmin, checkPermission('view_reports'), asyn
   }
 });
 
+// Get booking details with all related passengers for the same trip
+router.get('/bookings/:id/details', authenticateAdmin, checkPermission('view_reports'), async (req, res) => {
+  try {
+    const bookingId = req.params.id;
+    
+    // Get the main booking
+    const mainBooking = await Booking.findById(bookingId)
+      .populate('userId', 'name email phone');
+    
+    if (!mainBooking) {
+      return res.status(404).json({
+        error: {
+          message: 'Booking not found',
+          status: 404
+        }
+      });
+    }
+    
+    // Find all related bookings for the same trip
+    let relatedBookings = [];
+    
+    if (mainBooking.bookingType === 'flight' && mainBooking.trip?.flightDetails) {
+      // Find all bookings for the same flight, same departure time, booked around the same time
+      const timeWindow = 5 * 60 * 1000; // 5 minutes
+      relatedBookings = await Booking.find({
+        bookingType: 'flight',
+        'trip.flightDetails.flightNumber': mainBooking.trip.flightDetails.flightNumber,
+        'trip.flightDetails.departureTime': mainBooking.trip.flightDetails.departureTime,
+        bookingDate: {
+          $gte: new Date(mainBooking.bookingDate.getTime() - timeWindow),
+          $lte: new Date(mainBooking.bookingDate.getTime() + timeWindow)
+        }
+      }).populate('userId', 'name email phone');
+    } else if (mainBooking.bookingType === 'train' && mainBooking.trip?.trainDetails) {
+      // Find all bookings for the same train, same departure time, booked around the same time
+      const timeWindow = 5 * 60 * 1000; // 5 minutes
+      relatedBookings = await Booking.find({
+        bookingType: 'train',
+        'trip.trainDetails.trainNumber': mainBooking.trip.trainDetails.trainNumber,
+        'trip.trainDetails.departureTime': mainBooking.trip.trainDetails.departureTime,
+        bookingDate: {
+          $gte: new Date(mainBooking.bookingDate.getTime() - timeWindow),
+          $lte: new Date(mainBooking.bookingDate.getTime() + timeWindow)
+        }
+      }).populate('userId', 'name email phone');
+    } else if (mainBooking.bookingType === 'hotel' && mainBooking.trip?.hotelDetails) {
+      // Find all bookings for the same hotel, same dates, booked around the same time
+      const timeWindow = 5 * 60 * 1000; // 5 minutes
+      relatedBookings = await Booking.find({
+        bookingType: 'hotel',
+        'trip.hotelDetails.hotelId': mainBooking.trip.hotelDetails.hotelId,
+        'trip.hotelDetails.checkInDate': mainBooking.trip.hotelDetails.checkInDate,
+        'trip.hotelDetails.checkOutDate': mainBooking.trip.hotelDetails.checkOutDate,
+        bookingDate: {
+          $gte: new Date(mainBooking.bookingDate.getTime() - timeWindow),
+          $lte: new Date(mainBooking.bookingDate.getTime() + timeWindow)
+        }
+      }).populate('userId', 'name email phone');
+    } else {
+      // If no trip details, just return the main booking
+      relatedBookings = [mainBooking];
+    }
+    
+    // If no related bookings found, return just the main booking
+    if (relatedBookings.length === 0) {
+      relatedBookings = [mainBooking];
+    }
+    
+    // Calculate total amount and passenger count
+    const totalAmount = relatedBookings.reduce((sum, booking) => sum + booking.totalAmount, 0);
+    const passengerCount = relatedBookings.length;
+    
+    res.status(200).json({
+      mainBooking,
+      relatedBookings,
+      isGroupBooking: relatedBookings.length > 1,
+      passengerCount,
+      totalAmount
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: {
+        message: error.message,
+        status: 500
+      }
+    });
+  }
+});
+
 // Get analytics data
 router.get('/analytics/overview', authenticateAdmin, checkPermission('view_reports'), async (req, res) => {
   try {

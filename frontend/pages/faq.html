@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FAQ - TravelEase</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../css/styles.css">
 </head>
 <body>
@@ -41,9 +42,250 @@
         </div>
     </nav>
 
+    <!-- Page Header -->
+    <section class="bg-primary text-white py-4">
+        <div class="container">
+            <h1><i class="fas fa-question-circle me-2"></i>Frequently Asked Questions</h1>
+            <p class="lead mb-0">Find answers to common questions about TravelEase</p>
+        </div>
+    </section>
+
+    <!-- FAQ Content -->
     <div class="container my-5">
-        <h1 class="text-center mb-4">Frequently Asked Questions</h1>
-        <p>Content for FAQ goes here...</p>
+        <!-- Search Box -->
+        <div class="row justify-content-center mb-5">
+            <div class="col-lg-6">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="faqSearch" placeholder="Search FAQs...">
+                    <button class="btn btn-primary" type="button" id="searchBtn">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ Categories -->
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <!-- General Questions -->
+                <div class="card mb-4 faq-category" data-category="general">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0"><i class="fas fa-info-circle me-2"></i>General Questions</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="accordion" id="generalAccordion">
+                            <div class="accordion-item faq-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#general1">
+                                        What is TravelEase?
+                                    </button>
+                                </h2>
+                                <div id="general1" class="accordion-collapse collapse" data-bs-parent="#generalAccordion">
+                                    <div class="accordion-body">
+                                        TravelEase is a comprehensive online booking platform that allows you to book flights, trains, and hotels all in one place. We provide a seamless travel booking experience with competitive prices and excellent customer service.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item faq-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#general2">
+                                        How do I create an account?
+                                    </button>
+                                </h2>
+                                <div id="general2" class="accordion-collapse collapse" data-bs-parent="#generalAccordion">
+                                    <div class="accordion-body">
+                                        Click on the "Login/Register" button in the top right corner of any page, then select "Create an Account." Fill in your details including name, email, phone number, and password. Don't forget to agree to our Terms & Conditions!
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item faq-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#general3">
+                                        Is my personal information secure?
+                                    </button>
+                                </h2>
+                                <div id="general3" class="accordion-collapse collapse" data-bs-parent="#generalAccordion">
+                                    <div class="accordion-body">
+                                        Yes, we take your privacy and security seriously. All personal information is encrypted and stored securely. We never share your information with third parties without your consent. Read our Privacy Policy for more details.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Booking Questions -->
+                <div class="card mb-4 faq-category" data-category="booking">
+                    <div class="card-header bg-success text-white">
+                        <h3 class="mb-0"><i class="fas fa-calendar-check me-2"></i>Booking Questions</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="accordion" id="bookingAccordion">
+                            <div class="accordion-item faq-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#booking1">
+                                        How do I make a booking?
+                                    </button>
+                                </h2>
+                                <div id="booking1" class="accordion-collapse collapse" data-bs-parent="#bookingAccordion">
+                                    <div class="accordion-body">
+                                        1. Search for your desired flight, train, or hotel<br>
+                                        2. Select your preferred option from the results<br>
+                                        3. Fill in passenger/guest details<br>
+                                        4. Choose your payment method<br>
+                                        5. Review and confirm your booking<br>
+                                        6. Receive confirmation via email
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item faq-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#booking2">
+                                        What payment methods do you accept?
+                                    </button>
+                                </h2>
+                                <div id="booking2" class="accordion-collapse collapse" data-bs-parent="#bookingAccordion">
+                                    <div class="accordion-body">
+                                        We accept all major credit cards (Visa, MasterCard, American Express), debit cards, PayPal, and secure online banking. All transactions are processed through secure, encrypted connections.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item faq-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#booking3">
+                                        Can I book for multiple passengers?
+                                    </button>
+                                </h2>
+                                <div id="booking3" class="accordion-collapse collapse" data-bs-parent="#bookingAccordion">
+                                    <div class="accordion-body">
+                                        Yes, you can book for up to 9 passengers in a single transaction for flights and trains. For hotels, you can book multiple rooms. Just specify the number of passengers/rooms during your search.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cancellation Questions -->
+                <div class="card mb-4 faq-category" data-category="cancellation">
+                    <div class="card-header bg-warning text-dark">
+                        <h3 class="mb-0"><i class="fas fa-times-circle me-2"></i>Cancellation & Refunds</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="accordion" id="cancellationAccordion">
+                            <div class="accordion-item faq-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#cancel1">
+                                        How do I cancel my booking?
+                                    </button>
+                                </h2>
+                                <div id="cancel1" class="accordion-collapse collapse" data-bs-parent="#cancellationAccordion">
+                                    <div class="accordion-body">
+                                        Log into your account, go to "My Bookings," find your booking, and click "Cancel." You can also contact our customer support at support@travelease.com or call our 24/7 helpline.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item faq-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#cancel2">
+                                        What is your refund policy?
+                                    </button>
+                                </h2>
+                                <div id="cancel2" class="accordion-collapse collapse" data-bs-parent="#cancellationAccordion">
+                                    <div class="accordion-body">
+                                        Refund policies vary by service provider and fare type. Generally:<br>
+                                        • Free cancellation within 24 hours of booking<br>
+                                        • Cancellation fees may apply after 24 hours<br>
+                                        • Non-refundable fares: No refund, but may get credit<br>
+                                        • Refunds processed within 7-10 business days
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item faq-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#cancel3">
+                                        Can I modify my booking?
+                                    </button>
+                                </h2>
+                                <div id="cancel3" class="accordion-collapse collapse" data-bs-parent="#cancellationAccordion">
+                                    <div class="accordion-body">
+                                        Yes, most bookings can be modified subject to availability and fare differences. Modification fees may apply depending on the service provider's policy. Contact our support team for assistance.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Support Questions -->
+                <div class="card mb-4 faq-category" data-category="support">
+                    <div class="card-header bg-info text-white">
+                        <h3 class="mb-0"><i class="fas fa-headset me-2"></i>Customer Support</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="accordion" id="supportAccordion">
+                            <div class="accordion-item faq-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#support1">
+                                        How can I contact customer support?
+                                    </button>
+                                </h2>
+                                <div id="support1" class="accordion-collapse collapse" data-bs-parent="#supportAccordion">
+                                    <div class="accordion-body">
+                                        • 24/7 Phone Support: +1-800-TRAVEL-EASE<br>
+                                        • Email: support@travelease.com<br>
+                                        • Live Chat: Available on our website<br>
+                                        • Contact Form: Visit our Contact page<br>
+                                        • Response time: Within 2 hours for urgent matters
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item faq-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#support2">
+                                        What if I need help during my trip?
+                                    </button>
+                                </h2>
+                                <div id="support2" class="accordion-collapse collapse" data-bs-parent="#supportAccordion">
+                                    <div class="accordion-body">
+                                        Our 24/7 customer support is available to help you during your travels. Keep your booking reference number handy and contact us immediately if you encounter any issues. We also provide emergency assistance for urgent travel disruptions.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item faq-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#support3">
+                                        Do you have a mobile app?
+                                    </button>
+                                </h2>
+                                <div id="support3" class="accordion-collapse collapse" data-bs-parent="#supportAccordion">
+                                    <div class="accordion-body">
+                                        Yes! Download the TravelEase mobile app from the App Store or Google Play Store. The app allows you to book, manage reservations, check-in, and get real-time updates on your trips.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Contact Support Section -->
+        <div class="row mt-5">
+            <div class="col-lg-8 mx-auto">
+                <div class="text-center">
+                    <h3>Still have questions?</h3>
+                    <p class="text-muted">Can't find what you're looking for? Our customer support team is here to help.</p>
+                    <a href="contact.html" class="btn btn-primary me-3">
+                        <i class="fas fa-envelope me-2"></i>Contact Support
+                    </a>
+                    <a href="tel:+1-800-TRAVEL-EASE" class="btn btn-outline-primary">
+                        <i class="fas fa-phone me-2"></i>Call Us Now
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Include Footer (copy from index.html) -->
@@ -51,14 +293,85 @@
         <div class="container text-center">
             <p>&copy; 2025 TravelEase. All rights reserved.</p>
             <p>
-                <a href="pages/faq.html" class="text-white mx-2">FAQ</a> |
-                <a href="pages/terms.html" class="text-white mx-2">Terms & Conditions</a> |
-                <a href="pages/privacy.html" class="text-white mx-2">Privacy Policy</a>
+                <a href="faq.html" class="text-white mx-2">FAQ</a> |
+                <a href="terms.html" class="text-white mx-2">Terms & Conditions</a> |
+                <a href="privacy.html" class="text-white mx-2">Privacy Policy</a>
             </p>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/main.js"></script>
+    <script>
+        // FAQ Search functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('faqSearch');
+            const searchBtn = document.getElementById('searchBtn');
+            const faqItems = document.querySelectorAll('.faq-item');
+            const faqCategories = document.querySelectorAll('.faq-category');
+
+            function performSearch() {
+                const searchTerm = searchInput.value.toLowerCase().trim();
+                let hasVisibleItems = false;
+
+                faqCategories.forEach(category => {
+                    let categoryHasVisible = false;
+                    const categoryItems = category.querySelectorAll('.faq-item');
+                    
+                    categoryItems.forEach(item => {
+                        const question = item.querySelector('.accordion-button').textContent.toLowerCase();
+                        const answer = item.querySelector('.accordion-body').textContent.toLowerCase();
+                        
+                        if (searchTerm === '' || question.includes(searchTerm) || answer.includes(searchTerm)) {
+                            item.style.display = 'block';
+                            categoryHasVisible = true;
+                            hasVisibleItems = true;
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                    
+                    // Show/hide category based on whether it has visible items
+                    if (categoryHasVisible || searchTerm === '') {
+                        category.style.display = 'block';
+                    } else {
+                        category.style.display = 'none';
+                    }
+                });
+
+                // Show no results message if needed
+                const existingNoResults = document.getElementById('noResults');
+                if (existingNoResults) {
+                    existingNoResults.remove();
+                }
+
+                if (!hasVisibleItems && searchTerm !== '') {
+                    const noResultsDiv = document.createElement('div');
+                    noResultsDiv.id = 'noResults';
+                    noResultsDiv.className = 'text-center mt-4';
+                    noResultsDiv.innerHTML = `
+                        <div class="alert alert-info">
+                            <i class="fas fa-search me-2"></i>
+                            No FAQs found matching "${searchTerm}". Try different keywords or contact our support team.
+                        </div>
+                    `;
+                    document.querySelector('.container .row .col-lg-8').appendChild(noResultsDiv);
+                }
+            }
+
+            // Search on input
+            searchInput.addEventListener('input', performSearch);
+            
+            // Search on button click
+            searchBtn.addEventListener('click', performSearch);
+            
+            // Search on Enter key
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+        });
+    </script>
 </body>
 </html>

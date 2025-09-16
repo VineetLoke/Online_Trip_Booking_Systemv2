@@ -2,8 +2,10 @@
  * Online Booking System - Main JavaScript
  */
 
-// API Base URL
-const API_BASE_URL = 'http://localhost:3000/api';
+// API Base URL - can be configured via environment or defaults to localhost
+const API_BASE_URL = window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1') 
+  ? 'http://localhost:3000/api' 
+  : `${window.location.protocol}//${window.location.hostname}:3000/api`;
 // Make available on the window so page-specific scripts can reuse it without redeclaring
 window.API_BASE_URL = API_BASE_URL;
 
@@ -31,6 +33,9 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Setup Search Forms for actually working
   setupSearchForms();
+  
+  // Setup Terms & Conditions Modal
+  setupTermsModal();
   
   // Check if user is logged in or not
   checkAuthStatus();
@@ -444,14 +449,24 @@ function displayFlightResults(flights) {
   
   if (!resultsContainer) return;
   
-  if (flights.length === 0) {
+  // Client-side filter to mirror server-side filtering
+  const now = new Date();
+  const bufferMinutes = 60; // 60 minutes buffer
+  const cutoffTime = new Date(now.getTime() + bufferMinutes * 60 * 1000);
+  
+  const availableFlights = flights.filter(flight => {
+    const departureTime = new Date(flight.departureTime);
+    return departureTime > cutoffTime;
+  });
+  
+  if (availableFlights.length === 0) {
     resultsContainer.innerHTML = '<div class="text-center py-5"><p>No flights found. Please try different search criteria.</p></div>';
     return;
   }
   
   let html = '<h3 class="mb-4">Flight Search Results</h3>';
   
-  flights.forEach(flight => {
+  availableFlights.forEach(flight => {
     const departureTime = new Date(flight.departureTime);
     const arrivalTime = new Date(flight.arrivalTime);
     
@@ -727,6 +742,199 @@ function getDurationString(start, end) {
   
   return `${hours}h ${minutes}m`;
 }
+/**
+ * Setup Terms & Conditions Modal
+ */
+function setupTermsModal() {
+  // Create the modal if it doesn't exist
+  if (!document.getElementById('termsModal')) {
+    const modalHTML = createTermsModalHTML();
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+  }
+  
+  // Attach event listeners to all Terms & Conditions links
+  const termsLinks = document.querySelectorAll('a[href="terms.html"], a[href="#terms"], a[data-terms-modal]');
+  termsLinks.forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      showTermsModal();
+    });
+  });
+  
+  // Setup modal keyboard navigation (ESC to close)
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      const modal = document.getElementById('termsModal');
+      if (modal && modal.classList.contains('show')) {
+        hideTermsModal();
+      }
+    }
+  });
+}
+
+/**
+ * Show Terms & Conditions Modal
+ */
+function showTermsModal() {
+  const modal = document.getElementById('termsModal');
+  if (modal) {
+    const bsModal = new bootstrap.Modal(modal, {
+      backdrop: true,
+      keyboard: true,
+      focus: true
+    });
+    bsModal.show();
+    
+    // Set focus trap
+    trapFocus(modal);
+  }
+}
+
+/**
+ * Hide Terms & Conditions Modal
+ */
+function hideTermsModal() {
+  const modal = document.getElementById('termsModal');
+  if (modal) {
+    const bsModal = bootstrap.Modal.getInstance(modal);
+    if (bsModal) {
+      bsModal.hide();
+    }
+  }
+}
+
+/**
+ * Create Terms Modal HTML
+ */
+function createTermsModalHTML() {
+  return `
+    <!-- Terms & Conditions Modal -->
+    <div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="termsModalLabel">
+              <i class="fas fa-file-contract me-2"></i>Terms & Conditions
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p class="text-muted mb-4"><strong>Last updated:</strong> January 1, 2025</p>
+            
+            <h6 class="text-primary mb-3">1. Acceptance of Terms</h6>
+            <p>By accessing and using TravelEase, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.</p>
+            
+            <h6 class="text-primary mb-3">2. Service Description</h6>
+            <p>TravelEase is an online travel booking platform that allows users to search, compare, and book flights, trains, and hotels. We act as an intermediary between travelers and travel service providers.</p>
+            
+            <h6 class="text-primary mb-3">3. User Accounts</h6>
+            <ul>
+              <li>You must be at least 18 years old to create an account</li>
+              <li>You are responsible for maintaining the confidentiality of your account</li>
+              <li>You agree to provide accurate, current, and complete information</li>
+              <li>You are responsible for all activities that occur under your account</li>
+            </ul>
+            
+            <h6 class="text-primary mb-3">4. Booking and Payment</h6>
+            <ul>
+              <li>All bookings are subject to availability and confirmation</li>
+              <li>Prices are subject to change until booking is confirmed</li>
+              <li>Payment must be made in full at the time of booking</li>
+              <li>We accept major credit cards and secure payment methods</li>
+              <li>Additional fees may apply for certain services</li>
+            </ul>
+            
+            <h6 class="text-primary mb-3">5. Cancellation and Refunds</h6>
+            <ul>
+              <li>Cancellation policies vary by service provider</li>
+              <li>Cancellation fees may apply as per provider policies</li>
+              <li>Refunds are processed according to the original payment method</li>
+              <li>Processing time for refunds may vary (typically 5-10 business days)</li>
+            </ul>
+            
+            <h6 class="text-primary mb-3">6. User Responsibilities</h6>
+            <ul>
+              <li>Ensure all travel documents are valid and up-to-date</li>
+              <li>Comply with all applicable laws and regulations</li>
+              <li>Arrive at departure points with adequate time</li>
+              <li>Report any issues or concerns promptly</li>
+            </ul>
+            
+            <h6 class="text-primary mb-3">7. Limitation of Liability</h6>
+            <p>TravelEase acts as an intermediary and is not liable for:</p>
+            <ul>
+              <li>Flight delays, cancellations, or schedule changes</li>
+              <li>Hotel service quality or amenities</li>
+              <li>Train service disruptions</li>
+              <li>Force majeure events beyond our control</li>
+              <li>Third-party service provider actions or omissions</li>
+            </ul>
+            
+            <h6 class="text-primary mb-3">8. Privacy and Data Protection</h6>
+            <p>We are committed to protecting your privacy. Please review our Privacy Policy to understand how we collect, use, and protect your personal information.</p>
+            
+            <h6 class="text-primary mb-3">9. Intellectual Property</h6>
+            <p>All content, trademarks, and intellectual property on TravelEase are owned by us or our licensors. You may not reproduce, distribute, or create derivative works without written permission.</p>
+            
+            <h6 class="text-primary mb-3">10. Prohibited Activities</h6>
+            <p>You agree not to:</p>
+            <ul>
+              <li>Use the service for any illegal or unauthorized purpose</li>
+              <li>Attempt to gain unauthorized access to our systems</li>
+              <li>Submit false or misleading information</li>
+              <li>Interfere with the proper functioning of the website</li>
+              <li>Engage in any activity that could harm our reputation</li>
+            </ul>
+            
+            <h6 class="text-primary mb-3">11. Contact Information</h6>
+            <p>If you have any questions about these Terms & Conditions, please contact us:</p>
+            <ul class="list-unstyled">
+              <li><i class="fas fa-envelope me-2"></i>Email: legal@travelease.com</li>
+              <li><i class="fas fa-phone me-2"></i>Phone: +91 1234567890</li>
+              <li><i class="fas fa-map-marker-alt me-2"></i>Address: 123 Travel Street, Mumbai, India</li>
+            </ul>
+            
+            <div class="alert alert-info mt-4">
+              <i class="fas fa-info-circle me-2"></i>
+              <strong>Important:</strong> By using TravelEase, you acknowledge that you have read, understood, and agree to be bound by these Terms & Conditions.
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * Focus trap for accessibility
+ */
+function trapFocus(modal) {
+  const focusableElements = modal.querySelectorAll(
+    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+  );
+  const firstFocusableElement = focusableElements[0];
+  const lastFocusableElement = focusableElements[focusableElements.length - 1];
+  
+  modal.addEventListener('keydown', function(e) {
+    if (e.key === 'Tab') {
+      if (e.shiftKey) {
+        if (document.activeElement === firstFocusableElement) {
+          lastFocusableElement.focus();
+          e.preventDefault();
+        }
+      } else {
+        if (document.activeElement === lastFocusableElement) {
+          firstFocusableElement.focus();
+          e.preventDefault();
+        }
+      }
+    }
+  });
+}
+
 /**
  * API function to cancel booking (moved from bookings.html)
  */

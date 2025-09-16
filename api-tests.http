@@ -1,0 +1,72 @@
+### Health Check
+GET http://localhost:3000/api/health
+
+### User Registration
+POST http://localhost:3000/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Test User",
+  "email": "test@example.com", 
+  "phone": "1234567890",
+  "password": "password123"
+}
+
+### User Login
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "password123"
+}
+
+### Admin Login
+POST http://localhost:3000/api/auth/admin-login
+Content-Type: application/json
+
+{
+  "email": "admin@travelease.com",
+  "password": "admin123"
+}
+
+### Search Flights
+GET http://localhost:3000/api/search/flights?source=Delhi&destination=Mumbai&date=2024-12-01
+
+### Search Trains
+GET http://localhost:3000/api/search/trains?source=Delhi&destination=Mumbai&date=2024-12-01
+
+### Search Hotels
+GET http://localhost:3000/api/search/hotels?location=Mumbai&checkIn=2024-12-01&checkOut=2024-12-03
+
+### Get User Profile (requires auth token)
+GET http://localhost:3000/api/users/profile
+Authorization: Bearer YOUR_TOKEN_HERE
+
+### Create Flight Booking (requires auth token)
+POST http://localhost:3000/api/bookings
+Content-Type: application/json
+Authorization: Bearer YOUR_TOKEN_HERE
+
+{
+  "bookingType": "flight",
+  "serviceId": "FLIGHT_ID_HERE",
+  "passengers": 1,
+  "totalAmount": 5000
+}
+
+### Get User Bookings (requires auth token)
+GET http://localhost:3000/api/bookings/user
+Authorization: Bearer YOUR_TOKEN_HERE
+
+### Admin: Get All Users (requires admin token)
+GET http://localhost:3000/api/admin/users
+Authorization: Bearer YOUR_ADMIN_TOKEN_HERE
+
+### Admin: Get All Bookings (requires admin token)
+GET http://localhost:3000/api/admin/bookings
+Authorization: Bearer YOUR_ADMIN_TOKEN_HERE
+
+### Admin: Get Analytics (requires admin token)
+GET http://localhost:3000/api/admin/analytics
+Authorization: Bearer YOUR_ADMIN_TOKEN_HERE
