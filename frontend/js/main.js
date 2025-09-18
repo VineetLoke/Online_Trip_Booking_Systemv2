@@ -1145,9 +1145,17 @@ function generateSampleData() {
  * Setup Swap Buttons for Flight and Train Search Forms
  */
 function setupSwapButtons() {
+  // Only setup if we're on a page that has search forms
+  const hasFlightForm = document.getElementById('flightSource') && document.getElementById('flightDestination');
+  const hasTrainForm = document.getElementById('trainSource') && document.getElementById('trainDestination');
+  
+  if (!hasFlightForm && !hasTrainForm) {
+    return; // Skip setup on pages without search forms
+  }
+  
   // Setup flight swap button
   const flightSwapBtn = document.getElementById('swapFlightBtn');
-  if (flightSwapBtn) {
+  if (flightSwapBtn && hasFlightForm) {
     flightSwapBtn.addEventListener('click', function() {
       swapFields('flightSource', 'flightDestination');
     });
@@ -1155,7 +1163,7 @@ function setupSwapButtons() {
   
   // Setup train swap button
   const trainSwapBtn = document.getElementById('swapTrainBtn');
-  if (trainSwapBtn) {
+  if (trainSwapBtn && hasTrainForm) {
     trainSwapBtn.addEventListener('click', function() {
       swapFields('trainSource', 'trainDestination');
     });
@@ -1168,25 +1176,35 @@ function setupSwapButtons() {
  * @param {string} destinationId - ID of the destination input field
  */
 function swapFields(sourceId, destinationId) {
+  console.log('Swapping fields:', sourceId, destinationId);
+  
   const sourceField = document.getElementById(sourceId);
   const destinationField = document.getElementById(destinationId);
+  
+  console.log('Source field found:', sourceField);
+  console.log('Destination field found:', destinationField);
   
   if (sourceField && destinationField) {
     const tempValue = sourceField.value;
     sourceField.value = destinationField.value;
     destinationField.value = tempValue;
     
+    console.log('Values swapped successfully');
+    
     // Add a small animation effect to show the swap
-    const swapBtn = document.querySelector(`[onclick*="${sourceId}"], [onclick*="${destinationId}"]`) || 
-                   (sourceId.includes('flight') ? document.getElementById('swapFlightBtn') : document.getElementById('swapTrainBtn'));
+    const swapBtn = sourceId.includes('flight') ? 
+      document.getElementById('swapFlightBtn') : 
+      document.getElementById('swapTrainBtn');
     
     if (swapBtn) {
+      swapBtn.style.transition = 'transform 0.3s ease';
       swapBtn.style.transform = 'rotate(180deg)';
       setTimeout(() => {
         swapBtn.style.transform = 'rotate(0deg)';
       }, 300);
     }
+  } else {
+    console.log('One or both fields not found!');
   }
 }
-*/
 

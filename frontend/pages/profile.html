@@ -295,18 +295,23 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/main.js"></script>
     <script>
-        // Define API_BASE_URL for this page
-        const API_BASE_URL = window.API_BASE_URL || (window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1') 
-            ? 'http://localhost:3000/api' 
-            : `${window.location.protocol}//${window.location.hostname}:3000/api`);
+        // Use API_BASE_URL from main.js (don't redeclare it)
+        const API_BASE_URL = window.API_BASE_URL || 'http://localhost:3000/api';
 
         // Populate profile data from stored user object
         document.addEventListener("DOMContentLoaded", () => {
+            console.log('Profile page loaded - checking user data...');
+            
             const userJson = localStorage.getItem('user');
             const token = localStorage.getItem('token');
             
+            console.log('Token found:', !!token);
+            console.log('User JSON found:', !!userJson);
+            console.log('User JSON content:', userJson);
+            
             if (!userJson || !token) {
                 // Not logged in -> redirect to home page
+                console.log('No user data or token found, redirecting...');
                 showAlert('mainAlert', 'Please log in to view your profile.', 'warning');
                 setTimeout(() => {
                     window.location.href = '../index.html';
@@ -316,32 +321,62 @@
 
             try {
                 const user = JSON.parse(userJson);
+                console.log('Parsed user object:', user);
                 
                 // Update profile information
-                document.getElementById('profileUsername').textContent = user.name || user.username || 'User';
-                document.getElementById('profileEmail').textContent = user.email || 'No email provided';
-                document.getElementById('profilePhone').textContent = user.phone || 'Not provided';
+                const username = user.name || user.username || user.fullName || 'User';
+                const email = user.email || 'No email provided';
+                const phone = user.phone || user.phoneNumber || 'Not provided';
+                
+                console.log('Setting profile data:', { username, email, phone });
+                
+                document.getElementById('profileUsername').textContent = username;
+                document.getElementById('profileEmail').textContent = email;
+                document.getElementById('profilePhone').textContent = phone;
                 
                 // Format join date if available
+                let joinDate = 'Not available';
                 if (user.createdAt) {
-                    const joinDate = new Date(user.createdAt).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                    });
-                    document.getElementById('profileJoinDate').textContent = joinDate;
-                } else {
-                    document.getElementById('profileJoinDate').textContent = 'Not available';
+                    try {
+                        joinDate = new Date(user.createdAt).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        });
+                    } catch (dateError) {
+                        console.error('Error formatting date:', dateError);
+                        joinDate = 'Invalid date format';
+                    }
+                } else if (user.joinDate) {
+                    try {
+                        joinDate = new Date(user.joinDate).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        });
+                    } catch (dateError) {
+                        console.error('Error formatting join date:', dateError);
+                        joinDate = 'Invalid date format';
+                    }
                 }
+                
+                console.log('Setting join date:', joinDate);
+                document.getElementById('profileJoinDate').textContent = joinDate;
 
                 // Update navbar dropdown display if present
                 const usernameDisplay = document.getElementById('userName');
                 if (usernameDisplay) {
-                    usernameDisplay.textContent = user.name || user.username || 'User';
+                    usernameDisplay.textContent = username;
                 }
+                
+                console.log('Profile data loaded successfully');
+                
             } catch (err) {
                 console.error('Error parsing user from localStorage', err);
                 showAlert('mainAlert', 'Error loading profile data. Please try logging in again.', 'danger');
+                
+                // Show what data we actually have for debugging
+                console.log('Raw userJson that failed to parse:', userJson);
             }
 
             // Setup edit profile functionality
