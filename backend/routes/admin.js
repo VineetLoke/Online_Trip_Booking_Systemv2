@@ -8,6 +8,13 @@ const Train = require('../models/Train');
 const Hotel = require('../models/Hotel');
 const Booking = require('../models/Booking');
 
+// Get current admin user
+router.get('/me', authenticateAdmin, (req, res) => {
+  // The `authenticateAdmin` middleware already validated the token
+  // and attached the admin user to the request object.
+  res.status(200).json({ admin: req.admin });
+});
+
 // Get all users
 router.get('/users', authenticateAdmin, checkPermission('manage_users'), async (req, res) => {
   try {

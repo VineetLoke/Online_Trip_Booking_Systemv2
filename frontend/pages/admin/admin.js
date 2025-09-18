@@ -42,11 +42,33 @@ window.isAdminPage = true;
 // Do not redeclare API_BASE_URL here to avoid SyntaxError when main.js already defines it.
 
 document.addEventListener('DOMContentLoaded', function() {
-  // Check if admin is logged in
-  if (!localStorage.getItem('adminToken')) {
+  // Check if admin is logged in and token is valid
+  const token = localStorage.getItem('adminToken');
+  console.log('admin.js: adminToken on page load:', token);
+  console.log('admin.js: API_BASE_URL on page load:', window.API_BASE_URL);
+  if (!token) {
     window.location.href = 'login.html';
     return;
   }
+  // Verify admin token with backend
+  fetch(`${window.API_BASE_URL}/admin/me`, {
+    headers: { 'Authorization': `Bearer ${token}` }
+  })
+    .then(res => {
+      if (!res.ok) {
+        // Token invalid or expired
+        localStorage.removeItem('adminToken');
+        localStorage.removeItem('adminUser');
+        window.location.href = 'login.html';
+        throw new Error('Invalid admin token');
+      }
+      return res.json();
+    })
+    .catch(() => {
+      localStorage.removeItem('adminToken');
+      localStorage.removeItem('adminUser');
+      window.location.href = 'login.html';
+    });
 
   // Set admin name
   const adminUser = JSON.parse(localStorage.getItem('adminUser') || '{}');
@@ -1150,8 +1172,9 @@ async function loadBookingTypesChart() {
     const ctx = document.getElementById('bookingTypesChart').getContext('2d');
     
     // Destroy existing chart if it exists
-    if (window.bookingTypesChart) {
+    if (window.bookingTypesChart && typeof window.bookingTypesChart.destroy === 'function') {
       window.bookingTypesChart.destroy();
+      window.bookingTypesChart = null;
     }
     
     // Check if we have data
@@ -1218,8 +1241,9 @@ async function loadBookingStatusChart() {
     const ctx = document.getElementById('bookingStatusChart').getContext('2d');
     
     // Destroy existing chart if it exists
-    if (window.bookingStatusChart) {
+    if (window.bookingStatusChart && typeof window.bookingStatusChart.destroy === 'function') {
       window.bookingStatusChart.destroy();
+      window.bookingStatusChart = null;
     }
     
     // Check if we have data
@@ -1292,8 +1316,9 @@ async function loadFlightRoutesChart() {
     const ctx = document.getElementById('flightRoutesChart').getContext('2d');
     
     // Destroy existing chart if it exists
-    if (window.flightRoutesChart) {
+    if (window.flightRoutesChart && typeof window.flightRoutesChart.destroy === 'function') {
       window.flightRoutesChart.destroy();
+      window.flightRoutesChart = null;
     }
     
     // Check if we have data
@@ -1367,8 +1392,9 @@ async function loadTrainRoutesChart() {
     const ctx = document.getElementById('trainRoutesChart').getContext('2d');
     
     // Destroy existing chart if it exists
-    if (window.trainRoutesChart) {
+    if (window.trainRoutesChart && typeof window.trainRoutesChart.destroy === 'function') {
       window.trainRoutesChart.destroy();
+      window.trainRoutesChart = null;
     }
     
     // Check if we have data
@@ -1442,8 +1468,9 @@ async function loadHotelLocationsChart() {
     const ctx = document.getElementById('hotelLocationsChart').getContext('2d');
     
     // Destroy existing chart if it exists
-    if (window.hotelLocationsChart) {
+    if (window.hotelLocationsChart && typeof window.hotelLocationsChart.destroy === 'function') {
       window.hotelLocationsChart.destroy();
+      window.hotelLocationsChart = null;
     }
     
     // Check if we have data
@@ -1510,8 +1537,9 @@ async function loadRevenueChart() {
     const ctx = document.getElementById('revenueChart').getContext('2d');
     
     // Destroy existing chart if it exists
-    if (window.revenueChart) {
+    if (window.revenueChart && typeof window.revenueChart.destroy === 'function') {
       window.revenueChart.destroy();
+      window.revenueChart = null;
     }
     
     // Check if we have data

@@ -82,11 +82,16 @@
       <div id="searchAlert"></div>
       <form id="flightSearchForm">
         <div class="row g-3">
-          <div class="col-md-4">
+          <div class="col-md-3">
             <label for="flightSource" class="form-label">From</label>
             <input type="text" class="form-control" id="flightSource" placeholder="City or Airport" required>
           </div>
-          <div class="col-md-4">
+          <div class="col-md-2 d-flex align-items-end justify-content-center">
+            <button type="button" class="btn btn-outline-secondary swap-btn" id="swapFlightBtn" title="Swap Source and Destination">
+              <i class="fas fa-exchange-alt"></i>
+            </button>
+          </div>
+          <div class="col-md-3">
             <label for="flightDestination" class="form-label">To</label>
             <input type="text" class="form-control" id="flightDestination" placeholder="City or Airport" required>
           </div>

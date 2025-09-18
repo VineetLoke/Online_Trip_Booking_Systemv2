@@ -106,35 +106,32 @@
   <script src="../../js/main.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Check if admin is already logged in
+      // Always clear any old admin tokens on login page load
+      localStorage.removeItem('adminToken');
+      localStorage.removeItem('adminUser');
+      // Check if admin is already logged in (should never happen now, but keep for safety)
       if (localStorage.getItem('adminToken')) {
         window.location.href = 'index.html';
         return;
       }
-      
       // Handle admin login form
       document.getElementById('adminLoginForm').addEventListener('submit', async function(e) {
         e.preventDefault();
-        
         const email = document.getElementById('adminEmail').value;
         const password = document.getElementById('adminPassword').value;
-        
         try {
-          const response = await fetch('http://localhost:3000/api/auth/admin/login', {
+          const response = await fetch(`${window.API_BASE_URL}/auth/admin/login`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({ email, password })
           });
-          
           const data = await response.json();
-          
           if (response.ok) {
             // Store admin token
             localStorage.setItem('adminToken', data.token);
             localStorage.setItem('adminUser', JSON.stringify(data.admin));
-            
             // Redirect to admin dashboard
             window.location.href = 'index.html';
           } else {

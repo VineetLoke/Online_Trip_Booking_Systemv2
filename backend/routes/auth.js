@@ -1,5 +1,10 @@
 const express = require('express');
 const router = express.Router();
+const { authenticateAdmin } = require('../middleware/auth');
+// Admin token validation endpoint
+router.get('/auth/admin/me', authenticateAdmin, (req, res) => {
+  res.json({ admin: req.admin });
+});
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');

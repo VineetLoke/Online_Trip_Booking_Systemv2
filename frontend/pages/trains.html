@@ -82,11 +82,16 @@
       <div id="searchAlert"></div>
       <form id="trainSearchForm">
         <div class="row g-3">
-          <div class="col-md-4">
+          <div class="col-md-3">
             <label for="trainSource" class="form-label">From</label>
             <input type="text" class="form-control" id="trainSource" placeholder="City or Station" required>
           </div>
-          <div class="col-md-4">
+          <div class="col-md-2 d-flex align-items-end justify-content-center">
+            <button type="button" class="btn btn-outline-secondary swap-btn" id="swapTrainBtn" title="Swap Source and Destination">
+              <i class="fas fa-exchange-alt"></i>
+            </button>
+          </div>
+          <div class="col-md-3">
             <label for="trainDestination" class="form-label">To</label>
             <input type="text" class="form-control" id="trainDestination" placeholder="City or Station" required>
           </div>

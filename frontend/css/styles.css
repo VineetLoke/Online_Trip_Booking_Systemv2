@@ -287,3 +287,31 @@ footer a:hover {
   }
 }
 
+/* Swap Button Styles */
+.swap-btn {
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  margin-bottom: 8px;
+}
+
+.swap-btn:hover {
+  background-color: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  transform: scale(1.1);
+}
+
+.swap-btn i {
+  font-size: 16px;
+  transition: transform 0.3s ease;
+}
+
+.swap-btn:active {
+  transform: scale(0.95);
+}
+

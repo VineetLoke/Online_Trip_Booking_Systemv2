@@ -37,8 +37,13 @@ document.addEventListener('DOMContentLoaded', function() {
   // Setup Terms & Conditions Modal
   setupTermsModal();
   
-  // Check if user is logged in or not
-  checkAuthStatus();
+  // Setup swap buttons for flight and train search forms
+  setupSwapButtons();
+  
+  // Check if user is logged in or not (but skip on admin pages)
+  if (!window.location.pathname.includes('/admin/')) {
+    checkAuthStatus();
+  }
 });
 
 /**
@@ -1133,6 +1138,54 @@ function generateSampleData() {
       createdAt: new Date(),
       updatedAt: new Date()
     });
+  }
+}
+
+/**
+ * Setup Swap Buttons for Flight and Train Search Forms
+ */
+function setupSwapButtons() {
+  // Setup flight swap button
+  const flightSwapBtn = document.getElementById('swapFlightBtn');
+  if (flightSwapBtn) {
+    flightSwapBtn.addEventListener('click', function() {
+      swapFields('flightSource', 'flightDestination');
+    });
+  }
+  
+  // Setup train swap button
+  const trainSwapBtn = document.getElementById('swapTrainBtn');
+  if (trainSwapBtn) {
+    trainSwapBtn.addEventListener('click', function() {
+      swapFields('trainSource', 'trainDestination');
+    });
+  }
+}
+
+/**
+ * Swap values between two input fields
+ * @param {string} sourceId - ID of the source input field
+ * @param {string} destinationId - ID of the destination input field
+ */
+function swapFields(sourceId, destinationId) {
+  const sourceField = document.getElementById(sourceId);
+  const destinationField = document.getElementById(destinationId);
+  
+  if (sourceField && destinationField) {
+    const tempValue = sourceField.value;
+    sourceField.value = destinationField.value;
+    destinationField.value = tempValue;
+    
+    // Add a small animation effect to show the swap
+    const swapBtn = document.querySelector(`[onclick*="${sourceId}"], [onclick*="${destinationId}"]`) || 
+                   (sourceId.includes('flight') ? document.getElementById('swapFlightBtn') : document.getElementById('swapTrainBtn'));
+    
+    if (swapBtn) {
+      swapBtn.style.transform = 'rotate(180deg)';
+      setTimeout(() => {
+        swapBtn.style.transform = 'rotate(0deg)';
+      }, 300);
+    }
   }
 }
 */
