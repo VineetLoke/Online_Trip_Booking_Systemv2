@@ -1,0 +1,91 @@
+﻿<!doctype html>
+<html lang="en"><head>
+<meta charset='utf-8'><meta name='viewport' content='width=device-width, initial-scale=1'>
+<title>Cheat Sheet</title>
+<style>body{font-family:Segoe UI,Arial,sans-serif;max-width:900px;margin:40px auto;padding:0 24px;line-height:1.6;color:#2c3e50} pre,code{font-family:Consolas,Menlo,monospace} pre{background:#f6f8fa;padding:12px;border-radius:6px;overflow:auto} h1,h2,h3{color:#1a73e8} h1{border-bottom:2px solid #e9ecef;padding-bottom:8px} table{border-collapse:collapse} td,th{border:1px solid #e9ecef;padding:6px 10px} .meta{color:#6c757d;font-size:12px;margin-bottom:20px}</style>
+</head><body>
+<div class='meta'>Printed: 2025-09-20 18:29:22Z</div>
+<h1>Oral Exam Cheat Sheet â€“ Online Booking System</h1>
+<br>
+<p>Core stack</p>
+<ul>
+<li>Node.js: JS runtime for server-side code</li>
+<li>Express: Routing + middleware framework</li>
+<li>MongoDB: Document database; collections: users, admins, flights, trains, hotels, bookings</li>
+<li>Mongoose: ODM for schemas, validation, and queries</li>
+<li>JWT: Token-based authentication; sent as Authorization: Bearer <token></li>
+<li>CORS: Controls which web origins can call the API</li>
+</ul>
+<br>
+<p>Architecture</p>
+<ul>
+<li>Entry: backend/server.js</li>
+<li>Routers: /api/auth, /api/search, /api/bookings, /api/users, /api/admin</li>
+<li>Middleware: backend/middleware/auth.js (authenticateUser, authenticateAdmin, rateLimitAuth, checkPermission)</li>
+<li>Models: in backend/models/*.js</li>
+<li>Utilities: backend/utils/eventBus.js, logger.js</li>
+<li>Real-time: /api/admin/stream via Server-Sent Events (SSE)</li>
+</ul>
+<br>
+<p>Common flows</p>
+<ul>
+<li>Registration/Login: Validate input -> save/find User -> bcrypt password check -> sign JWT -> client stores token</li>
+<li>Authenticated Request: Client sends Authorization header -> authenticateUser verifies token -> req.user available -> route executes</li>
+<li>Booking Creation: Validate -> find item -> create Booking -> decrement availability -> emit booking:created -> return JSON</li>
+<li>Cancellation: Verify owner -> set status cancelled -> restore availability -> set refunded if paid</li>
+</ul>
+<br>
+<p>Key security points</p>
+<ul>
+<li>Passwords hashed (bcrypt) in pre-save hooks</li>
+<li>JWT secret in .env (JWT_SECRET), expiry JWT_EXPIRES_IN</li>
+<li>Rate limiting for login (MAX_ATTEMPTS, LOCKOUT_TIME)</li>
+<li>CORS allows only allowedOrigins (strict in production)</li>
+</ul>
+<br>
+<p>Error handling</p>
+<ul>
+<li>JSON shape: { error: { message, status, details? } }</li>
+<li>400 invalid input, 401 auth, 403 forbidden, 404 not found, 409 conflict, 500 server error</li>
+</ul>
+<br>
+<p>Database specifics</p>
+<ul>
+<li>Indexes on frequent queries: e.g., flights (source,destination,departureTime), bookings (userId,status,bookingDate)</li>
+<li>Booking embeds trip subdocs (flight/train/hotel details) to simplify ticket PDFs and history</li>
+</ul>
+<br>
+<p>SSE (real-time)</p>
+<ul>
+<li>EventBus emits 'user:registered' and 'booking:created'</li>
+<li>server.js broadcasts events to connected SSE clients at /api/admin/stream</li>
+</ul>
+<br>
+<p>Environment</p>
+<ul>
+<li>.env: MONGODB_URI, JWT_SECRET, JWT_EXPIRES_IN, PORT, NODE_ENV, DEBUG</li>
+<li>Connects to MongoDB with retry/backoff and event handlers (error/disconnected/reconnected)</li>
+</ul>
+<br>
+<p>How to extend</p>
+<ul>
+<li>Add a new model (e.g., Car), new routes (search, bookings), mount with app.use('/api/cars', routes)</li>
+<li>Reuse patterns: input validation, auth, Mongoose queries, consistent responses, optional SSE events</li>
+</ul>
+<br>
+<p>Performance & scaling</p>
+<ul>
+<li>Use indexes, paginate results, connection pool (configured), add caching layer, horizontal scaling + load balancer</li>
+<li>Consider rate limits and circuit breakers for robustness</li>
+</ul>
+<br>
+<p>Checklist before demo</p>
+<ul>
+<li>MongoDB running; .env configured</li>
+<li>Seed sample data via backend/data_manager.js --action=setup</li>
+<li>Start server: node backend/server.js; test /api/health</li>
+<li>Use Postman collection (docs/postman/Online_Booking_System.postman_collection.json)</li>
+</ul>
+<br>
+</body></html>
+

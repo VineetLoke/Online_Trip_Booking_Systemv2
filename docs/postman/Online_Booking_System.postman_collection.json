@@ -1,0 +1,182 @@
+{
+  "info": {
+    "name": "Online Booking System API",
+    "_postman_id": "3c0f3c6e-9d3c-4c2f-9bfa-abc123456789",
+    "description": "Comprehensive collection for Auth, Search, Bookings, Users, and Admin endpoints.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "token", "value": "" },
+    { "key": "adminToken", "value": "" },
+    { "key": "bookingId", "value": "" },
+    { "key": "flightId", "value": "" },
+    { "key": "trainId", "value": "" },
+    { "key": "hotelId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/api/auth/register", "host": ["{{baseUrl}}"], "path": ["api","auth","register"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Alice Test\",\n  \"email\": \"alice{{$timestamp}}@example.com\",\n  \"phone\": \"+1-234-567-8900\",\n  \"password\": \"password123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json && json.token) { pm.collectionVariables.set('token', json.token); pm.environment.set('token', json.token); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api","auth","login"] },
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"alice@example.com\",\n  \"password\": \"password123\"\n}" }
+          }
+        },
+        {
+          "name": "Me (User)",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/api/auth/me", "host": ["{{baseUrl}}"], "path": ["api","auth","me"] }
+          }
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "PUT",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/api/auth/change-password", "host": ["{{baseUrl}}"], "path": ["api","auth","change-password"] },
+            "body": { "mode": "raw", "raw": "{\n  \"currentPassword\": \"password123\",\n  \"newPassword\": \"newpass456\"\n}" }
+          }
+        },
+        {
+          "name": "Admin Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json && json.token) { pm.collectionVariables.set('adminToken', json.token); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/api/auth/admin/login", "host": ["{{baseUrl}}"], "path": ["api","auth","admin","login"] },
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"admin@travelease.com\",\n  \"password\": \"admin123\"\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Search",
+      "item": [
+        { "name": "Flights", "request": { "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/api/search/flights?source=DEL&destination=BOM", "host": ["{{baseUrl}}"], "path": ["api","search","flights"], "query": [ {"key":"source","value":"DEL"},{"key":"destination","value":"BOM"} ] } } },
+        { "name": "Trains",  "request": { "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/api/search/trains?source=Delhi&destination=Mumbai", "host": ["{{baseUrl}}"], "path": ["api","search","trains"], "query": [ {"key":"source","value":"Delhi"},{"key":"destination","value":"Mumbai"} ] } } },
+        { "name": "Hotels",  "request": { "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/api/search/hotels?location=Mumbai&minRating=3", "host": ["{{baseUrl}}"], "path": ["api","search","hotels"], "query": [ {"key":"location","value":"Mumbai"},{"key":"minRating","value":"3"} ] } } }
+      ]
+    },
+    {
+      "name": "Bookings (User)",
+      "item": [
+        {
+          "name": "Create Flight Booking",
+          "request": {
+            "method": "POST",
+            "header": [ {"key":"Authorization","value":"Bearer {{token}}"}, {"key":"Content-Type","value":"application/json"} ],
+            "url": { "raw": "{{baseUrl}}/api/bookings/flights", "host": ["{{baseUrl}}"], "path": ["api","bookings","flights"] },
+            "body": { "mode": "raw", "raw": "{\n  \"flightId\": \"{{flightId}}\",\n  \"passengerDetails\": {\n    \"name\": \"Alice Test\",\n    \"age\": 28,\n    \"gender\": \"Female\"\n  }\n}" }
+          }
+        },
+        {
+          "name": "Create Train Booking",
+          "request": {
+            "method": "POST",
+            "header": [ {"key":"Authorization","value":"Bearer {{token}}"}, {"key":"Content-Type","value":"application/json"} ],
+            "url": { "raw": "{{baseUrl}}/api/bookings/trains", "host": ["{{baseUrl}}"], "path": ["api","bookings","trains"] },
+            "body": { "mode": "raw", "raw": "{\n  \"trainId\": \"{{trainId}}\",\n  \"passengerDetails\": {\n    \"name\": \"Bob Sample\",\n    \"age\": 30,\n    \"gender\": \"Male\"\n  }\n}" }
+          }
+        },
+        {
+          "name": "Create Hotel Booking",
+          "request": {
+            "method": "POST",
+            "header": [ {"key":"Authorization","value":"Bearer {{token}}"}, {"key":"Content-Type","value":"application/json"} ],
+            "url": { "raw": "{{baseUrl}}/api/bookings/hotels", "host": ["{{baseUrl}}"], "path": ["api","bookings","hotels"] },
+            "body": { "mode": "raw", "raw": "{\n  \"hotelId\": \"{{hotelId}}\",\n  \"checkInDate\": \"2025-12-10\",\n  \"checkOutDate\": \"2025-12-12\",\n  \"guestDetails\": {\n    \"primaryGuest\": \"Alice Test\",\n    \"numberOfGuests\": 2\n  }\n}" }
+          }
+        },
+        {
+          "name": "Bulk Booking",
+          "request": {
+            "method": "POST",
+            "header": [ {"key":"Authorization","value":"Bearer {{token}}"}, {"key":"Content-Type","value":"application/json"} ],
+            "url": { "raw": "{{baseUrl}}/api/bookings/bulk", "host": ["{{baseUrl}}"], "path": ["api","bookings","bulk"] },
+            "body": { "mode": "raw", "raw": "{\n  \"bookingType\": \"flight\",\n  \"itemId\": \"{{flightId}}\",\n  \"passengers\": [\n    { \"name\": \"P1\", \"age\": 28, \"gender\": \"Female\" },\n    { \"name\": \"P2\", \"age\": 32, \"gender\": \"Male\" }\n  ]\n}" }
+          }
+        },
+        {
+          "name": "Payment for Booking",
+          "request": {
+            "method": "POST",
+            "header": [ {"key":"Authorization","value":"Bearer {{token}}"}, {"key":"Content-Type","value":"application/json"} ],
+            "url": { "raw": "{{baseUrl}}/api/bookings/{{bookingId}}/payment", "host": ["{{baseUrl}}"], "path": ["api","bookings","{{bookingId}}","payment"] },
+            "body": { "mode": "raw", "raw": "{\n  \"paymentMethod\": \"card\",\n  \"paymentDetails\": {\n    \"cardLast4\": \"4242\"\n  }\n}" }
+          }
+        },
+        { "name": "History", "request": { "method": "GET", "header": [ {"key":"Authorization","value":"Bearer {{token}}"} ], "url": { "raw": "{{baseUrl}}/api/bookings/history", "host": ["{{baseUrl}}"], "path": ["api","bookings","history"] } } },
+        { "name": "Get Booking by ID", "request": { "method": "GET", "header": [ {"key":"Authorization","value":"Bearer {{token}}"} ], "url": { "raw": "{{baseUrl}}/api/bookings/{{bookingId}}", "host": ["{{baseUrl}}"], "path": ["api","bookings","{{bookingId}}"] } } },
+        { "name": "Cancel Booking (DELETE)", "request": { "method": "DELETE", "header": [ {"key":"Authorization","value":"Bearer {{token}}"} ], "url": { "raw": "{{baseUrl}}/api/bookings/{{bookingId}}", "host": ["{{baseUrl}}"], "path": ["api","bookings","{{bookingId}}"] } } },
+        { "name": "Cancel Booking (PUT)", "request": { "method": "PUT", "header": [ {"key":"Authorization","value":"Bearer {{token}}"}, {"key":"Content-Type","value":"application/json"} ], "url": { "raw": "{{baseUrl}}/api/bookings/{{bookingId}}/cancel", "host": ["{{baseUrl}}"], "path": ["api","bookings","{{bookingId}}","cancel"] }, "body": {"mode":"raw","raw":"{\n  \"reason\": \"Change of plans\"\n}"} } },
+        { "name": "Download Ticket (PDF)", "request": { "method": "GET", "header": [ {"key":"Authorization","value":"Bearer {{token}}"} ], "url": { "raw": "{{baseUrl}}/api/bookings/ticket/{{bookingId}}", "host": ["{{baseUrl}}"], "path": ["api","bookings","ticket","{{bookingId}}"] } } },
+        { "name": "Group Ticket (PDF)", "request": { "method": "POST", "header": [ {"key":"Authorization","value":"Bearer {{token}}"}, {"key":"Content-Type","value":"application/json"} ], "url": { "raw": "{{baseUrl}}/api/bookings/group-ticket", "host": ["{{baseUrl}}"], "path": ["api","bookings","group-ticket"] }, "body": {"mode":"raw","raw":"{\n  \"bookingIds\": [\"{{bookingId}}\"]\n}"} } }
+      ]
+    },
+    {
+      "name": "Users (Profile/Stats)",
+      "item": [
+        { "name": "Get Profile", "request": { "method": "GET", "header": [ {"key":"Authorization","value":"Bearer {{token}}"} ], "url": { "raw": "{{baseUrl}}/api/users/profile", "host": ["{{baseUrl}}"], "path": ["api","users","profile"] } } },
+        { "name": "Update Profile", "request": { "method": "PUT", "header": [ {"key":"Authorization","value":"Bearer {{token}}"}, {"key":"Content-Type","value":"application/json"} ], "url": { "raw": "{{baseUrl}}/api/users/profile", "host": ["{{baseUrl}}"], "path": ["api","users","profile"] }, "body": {"mode":"raw","raw":"{\n  \"name\": \"Alice Updated\",\n  \"phone\": \"+1-222-333-4444\"\n}"} } },
+        { "name": "Get Stats", "request": { "method": "GET", "header": [ {"key":"Authorization","value":"Bearer {{token}}"} ], "url": { "raw": "{{baseUrl}}/api/users/stats", "host": ["{{baseUrl}}"], "path": ["api","users","stats"] } } }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        { "name": "Me (Admin)", "request": { "method": "GET", "header": [ {"key":"Authorization","value":"Bearer {{adminToken}}"} ], "url": { "raw": "{{baseUrl}}/api/admin/me", "host": ["{{baseUrl}}"], "path": ["api","admin","me"] } } },
+        { "name": "List Users", "request": { "method": "GET", "header": [ {"key":"Authorization","value":"Bearer {{adminToken}}"} ], "url": { "raw": "{{baseUrl}}/api/admin/users", "host": ["{{baseUrl}}"], "path": ["api","admin","users"] } } },
+        { "name": "List Flights", "request": { "method": "GET", "header": [ {"key":"Authorization","value":"Bearer {{adminToken}}"} ], "url": { "raw": "{{baseUrl}}/api/admin/flights", "host": ["{{baseUrl}}"], "path": ["api","admin","flights"] } } },
+        { "name": "Create Flight", "request": { "method": "POST", "header": [ {"key":"Authorization","value":"Bearer {{adminToken}}"}, {"key":"Content-Type","value":"application/json"} ], "url": { "raw": "{{baseUrl}}/api/admin/flights", "host": ["{{baseUrl}}"], "path": ["api","admin","flights"] }, "body": {"mode":"raw","raw":"{\n  \"flightNumber\": \"AI-101\",\n  \"airline\": \"Air India\",\n  \"source\": \"DEL\",\n  \"destination\": \"BOM\",\n  \"departureTime\": \"2026-01-01T10:00:00.000Z\",\n  \"arrivalTime\": \"2026-01-01T12:00:00.000Z\",\n  \"price\": 6500,\n  \"availableSeats\": 50,\n  \"totalSeats\": 180,\n  \"aircraft\": \"A320\"\n}"} } },
+        { "name": "Update Flight", "request": { "method": "PUT", "header": [ {"key":"Authorization","value":"Bearer {{adminToken}}"}, {"key":"Content-Type","value":"application/json"} ], "url": { "raw": "{{baseUrl}}/api/admin/flights/{{flightId}}", "host": ["{{baseUrl}}"], "path": ["api","admin","flights","{{flightId}}"] }, "body": {"mode":"raw","raw":"{\n  \"price\": 6800\n}"} } },
+        { "name": "Delete Flight", "request": { "method": "DELETE", "header": [ {"key":"Authorization","value":"Bearer {{adminToken}}"} ], "url": { "raw": "{{baseUrl}}/api/admin/flights/{{flightId}}", "host": ["{{baseUrl}}"], "path": ["api","admin","flights","{{flightId}}"] } } },
+        { "name": "List Trains", "request": { "method": "GET", "header": [ {"key":"Authorization","value":"Bearer {{adminToken}}"} ], "url": { "raw": "{{baseUrl}}/api/admin/trains", "host": ["{{baseUrl}}"], "path": ["api","admin","trains"] } } },
+        { "name": "Create Train", "request": { "method": "POST", "header": [ {"key":"Authorization","value":"Bearer {{adminToken}}"}, {"key":"Content-Type","value":"application/json"} ], "url": { "raw": "{{baseUrl}}/api/admin/trains", "host": ["{{baseUrl}}"], "path": ["api","admin","trains"] }, "body": {"mode":"raw","raw":"{\n  \"trainNumber\": \"TR-7001\",\n  \"trainName\": \"Rajdhani\",\n  \"source\": \"Delhi\",\n  \"destination\": \"Mumbai\",\n  \"departureTime\": \"2026-01-01T08:00:00.000Z\",\n  \"arrivalTime\": \"2026-01-01T20:00:00.000Z\",\n  \"price\": 1800,\n  \"availableSeats\": 100,\n  \"totalSeats\": 600,\n  \"class\": \"AC 3-Tier\"\n}"} } },
+        { "name": "List Hotels", "request": { "method": "GET", "header": [ {"key":"Authorization","value":"Bearer {{adminToken}}"} ], "url": { "raw": "{{baseUrl}}/api/admin/hotels", "host": ["{{baseUrl}}"], "path": ["api","admin","hotels"] } } },
+        { "name": "Create Hotel", "request": { "method": "POST", "header": [ {"key":"Authorization","value":"Bearer {{adminToken}}"}, {"key":"Content-Type","value":"application/json"} ], "url": { "raw": "{{baseUrl}}/api/admin/hotels", "host": ["{{baseUrl}}"], "path": ["api","admin","hotels"] }, "body": {"mode":"raw","raw":"{\n  \"name\": \"Grand Plaza\",\n  \"location\": \"Mumbai\",\n  \"address\": \"MG Road\",\n  \"price\": 3500,\n  \"rating\": 4,\n  \"availableRooms\": 10,\n  \"totalRooms\": 100,\n  \"roomType\": \"Deluxe\"\n}"} } }
+      ]
+    }
+  ]
+}

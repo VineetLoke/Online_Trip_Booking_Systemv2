@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>BEGINNERS_GUIDE.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="online-booking-system-%E2%80%93-beginners-mastery-guide">Online Booking System – Beginner’s Mastery Guide</h1>
+<p>This guide explains everything used in your repository in plain language. You’ll learn what each technology is, how the backend works end-to-end, and how to answer any question an examiner might ask. It includes diagrams, flowcharts, and real code references from your project.</p>
+<p>Table of contents</p>
+<ul>
+<li>Part 1: Big picture overview</li>
+<li>Part 2: What is an API (and how your API works)</li>
+<li>Part 3: What is Node.js, Express, CORS, JWT, MongoDB, Mongoose</li>
+<li>Part 4: Request lifecycle: from client to database and back</li>
+<li>Part 5: Environment and configuration</li>
+<li>Part 6: Data models (MongoDB schemas)</li>
+<li>Part 7: Middleware (auth, rate limiting, permissions)</li>
+<li>Part 8: Routes and features (Auth, Search, Bookings, Users, Admin)</li>
+<li>Part 9: Real-time admin stream (SSE) and Event Bus</li>
+<li>Part 10: Logging and debugging</li>
+<li>Part 11: How to add your own feature</li>
+<li>Part 12: FAQ and examiner-style Q&amp;A</li>
+</ul>
+<p>Part 1: Big picture overview</p>
+<p>Your project is a typical web backend:</p>
+<ul>
+<li>Client (browser or Postman) sends HTTP requests</li>
+<li>Backend server (Node.js + Express) receives requests on endpoints like /api/auth/login</li>
+<li>Middleware handles security (JWT auth), CORS, parsing JSON, rate limits</li>
+<li>Controllers/Routes run logic and talk to MongoDB via Mongoose models</li>
+<li>MongoDB stores documents for users, flights, trains, hotels, and bookings</li>
+<li>Responses are sent back as JSON</li>
+<li>Admin can watch real-time events (user registered, booking created) via SSE</li>
+</ul>
+<p>Visual map</p>
+<pre><code class="language-mermaid"><div class="mermaid">flowchart LR
+  A[Client (Browser / Postman)] -->|HTTP JSON| B[Express App]
+  B --> C[CORS / JSON parser / Logger]
+  C --> D{Route Match}
+  D -->|/api/auth| E[Auth Router]
+  D -->|/api/search| F[Search Router]
+  D -->|/api/bookings| G[Bookings Router]
+  D -->|/api/users| H[Users Router]
+  D -->|/api/admin| I[Admin Router]
+  E --> J[User/Admin Models]
+  F --> K[Flight/Train/Hotel Models]
+  G --> L[Booking + Item Models]
+  H --> J
+  I --> All[All Models]
+  subgraph DB[MongoDB]
+    M[Mongoose ODM]
+  end
+  J --> M
+  K --> M
+  L --> M
+  All --> M
+  M --> DB
+  G -- emits --> SSE((Event Bus))
+  SSE -- streams --> Admin[Admin Panel via /api/admin/stream]
+</div></code></pre>
+<p>Part 2: What is an API (and how your API works)</p>
+<ul>
+<li>API (Application Programming Interface): a set of rules for how programs talk to each other. In web apps, it’s usually HTTP endpoints that send/receive JSON.</li>
+<li>REST API: uses HTTP methods (GET, POST, PUT, DELETE) on resource URLs.</li>
+<li>Your API base path is /api with subpaths:
+<ul>
+<li>/api/auth: login, register, profile</li>
+<li>/api/search: find flights, trains, hotels</li>
+<li>/api/bookings: create/cancel bookings, pay, get tickets</li>
+<li>/api/users: profile and stats</li>
+<li>/api/admin: admin-only management and analytics</li>
+</ul>
+</li>
+</ul>
+<p>How your app wires routes</p>
+<pre class="hljs"><code><div><span class="hljs-comment">// Routes</span>
+app.use(<span class="hljs-string">'/api/auth'</span>, authRoutes);
+app.use(<span class="hljs-string">'/api/search'</span>, searchRoutes);
+app.use(<span class="hljs-string">'/api/bookings'</span>, bookingRoutes);
+app.use(<span class="hljs-string">'/api/users'</span>, userRoutes);
+app.use(<span class="hljs-string">'/api/admin'</span>, adminRoutes);
+</div></code></pre>
+<p>How to make an API endpoint (in Express)</p>
+<ul>
+<li>Create a router file (e.g., backend/routes/search.js)</li>
+<li>Define routes like router.get('/flights', handler)</li>
+<li>Export router and mount it in server.js with app.use('/api/search', router)</li>
+</ul>
+<p>Example from your code</p>
+<pre class="hljs"><code><div><span class="hljs-comment">// Search flights</span>
+router.get(<span class="hljs-string">'/flights'</span>, <span class="hljs-keyword">async</span> (req, res) =&gt; {
+  <span class="hljs-keyword">try</span> {
+    <span class="hljs-keyword">const</span> { source, destination, date, airline } = req.query;
+    <span class="hljs-comment">// Build query and return results ...</span>
+    <span class="hljs-keyword">const</span> flights = <span class="hljs-keyword">await</span> Flight.find(query).sort({ <span class="hljs-attr">departureTime</span>: <span class="hljs-number">1</span> }).limit(<span class="hljs-number">50</span>);
+    res.status(<span class="hljs-number">200</span>).json({ <span class="hljs-attr">count</span>: flights.length, flights });
+  } <span class="hljs-keyword">catch</span> (error) {
+    res.status(<span class="hljs-number">500</span>).json({ <span class="hljs-attr">error</span>: { <span class="hljs-attr">message</span>: <span class="hljs-string">"Internal server error"</span>, <span class="hljs-attr">status</span>: <span class="hljs-number">500</span>, <span class="hljs-attr">details</span>: error.message } });
+  }
+});
+</div></code></pre>
+<p>How to connect to your API (from a frontend)</p>
+<ul>
+<li>Use fetch or axios with the correct base URL (e.g., http://localhost:3000)</li>
+<li>Send Authorization header with Bearer <token> for protected routes</li>
+</ul>
+<p>Example</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">const</span> BASE = <span class="hljs-string">'http://localhost:3000'</span>;
+<span class="hljs-keyword">const</span> token = localStorage.getItem(<span class="hljs-string">'token'</span>);
+<span class="hljs-keyword">const</span> res = <span class="hljs-keyword">await</span> fetch(<span class="hljs-string">`<span class="hljs-subst">${BASE}</span>/api/bookings/history`</span>, {
+  <span class="hljs-attr">headers</span>: { <span class="hljs-attr">Authorization</span>: <span class="hljs-string">`Bearer <span class="hljs-subst">${token}</span>`</span> }
+});
+<span class="hljs-keyword">const</span> data = <span class="hljs-keyword">await</span> res.json();
+</div></code></pre>
+<p>Part 3: What is Node.js, Express, CORS, JWT, MongoDB, Mongoose</p>
+<ul>
+<li>Node.js: JavaScript runtime for servers. Lets you write backend code in JS.</li>
+<li>Express: Minimal framework for routing and middleware on top of Node.js.</li>
+<li>CORS: Security policy that controls which origins (websites) can call your backend from browsers.
+<ul>
+<li>In your app, only allowedOrigins (like localhost ports) can call the API in dev.</li>
+</ul>
+</li>
+</ul>
+<pre class="hljs"><code><div><span class="hljs-comment">// CORS Configuration</span>
+<span class="hljs-keyword">const</span> allowedOrigins = process.env.NODE_ENV === <span class="hljs-string">'production'</span> 
+  ? [<span class="hljs-string">'https://yourdomain.com'</span>, <span class="hljs-string">'https://www.yourdomain.com'</span>]
+  : [<span class="hljs-string">'http://localhost:3000'</span>,<span class="hljs-string">'http://127.0.0.1:3000'</span>,<span class="hljs-string">'http://localhost:5500'</span>,<span class="hljs-string">'http://127.0.0.1:5500'</span>,<span class="hljs-string">'http://localhost:8000'</span>,<span class="hljs-string">'http://127.0.0.1:8000'</span>];
+
+app.use(cors({
+  <span class="hljs-attr">origin</span>: <span class="hljs-function">(<span class="hljs-params">origin, callback</span>) =&gt;</span> {
+    <span class="hljs-keyword">if</span> (!origin) <span class="hljs-keyword">return</span> callback(<span class="hljs-literal">null</span>, <span class="hljs-literal">true</span>);
+    <span class="hljs-keyword">if</span> (allowedOrigins.includes(origin) || isDevLocalhost(origin)) callback(<span class="hljs-literal">null</span>, <span class="hljs-literal">true</span>);
+    <span class="hljs-keyword">else</span> callback(<span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'Not allowed by CORS'</span>));
+  },
+  <span class="hljs-attr">credentials</span>: <span class="hljs-literal">true</span>,
+  <span class="hljs-attr">methods</span>: [<span class="hljs-string">'GET'</span>,<span class="hljs-string">'POST'</span>,<span class="hljs-string">'PUT'</span>,<span class="hljs-string">'DELETE'</span>,<span class="hljs-string">'OPTIONS'</span>],
+  <span class="hljs-attr">allowedHeaders</span>: [<span class="hljs-string">'Content-Type'</span>,<span class="hljs-string">'Authorization'</span>],
+  <span class="hljs-attr">maxAge</span>: <span class="hljs-number">86400</span>
+}));
+</div></code></pre>
+<ul>
+<li>JWT (JSON Web Tokens): Signed tokens that prove identity. Server issues token at login; clients send it in Authorization header. Your middleware verifies it and loads the user/admin.</li>
+</ul>
+<pre class="hljs"><code><div><span class="hljs-comment">// Generate JWT token</span>
+<span class="hljs-keyword">const</span> token = jwt.sign(
+  { <span class="hljs-attr">id</span>: user._id },
+  process.env.JWT_SECRET,
+  { <span class="hljs-attr">expiresIn</span>: process.env.JWT_EXPIRES_IN }
+);
+</div></code></pre>
+<pre class="hljs"><code><div><span class="hljs-comment">// Middleware to verify user JWT token</span>
+exports.authenticateUser = <span class="hljs-keyword">async</span> (req, res, next) =&gt; {
+  <span class="hljs-keyword">const</span> authHeader = req.headers.authorization;
+  <span class="hljs-keyword">if</span> (!authHeader || !authHeader.startsWith(<span class="hljs-string">'Bearer '</span>)) <span class="hljs-keyword">return</span> res.status(<span class="hljs-number">401</span>).json({ <span class="hljs-attr">error</span>: { <span class="hljs-attr">message</span>: <span class="hljs-string">'Authentication failed. Invalid authorization header format.'</span>, <span class="hljs-attr">status</span>: <span class="hljs-number">401</span> } });
+  <span class="hljs-keyword">const</span> token = authHeader.split(<span class="hljs-string">' '</span>)[<span class="hljs-number">1</span>];
+  <span class="hljs-keyword">const</span> decoded = jwt.verify(token, process.env.JWT_SECRET, { <span class="hljs-attr">algorithms</span>: [<span class="hljs-string">'HS256'</span>], <span class="hljs-attr">maxAge</span>: process.env.JWT_EXPIRES_IN || <span class="hljs-string">'24h'</span> });
+  <span class="hljs-keyword">const</span> user = <span class="hljs-keyword">await</span> User.findById(decoded.id);
+  <span class="hljs-keyword">if</span> (!user) <span class="hljs-keyword">return</span> res.status(<span class="hljs-number">401</span>).json({ <span class="hljs-attr">error</span>: { <span class="hljs-attr">message</span>: <span class="hljs-string">'Authentication failed. User not found.'</span>, <span class="hljs-attr">status</span>: <span class="hljs-number">401</span> } });
+  req.user = user; req.userId = user._id.toString(); next();
+};
+</div></code></pre>
+<ul>
+<li>MongoDB: NoSQL database that stores documents (JSON-like). Collections here: users, admins, flights, trains, hotels, bookings</li>
+<li>Mongoose: ODM (Object Data Modeling) library for MongoDB. You define schemas and get Models that you can use to query.</li>
+</ul>
+<pre class="hljs"><code><div><span class="hljs-comment">// Main Booking Schema</span>
+<span class="hljs-keyword">const</span> bookingSchema = <span class="hljs-keyword">new</span> mongoose.Schema({
+  <span class="hljs-attr">userId</span>: { <span class="hljs-attr">type</span>: mongoose.Schema.Types.ObjectId, <span class="hljs-attr">ref</span>: <span class="hljs-string">'User'</span>, <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span> },
+  <span class="hljs-attr">bookingType</span>: { <span class="hljs-attr">type</span>: <span class="hljs-built_in">String</span>, <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">enum</span>: [<span class="hljs-string">'flight'</span>,<span class="hljs-string">'train'</span>,<span class="hljs-string">'hotel'</span>,<span class="hljs-string">'multi'</span>], <span class="hljs-attr">trim</span>: <span class="hljs-literal">true</span> },
+  <span class="hljs-attr">bookingDate</span>: { <span class="hljs-attr">type</span>: <span class="hljs-built_in">Date</span>, <span class="hljs-attr">default</span>: <span class="hljs-built_in">Date</span>.now },
+  <span class="hljs-attr">status</span>: { <span class="hljs-attr">type</span>: <span class="hljs-built_in">String</span>, <span class="hljs-attr">enum</span>: [<span class="hljs-string">'pending'</span>,<span class="hljs-string">'confirmed'</span>,<span class="hljs-string">'cancelled'</span>,<span class="hljs-string">'failed'</span>], <span class="hljs-attr">default</span>: <span class="hljs-string">'pending'</span> },
+  <span class="hljs-attr">totalAmount</span>: { <span class="hljs-attr">type</span>: <span class="hljs-built_in">Number</span>, <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">min</span>: [<span class="hljs-number">0</span>, <span class="hljs-string">'Total amount cannot be negative'</span>] },
+  <span class="hljs-attr">paymentStatus</span>: { <span class="hljs-attr">type</span>: <span class="hljs-built_in">String</span>, <span class="hljs-attr">enum</span>: [<span class="hljs-string">'pending'</span>,<span class="hljs-string">'completed'</span>,<span class="hljs-string">'failed'</span>,<span class="hljs-string">'refunded'</span>], <span class="hljs-attr">default</span>: <span class="hljs-string">'pending'</span> },
+  <span class="hljs-attr">paymentId</span>: { <span class="hljs-attr">type</span>: <span class="hljs-built_in">String</span>, <span class="hljs-attr">trim</span>: <span class="hljs-literal">true</span> },
+  <span class="hljs-attr">cancellationReason</span>: { <span class="hljs-attr">type</span>: <span class="hljs-built_in">String</span>, <span class="hljs-attr">trim</span>: <span class="hljs-literal">true</span> },
+  <span class="hljs-attr">cancelledAt</span>: { <span class="hljs-attr">type</span>: <span class="hljs-built_in">Date</span> },
+  <span class="hljs-attr">trip</span>: tripSchema
+}, { <span class="hljs-attr">timestamps</span>: <span class="hljs-literal">true</span> });
+</div></code></pre>
+<p>Part 4: Request lifecycle: from client to database and back</p>
+<p>Request flow chart</p>
+<pre><code class="language-mermaid"><div class="mermaid">sequenceDiagram
+  participant C as Client
+  participant S as Express Server
+  participant MW as Middleware
+  participant R as Route Handler
+  participant M as Mongoose Model
+  participant DB as MongoDB
+
+  C->>S: HTTP Request (JSON)
+  S->>MW: CORS, JSON parsing, logging
+  MW-->>S: next()
+  S->>MW: Auth check (for protected routes)
+  MW-->>S: req.user populated
+  S->>R: Match endpoint (e.g., POST /api/bookings/flights)
+  R->>M: Query/Save
+  M->>DB: DB operation
+  DB-->>M: Result
+  M-->>R: Document(s)
+  R-->>S: res.json({ ... })
+  S-->>C: HTTP Response (JSON)
+</div></code></pre>
+<p>Part 5: Environment and configuration</p>
+<ul>
+<li>.env controls secrets and settings</li>
+<li>Key variables (see backend/.env.example):
+<ul>
+<li>MONGODB_URI: your database address</li>
+<li>JWT_SECRET and JWT_EXPIRES_IN: token signing and validity</li>
+<li>PORT, NODE_ENV: server port/environment</li>
+<li>DEBUG: enables debug output (booking:*)</li>
+</ul>
+</li>
+</ul>
+<pre class="hljs"><code><div><span class="hljs-attr">MONGODB_URI</span>=mongodb://localhost:<span class="hljs-number">27017</span>/<span class="hljs-literal">on</span>line_booking_system
+<span class="hljs-attr">JWT_SECRET</span>=your_super_secret_jwt_key_here_please_change_this_in_production
+<span class="hljs-attr">JWT_EXPIRES_IN</span>=<span class="hljs-number">7</span>d
+<span class="hljs-attr">PORT</span>=<span class="hljs-number">3000</span>
+<span class="hljs-attr">NODE_ENV</span>=development
+<span class="hljs-attr">DEBUG</span>=booking:*
+</div></code></pre>
+<p>MongoDB connection with retry logic</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">const</span> connectToMongoDB = <span class="hljs-keyword">async</span> (retryCount = <span class="hljs-number">0</span>) =&gt; {
+  <span class="hljs-keyword">try</span> {
+    <span class="hljs-keyword">await</span> mongoose.connect(process.env.MONGODB_URI, { <span class="hljs-attr">useNewUrlParser</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">useUnifiedTopology</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">serverSelectionTimeoutMS</span>: <span class="hljs-number">10000</span>, <span class="hljs-attr">heartbeatFrequencyMS</span>: <span class="hljs-number">2000</span>, <span class="hljs-attr">maxPoolSize</span>: <span class="hljs-number">10</span>, <span class="hljs-attr">minPoolSize</span>: <span class="hljs-number">2</span> });
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'✅ Successfully connected to MongoDB'</span>);
+    mongoose.connection.on(<span class="hljs-string">'error'</span>, (error) =&gt; <span class="hljs-built_in">console</span>.error(<span class="hljs-string">'❌ MongoDB connection error:'</span>, error));
+    mongoose.connection.on(<span class="hljs-string">'disconnected'</span>, () =&gt; <span class="hljs-built_in">console</span>.warn(<span class="hljs-string">'⚠️  MongoDB disconnected. Attempting to reconnect...'</span>));
+    mongoose.connection.on(<span class="hljs-string">'reconnected'</span>, () =&gt; <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'✅ MongoDB reconnected successfully'</span>));
+  } <span class="hljs-keyword">catch</span> (error) {
+    <span class="hljs-comment">// Retry up to 5 times</span>
+  }
+};
+</div></code></pre>
+<p>Part 6: Data models (MongoDB schemas)</p>
+<ol>
+<li>User</li>
+</ol>
+<ul>
+<li>Fields: name, email (unique), phone, passwordHash</li>
+<li>Passwords are hashed with bcrypt in a pre-save hook</li>
+<li>Methods: comparePassword, toJSON (hides passwordHash)</li>
+</ul>
+<pre class="hljs"><code><div><span class="hljs-comment">// Hash password before saving</span>
+userSchema.pre(<span class="hljs-string">'save'</span>, <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">next</span>) </span>{
+  <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.isModified(<span class="hljs-string">'passwordHash'</span>)) <span class="hljs-keyword">return</span> next();
+  <span class="hljs-keyword">const</span> salt = <span class="hljs-keyword">await</span> bcrypt.genSalt(<span class="hljs-number">10</span>);
+  <span class="hljs-keyword">this</span>.passwordHash = <span class="hljs-keyword">await</span> bcrypt.hash(<span class="hljs-keyword">this</span>.passwordHash, salt);
+  next();
+});
+</div></code></pre>
+<ol start="2">
+<li>Admin</li>
+</ol>
+<ul>
+<li>Similar to User plus role and permissions array</li>
+<li>Roles: admin, super_admin; permissions: manage_users, manage_flights, manage_trains, manage_hotels, view_reports</li>
+</ul>
+<ol start="3">
+<li>Flight</li>
+</ol>
+<ul>
+<li>Includes times, price, seats, and ensures arrival after departure; prevents availableSeats &gt; totalSeats</li>
+</ul>
+<ol start="4">
+<li>Train</li>
+</ol>
+<ul>
+<li>Similar constraints as Flight, with class and seats</li>
+</ul>
+<ol start="5">
+<li>Hotel</li>
+</ol>
+<ul>
+<li>Location, address, price per night, rating, room counts, roomType</li>
+</ul>
+<ol start="6">
+<li>Booking</li>
+</ol>
+<ul>
+<li>References a user, holds bookingType, status, payment status, and a nested trip object with specific details for flight/train/hotel</li>
+</ul>
+<p>ER-style relationships (simplified)</p>
+<pre><code class="language-mermaid"><div class="mermaid">classDiagram
+  User "1" --> "many" Booking : userId
+  Booking --> Flight : flightDetails.flightId
+  Booking --> Train  : trainDetails.trainId
+  Booking --> Hotel  : hotelDetails.hotelId
+  Admin : role, permissions
+</div></code></pre>
+<p>Part 7: Middleware (auth, rate limiting, permissions)</p>
+<ul>
+<li>authenticateUser: verifies JWT, loads req.user</li>
+<li>authenticateAdmin: verifies JWT, loads req.admin</li>
+<li>checkPermission('permission'): ensures admin has required rights (or is super_admin)</li>
+<li>rateLimitAuth: limits repeated login attempts per IP</li>
+</ul>
+<pre class="hljs"><code><div>exports.checkPermission = <span class="hljs-function">(<span class="hljs-params">permission</span>) =&gt;</span> {
+  <span class="hljs-keyword">return</span> <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+    <span class="hljs-keyword">if</span> (!req.admin) <span class="hljs-keyword">return</span> res.status(<span class="hljs-number">401</span>).json({ <span class="hljs-attr">error</span>: { <span class="hljs-attr">message</span>: <span class="hljs-string">'Authentication failed. Admin not found.'</span>, <span class="hljs-attr">status</span>: <span class="hljs-number">401</span> } });
+    <span class="hljs-keyword">const</span> perms = <span class="hljs-built_in">Array</span>.isArray(req.admin.permissions) ? req.admin.permissions : [];
+    <span class="hljs-keyword">if</span> (req.admin.role === <span class="hljs-string">'super_admin'</span> || perms.includes(permission)) next();
+    <span class="hljs-keyword">else</span> <span class="hljs-keyword">return</span> res.status(<span class="hljs-number">403</span>).json({ <span class="hljs-attr">error</span>: { <span class="hljs-attr">message</span>: <span class="hljs-string">'Access denied. Insufficient permissions.'</span>, <span class="hljs-attr">status</span>: <span class="hljs-number">403</span> } });
+  };
+};
+</div></code></pre>
+<p>Auth flow</p>
+<pre><code class="language-mermaid"><div class="mermaid">flowchart LR
+  A[Register/Login] --> B[Server issues JWT]
+  B --> C[Client stores token]
+  C --> D[Client calls protected APIs with Authorization: Bearer <token>]
+  D --> E[authenticateUser verifies token and loads req.user]
+  E --> F[Route handler executes]
+</div></code></pre>
+<p>Part 8: Routes and features</p>
+<p>8.1 Authentication (/api/auth)</p>
+<ul>
+<li>POST /register: validate input, save User, emit event, sign token</li>
+<li>POST /login: rate-limited, check email+password, sign token</li>
+<li>POST /admin/login: admin login with role</li>
+<li>GET /me: returns current user (requires authenticateUser)</li>
+<li>PUT /change-password: verifies current password and updates</li>
+</ul>
+<pre class="hljs"><code><div><span class="hljs-comment">// User Login</span>
+router.post(<span class="hljs-string">'/login'</span>, rateLimitAuth, <span class="hljs-keyword">async</span> (req, res) =&gt; {
+  <span class="hljs-keyword">const</span> { email, password } = req.body;
+  <span class="hljs-keyword">const</span> user = <span class="hljs-keyword">await</span> User.findOne({ email });
+  <span class="hljs-keyword">if</span> (!user) { recordFailedAuth(req); <span class="hljs-keyword">return</span> res.status(<span class="hljs-number">401</span>).json({ <span class="hljs-attr">error</span>: { <span class="hljs-attr">message</span>: <span class="hljs-string">'Invalid credentials'</span>, <span class="hljs-attr">status</span>: <span class="hljs-number">401</span> } }); }
+  <span class="hljs-keyword">const</span> isMatch = <span class="hljs-keyword">await</span> user.comparePassword(password);
+  <span class="hljs-keyword">if</span> (!isMatch) { recordFailedAuth(req); <span class="hljs-keyword">return</span> res.status(<span class="hljs-number">401</span>).json({ <span class="hljs-attr">error</span>: { <span class="hljs-attr">message</span>: <span class="hljs-string">'Invalid credentials'</span>, <span class="hljs-attr">status</span>: <span class="hljs-number">401</span> } }); }
+  clearAuthAttempts(req);
+  <span class="hljs-keyword">const</span> token = jwt.sign({ <span class="hljs-attr">id</span>: user._id }, process.env.JWT_SECRET, { <span class="hljs-attr">expiresIn</span>: process.env.JWT_EXPIRES_IN });
+  res.status(<span class="hljs-number">200</span>).json({ <span class="hljs-attr">message</span>: <span class="hljs-string">'Login successful'</span>, <span class="hljs-attr">user</span>: { <span class="hljs-attr">_id</span>: user._id, <span class="hljs-attr">name</span>: user.name, <span class="hljs-attr">email</span>: user.email, <span class="hljs-attr">phone</span>: user.phone }, token });
+});
+</div></code></pre>
+<p>8.2 Search (/api/search)</p>
+<ul>
+<li>GET /flights: query by source, destination, airline, date; enforces future departures</li>
+<li>GET /trains: similar but simpler date logic</li>
+<li>GET /hotels: filter by location, rating, roomType</li>
+</ul>
+<p>8.3 Bookings (/api/bookings)</p>
+<ul>
+<li>POST /flights | /trains | /hotels: create bookings, update availability, emit booking:created event</li>
+<li>POST /bulk: create many bookings in one request (group)</li>
+<li>POST /:id/payment: mock payment success and update booking</li>
+<li>GET /history: current user’s bookings</li>
+<li>GET /<img class="emoji" alt="id" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAPCElEQVR4Xu2babBlV1XHf2ufc+c39pt6SnfTdIqQxEwQIDFNCImYCphBAkIby9KoiELxRcUPEEtxxLLQstAKpKKWMRiDDA2xCIohpBNiJ6ENdGdO5/U4vH6v33ync/ZevrvrlLeut8+53QUZuvDftepWde1db//+Z6111933PVFVfpxl+PHW/xsQcoqSFb1t7S0X55BrAslfHIaF9UZMXkQA4dWRoqo4dc04bhy02twVof/x6OG7dumKfmQGbF17y01Xb/zQb/flRi4t5/rCQlAklByiBhHh1ZSqouKINaJh6x+oRkvxylkfWznznz90+K4v00OZTfBtE9smSoXK7SPFtTcMF0ap5PrJawkThwRBSKmcw+QMgRH0FTZCVLFOcZGjVo2wNsaFMU2psRwtMtuYZqZ++Ku1xvKHHj1297HTzoAr1mw7b6g0es9EZcN5q4rj9Ek/YVxkYvMQr//JMdafP8Dg2iKFgRy5vEGM8EpKnRI1HY2FiPnDdQ7uXuDFh49z7KU5+guD9OUHWw/shmNm/5YVlp/bceTuPadswFvWffCskcLq7Wv7Nm8eLU9Qsv2MjA+y9dbNnP+ecYLQEDeV6vEmzWVLdd7ySr+dighBDiqDBca29HPONeNc9ZHN7P76FA/dsZdgqki+UiSUwnmHCbavML1j56EvHOhpgKzo6rN+83Or+zZtHqusoRwPsuknxvnZT7+R8nCOyR2LHNldpXYixsaKtSBOUV5ZCaBGCAwEOaG0KmTN+WUuuH6CLVtX8aXfeZrJH0whFYPDbY4Wos+JyHW6okwDrlj7Sx8YK6+/drQ0QcUNsuHccd7/1+czv6/Jzs9PUZuzhPkAEwphaFbiVZwmXPLilKWjMU/vn2XykQXOu2HEn/me39jN/mdgtBRTj2vXttiAL6Q2wTfLm3PjG9/x3Y1D575pTXEtg8VBfv7zF1GdsXz/3mnCYkCYN7yWFTcdcd1ywftGKY8E/NOv/jfz9XmO1A+zb+6pJ6b2ffuyx/Xx6KQZUFl7waUDxdE3DeT7CZoFLrllHXFDePJfjpMvh/6pv8ZHZ18OIoE/86W/vIZLbl7Hd+6s02JqsS2vMAKPnNQAI4Wryrl+CqZM/6oyG94yxO7t0wT5AIz6VDsjZGid2Z/97GuG6P9KmcZSmRabCYrvTDUgF1YuKgZlci7H+OsrLB2OqE41yfcFqKNDxgAI3ZMZPrrXAginJwUFB6CclkyIP/sKg2eZ3zWPZzPlC1ObYGjy63Imj5iA8nCe6ZfqBHnTkfYSCHkJoBmACJJAKfh1JhfTEItaRQSCMCBohoD4kFNHR0QJA+P7DmGrkcU0mzHOnZIh/uzTe+stFs+0wuYZUw0ICIpGAkJjAKE2G4MozrZTK28N/759L/fs30HVRW0DUIrGcP3YW7nupnMg5xBjmNy5wO0PPcBBcxxxAaejPAHD9SL9WuYN6zZx+UWvY8t5w7hSRLUee5MzJVCbi0HEMxkJPGOqAQKItLtpLnQ4daAJPzA3E3HhOyf4xF99BFdzHWkdloT7f+8Ysy9UGdhYwNYtLm/51+c/yMhIgMbCKUsE6xz7D02z+6lD/Oe/Pcunv/Yo5e3DvP8tW7n86nXUCnWadZuZDcZB3HCQsEnWIKSokCiuxrhCDm03PqyCqmP96/qpMAAlurRhS51nX5rGxhaNlFVjBTauHsErx2lr6OwhLjh7C9tuuBJud3zxGzv4449t55t/uoGP/cI7KW8KqVWjVBOcVc/SwZhhgAcEJYos1jqccyQCwYM16hFpajYi/+ScDyWOLXHdERYNP7wMN1/7dm5+9u188s/u5uO/ey+fuPEGxs/PUW1BKt2yeBYSNkVP5T5AUdcK15EBIniorFlA1e+FJLyBL4M+9fFtXHTRDm679j5uC99N35aQZi3uImkztDkyM8C1QhVnnYe1TjszwJE5DzgLsVViD684y8um9/70FTS+nOOOm3by0V+/DC36lKdDDs/imdAeGZAsIVnobCs6S8DZONMAdc6XDtb5/dbGqHBS1eZjZl6sERa6yyNXCRheX8CEQpa23fhWHv+14zx43yTveN8GalFnUxQxHUzgsgxQwKLiuz/OWbQzAzygqiNNKknpJD3A70/x68CuBe7/oxfoH893HUNEKA2GrD63wkXvXc3AmiJp+sPb38Uvrv4KCwfGKUyEWNuG9FmozjOBhYwM8GCq6sPG/gl2pbu1CVSK1O/x8D5sxtTiYosRpdBnUNfBDwqNasxz3z7Bi4/McsWHNnL2las4mcrkueYjm3nq76a45N1rOs9s8SwJl2fs3QRF/RzgrOusKQMudpkl4MFte2/rVdLMQpI5Q1E9+ThbGg78u8gDf7mX0oBh/cVDnEw3fviN/P5nH6CxZNFQwZFIPAvSuwmCqg9FaSxF2GGXTFsJggrW+qeaeVXlohY4eAOi9BIQp9gInCXTVBOKj+/87X623T4I0m3pxEiF9Rf2MXuwytDGkjcfTyKeRVESvvTvBRwWxbtFsxZRX4rAgHM2iRjnsq+/nCrWr4uTPS61CToU116bGUEJZg4urZTEDGk6d+sYs0ergPN7MLQYPAuins1h0w1Ien8SyuLxOlHDAngQHza7BNSv0fZ6ZwFJWaw4603qGajDGOHFh9MN2HTJMLGzxJEDgahuPUMHV69ByKn3CSd+GmTu0DKVkSK5sukwIqsHxNZhVbG9mqBTIuvX4Rw9FeTh6HMLpGlsUx+5ksGpo7nsWJqu+5J1JmFS7dEDsKAkoYgoNob5Y1UKpZDiYA7V3tfVai0aOTRS4tiRukUVtQ5trXH0lBhhcarO0kyTvpF8F0yxL0CtY/5oneZyjIggRkG1zYXtNQlaEr8wOMQIKNSWI+rViOqJJiNbSpk9IHYO2wpNRmFJWwvW2eSzA71lYOlEg+ZiBN0GoAInDlcJCwEmlxAlNEn995wEfWjHqwAgAV715SbLS03SpOrAOAgUcIg4pGcPUBza2ZQkiUQigipEUZzahFUVjCKhSwwBRTuYfGQboGj77bBzOjNgAjBCqpYWG8zsrZILDNZCoxGhRsl4HwBjwYJaiH3WgC8Nq8QR2EhxSex/Zo6axpl9Qp1CAGhigCZM9B6Fu/51Cg+DKGlqOsfyTIO5/hzNBcuiraOBntysKGLyyQXimsFZB9ouoyT5EAEMBDlD4GCxWcf0CSdTXHUEYcKRQpQ5Crv2KIxLHBPaEm1blCYTOExRCQvgSoKpQ9ogYFEimsSN5DOHATGAgMkJEggm+b8gLzRnYpqjddaM99MtvPESCI728KV4ljZX9ijcbhvJK52FCKq9biTVQ0iQhAhpEiDAEBYF57T9xEXAgIgiRpAA8jnD3oNzDLzHIBhOpqPPzmGtRY3r5GkzAfQqAeshfSCdBmj7A1OmjEKoECgmsGmGeUATKBIq4hRoZ4B0pL/4L2p2uN185qM/Q5omv3eCsCCodhrQ5rGA9poDFGgH3XDZGSDJmsQEkfTloiD/1wBPrgk85ENDxQzytcf+i+FL9nP9NVekzB+wb9dxciXpgOxgUc2eA2xSLy6jB/h66lECBMk+Y8Gkrw0koFwoUikWSfhBwACBMYjmqC4qd+35OnsKX+KFb9xHmnZ/6xCzR2v0jxc7Jj7tZMJmZkB7iw8QFDlpj0iVKoiigQPRTAMW6lUeX/wBR54cTgwAI9CwMbNRjSO8yCQ7OffSEi987T7Wj51Nmh7+x+cJCiCiKJrC06MHaPJJL4nuJ63gpzaUTIkiSSAZZo0d5+CGf2Cu0ofBAGBVKZWL9A8NceUb1nPnLZ/hqsuvA8h8+s8+fISB0UJXlwftZHI2swl2hHRbgKQ42dV1naIIWfqpq6/k0L4D/DCqL0Z88badFPpCJOhuOIJCZ2RfiCg2qReH7ZxHEQWrDhUlXQ5Vi9IKh0V5uWRj5fZbH2D+eI3+VUV/5m55FlzChmYYoD0nwd49QKFjv+B4ObQ81+Rzt36Ll3ZNMzBeRDtKLYMqOwMcqtpjDrA4a0mT0yQDAPXOW0D5Uerxr+7lK3/yOIszDQZb8GR9WdPm8WuyJ0GX6Zbfa4SxtYOkaXRtvx9jLRaHY2BViUKY44fV3FSNpx88wCP//Bx7nzhOuT9P36o8Dkemunh63gpnD0KlgZCpyTnu/+yTNGvtmkKEfDFg8okpKkMFcIoJoFgKefDvn0YMOKuckgSq803ipmXu6DJHn59jev8iy/MN8qXQP3UxGRNWNk/WIATaHhqQ7g3kSwEHnznB848dRbT7QqLUl6dQDvH7Q/F3B/d+6tHT//UaVQQwofEXHGE+YGCsBJKgqHJqavOoKjbLAMQJuEzHVL0JK1HKTLpEBCH0jxb40Ug5fbVZErasQSiOfOW2ewFnvtrXYp5No2aqAbE2p+z/3v1bFAHkzDdArWeyLm4xzqQaUI+Xn4pc/brYRTh1iOiZj496lhbTChuNeHlPqgHL8fLDjXjptyJt4NRiCBDMGW6A8ywtphU2z5hqwOG5p743UdqwZ6AwcV4p6MNIDhEF5MzFV6Vpm1SjZRYaM3tajKkG1KgtnWgcuXMoWvMX5Vw/ockhQR7BnKn4xK5JzVZZimZpsbUYswah2jMnHr1voDByYymobM1JzsOHJkDkTGqIiqoSO0s9rrLYmGG6tu+hFhtQyzKg3oq9s3s+WTTluwLJrwcoBiWfDYkJZwh8RN3WmG+c4Hh18mCLiYQv1QBdkYicmK5PFiYXih9WzN84Np41kB+hGJYIJU9gDCDIaw4bQLHOEWuTelxjoTnDseV9B/Yv7v7wCtMR4ESLsecfTYnIOqCyurhp7cahC24bLW+8aiA/TCmskDN5AgkQE2BeIzY4FHUWq5aoVfPx8gr8LNPVfQ/sm/v+HxytTx4GllX1EF69DQiBs4AcwDkjl71rtHjWrwwURi8sBn3kgpYJISLmVc6F9rW31ZjINqnbJRYa009O1w/c8czMd7+JFxFwQFXjdAO6TSgAaxMTAMzZAxdfXM4PX1oM+87JB+UJxISCedU7Peripq0eq8dLz1Sbs489v7BrF+Da8BxW1QZAlgFpmTABVDgztQwcaz/5bAOyjOgDVgFFzgzVk4a3RIrSDcg2ogS0ogCEr6HBQIEYaAA1Va1xivofFMgT72EjWNYAAAAASUVORK5CYII=" /> specific booking (only if owner)</li>
+<li>DELETE /:id and PUT /:id/cancel: cancel booking and restore availability</li>
+<li>GET /ticket/:bookingId and POST /group-ticket: generate professional PDF tickets via pdfkit</li>
+</ul>
+<pre class="hljs"><code><div><span class="hljs-comment">// Create flight booking</span>
+router.post(<span class="hljs-string">"/flights"</span>, authenticateUser, <span class="hljs-keyword">async</span> (req, res) =&gt; {
+  <span class="hljs-keyword">const</span> { flightId, passengerDetails } = req.body;
+  <span class="hljs-keyword">const</span> flight = <span class="hljs-keyword">await</span> Flight.findById(flightId);
+  <span class="hljs-comment">// validate + create Booking + decrement availableSeats + emit event + return JSON</span>
+});
+</div></code></pre>
+<p>8.4 Users (/api/users)</p>
+<ul>
+<li>GET /profile, PUT /profile</li>
+<li>GET /stats: aggregates bookings by type and status for the current user</li>
+</ul>
+<p>8.5 Admin (/api/admin)</p>
+<ul>
+<li>Protected by authenticateAdmin and checkPermission</li>
+<li>Manage users, flights, trains, hotels</li>
+<li>Analytics endpoints (overview, booking types, status, routes, revenue) described in “Online Booking System - Backend API.md”</li>
+</ul>
+<p>Part 9: Real-time admin stream (SSE) and Event Bus</p>
+<ul>
+<li>Event Bus: a simple EventEmitter shared across the app</li>
+<li>When a user registers or a booking is created, the event is emitted</li>
+<li>Server pushes events to connected admin panels via Server-Sent Events (SSE) at /api/admin/stream</li>
+</ul>
+<pre class="hljs"><code><div><span class="hljs-keyword">const</span> EventEmitter = <span class="hljs-built_in">require</span>(<span class="hljs-string">'events'</span>);
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">EventBus</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">EventEmitter</span> </span>{}
+<span class="hljs-built_in">module</span>.exports = <span class="hljs-keyword">new</span> EventBus();
+</div></code></pre>
+<pre class="hljs"><code><div><span class="hljs-comment">// SSE endpoint</span>
+app.get(<span class="hljs-string">'/api/admin/stream'</span>, (req, res) =&gt; {
+  res.setHeader(<span class="hljs-string">'Content-Type'</span>, <span class="hljs-string">'text/event-stream'</span>);
+  <span class="hljs-comment">// register client and stream events...</span>
+});
+<span class="hljs-comment">// Subscribe events to broadcast</span>
+[<span class="hljs-string">'user:registered'</span>, <span class="hljs-string">'booking:created'</span>].forEach(<span class="hljs-function">(<span class="hljs-params">evt</span>) =&gt;</span> {
+  eventBus.on(evt, (payload) =&gt; broadcast(evt, payload));
+});
+</div></code></pre>
+<p>SSE flow</p>
+<pre><code class="language-mermaid"><div class="mermaid">sequenceDiagram
+  participant AdminUI
+  participant Server
+  participant Bus as EventBus
+
+  AdminUI->>Server: GET /api/admin/stream (keep-alive)
+  Server-->>AdminUI: event: user:registered / booking:created
+  Note over Bus,Server: Routes emit events to Bus; Server broadcasts to SSE clients
+</div></code></pre>
+<p>Part 10: Logging and debugging</p>
+<ul>
+<li>Console logging with colors and timestamps in utils/logger.js</li>
+<li>Namespaced debug via DEBUG=booking:* (see .env.example)</li>
+<li>Request logging middleware example in server.js and utils/logger.js</li>
+<li>Health check endpoint: GET /api/health</li>
+</ul>
+<pre class="hljs"><code><div>app.get(<span class="hljs-string">'/api/health'</span>, (req, res) =&gt; {
+  res.json({ <span class="hljs-attr">status</span>: <span class="hljs-string">'OK'</span>, <span class="hljs-attr">message</span>: <span class="hljs-string">'Online Booking System API is running'</span>, <span class="hljs-attr">timestamp</span>: <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>().toISOString() });
+});
+</div></code></pre>
+<p>Part 11: How to add your own feature</p>
+<p>Example: Add a “Car Rentals” resource with search and bookings</p>
+<ol>
+<li>Create model backend/models/Car.js with fields like carType, pricePerDay, location, availableUnits</li>
+<li>Create routes backend/routes/cars.js
+<ul>
+<li>GET /api/cars/search?location=...&amp;type=...</li>
+<li>POST /api/cars/book (authenticateUser) to create a booking with trip.carDetails</li>
+</ul>
+</li>
+<li>Update server.js
+<ul>
+<li>const carRoutes = require('./routes/cars');</li>
+<li>app.use('/api/cars', carRoutes);</li>
+</ul>
+</li>
+<li>Update Booking schema (if you want rich carDetails) similar to flight/train/hotel</li>
+<li>Add admin endpoints to manage cars using authenticateAdmin + checkPermission('manage_cars')</li>
+<li>Test with Postman and add to API docs</li>
+</ol>
+<p>Checklist for any new route</p>
+<ul>
+<li>Validate input (types, formats, required fields)</li>
+<li>Handle auth for protected routes</li>
+<li>Use models to query MongoDB</li>
+<li>Return consistent JSON with status codes</li>
+<li>Emit events (optional) for admin SSE</li>
+<li>Add indexes to the model for performance</li>
+</ul>
+<p>Part 12: FAQ and examiner-style Q&amp;A</p>
+<p>Q: What is the difference between authentication and authorization?</p>
+<ul>
+<li>Authentication verifies identity (JWT token proves who you are). Authorization checks permissions/roles (checkPermission for admin actions).</li>
+</ul>
+<p>Q: Where are tokens stored and how are they validated?</p>
+<ul>
+<li>Client stores JWT (e.g., localStorage). Server validates with jwt.verify using the JWT_SECRET. authenticateUser loads req.user.</li>
+</ul>
+<p>Q: How does CORS protect the API?</p>
+<ul>
+<li>It restricts which web origins can make browser-based requests. Your config whitelists localhost ports during development and enforces a strict list in production.</li>
+</ul>
+<p>Q: How does the app prevent brute-force login attempts?</p>
+<ul>
+<li>rateLimitAuth limits attempts per IP and lockout time; recordFailedAuth and clearAuthAttempts track state.</li>
+</ul>
+<p>Q: What happens when a booking is created?</p>
+<ul>
+<li>Validate input -&gt; fetch item (flight/train/hotel) -&gt; create Booking -&gt; decrement availability -&gt; emit booking:created -&gt; return JSON.</li>
+</ul>
+<p>Q: How are passwords secured?</p>
+<ul>
+<li>bcrypt hashes passwords with salt in pre-save hooks; plaintext is never stored. comparePassword checks hashes at login.</li>
+</ul>
+<p>Q: What are common error response structures?</p>
+<ul>
+<li>{ error: { message, status, details } } with appropriate HTTP status codes (400, 401, 404, 409, 500, etc.).</li>
+</ul>
+<p>Q: How would you scale this system?</p>
+<ul>
+<li>Use connection pooling (already configured), add indexes (already present), paginate responses, add caching (e.g., Redis), move static files to CDN, containerize with Docker, use horizontal scaling and a load balancer, implement rate limiting and circuit breakers.</li>
+</ul>
+<p>Q: How does the real-time admin view work?</p>
+<ul>
+<li>Admin page keeps an open SSE connection to /api/admin/stream; server pushes events when user registers or a booking is created via EventBus.</li>
+</ul>
+<p>Q: How do you run the system locally?</p>
+<ul>
+<li>See backend/RUN_INSTRUCTIONS.md. In short: npm install, copy env.example to .env, start MongoDB, run node data_manager.js --action=setup (optional), then node server.js. Test with GET http://localhost:3000/api/health.</li>
+</ul>
+<p>You now have the concepts, code references, and end-to-end understanding to both explain this project and extend it confidently.</p>
+
+</body>
+</html>

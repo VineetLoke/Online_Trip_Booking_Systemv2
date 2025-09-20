@@ -1,0 +1,548 @@
+﻿<!doctype html>
+<html lang="en"><head>
+<meta charset='utf-8'><meta name='viewport' content='width=device-width, initial-scale=1'>
+<title>Beginner's Guide</title>
+<style>body{font-family:Segoe UI,Arial,sans-serif;max-width:900px;margin:40px auto;padding:0 24px;line-height:1.6;color:#2c3e50} pre,code{font-family:Consolas,Menlo,monospace} pre{background:#f6f8fa;padding:12px;border-radius:6px;overflow:auto} h1,h2,h3{color:#1a73e8} h1{border-bottom:2px solid #e9ecef;padding-bottom:8px} table{border-collapse:collapse} td,th{border:1px solid #e9ecef;padding:6px 10px} .meta{color:#6c757d;font-size:12px;margin-bottom:20px}</style>
+</head><body>
+<div class='meta'>Printed: 2025-09-20 18:29:21Z</div>
+<h1>Online Booking System â€“ Beginnerâ€™s Mastery Guide</h1>
+<br>
+<p>This guide explains everything used in your repository in plain language. Youâ€™ll learn what each technology is, how the backend works end-to-end, and how to answer any question an examiner might ask. It includes diagrams, flowcharts, and real code references from your project.</p>
+<br>
+<p>Table of contents</p>
+<ul>
+<li>Part 1: Big picture overview</li>
+<li>Part 2: What is an API (and how your API works)</li>
+<li>Part 3: What is Node.js, Express, CORS, JWT, MongoDB, Mongoose</li>
+<li>Part 4: Request lifecycle: from client to database and back</li>
+<li>Part 5: Environment and configuration</li>
+<li>Part 6: Data models (MongoDB schemas)</li>
+<li>Part 7: Middleware (auth, rate limiting, permissions)</li>
+<li>Part 8: Routes and features (Auth, Search, Bookings, Users, Admin)</li>
+<li>Part 9: Real-time admin stream (SSE) and Event Bus</li>
+<li>Part 10: Logging and debugging</li>
+<li>Part 11: How to add your own feature</li>
+<li>Part 12: FAQ and examiner-style Q&A</li>
+</ul>
+<br>
+<br>
+<p>Part 1: Big picture overview</p>
+<br>
+<p>Your project is a typical web backend:</p>
+<ul>
+<li>Client (browser or Postman) sends HTTP requests</li>
+<li>Backend server (Node.js + Express) receives requests on endpoints like /api/auth/login</li>
+<li>Middleware handles security (JWT auth), CORS, parsing JSON, rate limits</li>
+<li>Controllers/Routes run logic and talk to MongoDB via Mongoose models</li>
+<li>MongoDB stores documents for users, flights, trains, hotels, and bookings</li>
+<li>Responses are sent back as JSON</li>
+<li>Admin can watch real-time events (user registered, booking created) via SSE</li>
+</ul>
+<br>
+<p>Visual map</p>
+<pre><code>
+flowchart LR
+  A[Client (Browser / Postman)] --&gt;|HTTP JSON| B[Express App]
+  B --&gt; C[CORS / JSON parser / Logger]
+  C --&gt; D{Route Match}
+  D --&gt;|/api/auth| E[Auth Router]
+  D --&gt;|/api/search| F[Search Router]
+  D --&gt;|/api/bookings| G[Bookings Router]
+  D --&gt;|/api/users| H[Users Router]
+  D --&gt;|/api/admin| I[Admin Router]
+  E --&gt; J[User/Admin Models]
+  F --&gt; K[Flight/Train/Hotel Models]
+  G --&gt; L[Booking + Item Models]
+  H --&gt; J
+  I --&gt; All[All Models]
+  subgraph DB[MongoDB]
+    M[Mongoose ODM]
+  end
+  J --&gt; M
+  K --&gt; M
+  L --&gt; M
+  All --&gt; M
+  M --&gt; DB
+  G -- emits --&gt; SSE((Event Bus))
+  SSE -- streams --&gt; Admin[Admin Panel via /api/admin/stream]
+</code></pre>
+<br>
+<br>
+<p>Part 2: What is an API (and how your API works)</p>
+<br>
+<ul>
+<li>API (Application Programming Interface): a set of rules for how programs talk to each other. In web apps, itâ€™s usually HTTP endpoints that send/receive JSON.</li>
+<li>REST API: uses HTTP methods (GET, POST, PUT, DELETE) on resource URLs.</li>
+<li>Your API base path is /api with subpaths:</li>
+<li>/api/auth: login, register, profile</li>
+<li>/api/search: find flights, trains, hotels</li>
+<li>/api/bookings: create/cancel bookings, pay, get tickets</li>
+<li>/api/users: profile and stats</li>
+<li>/api/admin: admin-only management and analytics</li>
+</ul>
+<br>
+<p>How your app wires routes</p>
+<pre><code>
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/search', searchRoutes);
+app.use('/api/bookings', bookingRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/admin', adminRoutes);
+</code></pre>
+<br>
+<p>How to make an API endpoint (in Express)</p>
+<ul>
+<li>Create a router file (e.g., backend/routes/search.js)</li>
+<li>Define routes like router.get('/flights', handler)</li>
+<li>Export router and mount it in server.js with app.use('/api/search', router)</li>
+</ul>
+<br>
+<p>Example from your code</p>
+<pre><code>
+// Search flights
+router.get('/flights', async (req, res) =&gt; {
+  try {
+    const { source, destination, date, airline } = req.query;
+    // Build query and return results ...
+    const flights = await Flight.find(query).sort({ departureTime: 1 }).limit(50);
+    res.status(200).json({ count: flights.length, flights });
+  } catch (error) {
+    res.status(500).json({ error: { message: "Internal server error", status: 500, details: error.message } });
+  }
+});
+</code></pre>
+<br>
+<p>How to connect to your API (from a frontend)</p>
+<ul>
+<li>Use fetch or axios with the correct base URL (e.g., http://localhost:3000)</li>
+<li>Send Authorization header with Bearer <token> for protected routes</li>
+</ul>
+<br>
+<p>Example</p>
+<pre><code>
+const BASE = 'http://localhost:3000';
+const token = localStorage.getItem('token');
+const res = await fetch(`${BASE}/api/bookings/history`, {
+  headers: { Authorization: `Bearer ${token}` }
+});
+const data = await res.json();
+</code></pre>
+<br>
+<br>
+<p>Part 3: What is Node.js, Express, CORS, JWT, MongoDB, Mongoose</p>
+<br>
+<ul>
+<li>Node.js: JavaScript runtime for servers. Lets you write backend code in JS.</li>
+<li>Express: Minimal framework for routing and middleware on top of Node.js.</li>
+<li>CORS: Security policy that controls which origins (websites) can call your backend from browsers.</li>
+<li>In your app, only allowedOrigins (like localhost ports) can call the API in dev.</li>
+</ul>
+<pre><code>
+// CORS Configuration
+const allowedOrigins = process.env.NODE_ENV === 'production' 
+  ? ['https://yourdomain.com', 'https://www.yourdomain.com']
+  : ['http://localhost:3000','http://127.0.0.1:3000','http://localhost:5500','http://127.0.0.1:5500','http://localhost:8000','http://127.0.0.1:8000'];
+
+app.use(cors({
+  origin: (origin, callback) =&gt; {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin) || isDevLocalhost(origin)) callback(null, true);
+    else callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
+  methods: ['GET','POST','PUT','DELETE','OPTIONS'],
+  allowedHeaders: ['Content-Type','Authorization'],
+  maxAge: 86400
+}));
+</code></pre>
+<ul>
+<li>JWT (JSON Web Tokens): Signed tokens that prove identity. Server issues token at login; clients send it in Authorization header. Your middleware verifies it and loads the user/admin.</li>
+</ul>
+<pre><code>
+// Generate JWT token
+const token = jwt.sign(
+  { id: user._id },
+  process.env.JWT_SECRET,
+  { expiresIn: process.env.JWT_EXPIRES_IN }
+);
+</code></pre>
+<pre><code>
+// Middleware to verify user JWT token
+exports.authenticateUser = async (req, res, next) =&gt; {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) return res.status(401).json({ error: { message: 'Authentication failed. Invalid authorization header format.', status: 401 } });
+  const token = authHeader.split(' ')[1];
+  const decoded = jwt.verify(token, process.env.JWT_SECRET, { algorithms: ['HS256'], maxAge: process.env.JWT_EXPIRES_IN || '24h' });
+  const user = await User.findById(decoded.id);
+  if (!user) return res.status(401).json({ error: { message: 'Authentication failed. User not found.', status: 401 } });
+  req.user = user; req.userId = user._id.toString(); next();
+};
+</code></pre>
+<ul>
+<li>MongoDB: NoSQL database that stores documents (JSON-like). Collections here: users, admins, flights, trains, hotels, bookings</li>
+<li>Mongoose: ODM (Object Data Modeling) library for MongoDB. You define schemas and get Models that you can use to query.</li>
+</ul>
+<pre><code>
+// Main Booking Schema
+const bookingSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  bookingType: { type: String, required: true, enum: ['flight','train','hotel','multi'], trim: true },
+  bookingDate: { type: Date, default: Date.now },
+  status: { type: String, enum: ['pending','confirmed','cancelled','failed'], default: 'pending' },
+  totalAmount: { type: Number, required: true, min: [0, 'Total amount cannot be negative'] },
+  paymentStatus: { type: String, enum: ['pending','completed','failed','refunded'], default: 'pending' },
+  paymentId: { type: String, trim: true },
+  cancellationReason: { type: String, trim: true },
+  cancelledAt: { type: Date },
+  trip: tripSchema
+}, { timestamps: true });
+</code></pre>
+<br>
+<br>
+<p>Part 4: Request lifecycle: from client to database and back</p>
+<br>
+<p>Request flow chart</p>
+<pre><code>
+sequenceDiagram
+  participant C as Client
+  participant S as Express Server
+  participant MW as Middleware
+  participant R as Route Handler
+  participant M as Mongoose Model
+  participant DB as MongoDB
+
+  C-&gt;&gt;S: HTTP Request (JSON)
+  S-&gt;&gt;MW: CORS, JSON parsing, logging
+  MW--&gt;&gt;S: next()
+  S-&gt;&gt;MW: Auth check (for protected routes)
+  MW--&gt;&gt;S: req.user populated
+  S-&gt;&gt;R: Match endpoint (e.g., POST /api/bookings/flights)
+  R-&gt;&gt;M: Query/Save
+  M-&gt;&gt;DB: DB operation
+  DB--&gt;&gt;M: Result
+  M--&gt;&gt;R: Document(s)
+  R--&gt;&gt;S: res.json({ ... })
+  S--&gt;&gt;C: HTTP Response (JSON)
+</code></pre>
+<br>
+<br>
+<p>Part 5: Environment and configuration</p>
+<br>
+<ul>
+<li>.env controls secrets and settings</li>
+<li>Key variables (see backend/.env.example):</li>
+<li>MONGODB_URI: your database address</li>
+<li>JWT_SECRET and JWT_EXPIRES_IN: token signing and validity</li>
+<li>PORT, NODE_ENV: server port/environment</li>
+<li>DEBUG: enables debug output (booking:*)</li>
+</ul>
+<pre><code>
+MONGODB_URI=mongodb://localhost:27017/online_booking_system
+JWT_SECRET=your_super_secret_jwt_key_here_please_change_this_in_production
+JWT_EXPIRES_IN=7d
+PORT=3000
+NODE_ENV=development
+DEBUG=booking:*
+</code></pre>
+<br>
+<p>MongoDB connection with retry logic</p>
+<pre><code>
+const connectToMongoDB = async (retryCount = 0) =&gt; {
+  try {
+    await mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true, serverSelectionTimeoutMS: 10000, heartbeatFrequencyMS: 2000, maxPoolSize: 10, minPoolSize: 2 });
+    console.log('âœ… Successfully connected to MongoDB');
+    mongoose.connection.on('error', (error) =&gt; console.error('âŒ MongoDB connection error:', error));
+    mongoose.connection.on('disconnected', () =&gt; console.warn('âš ï¸  MongoDB disconnected. Attempting to reconnect...'));
+    mongoose.connection.on('reconnected', () =&gt; console.log('âœ… MongoDB reconnected successfully'));
+  } catch (error) {
+    // Retry up to 5 times
+  }
+};
+</code></pre>
+<br>
+<br>
+<p>Part 6: Data models (MongoDB schemas)</p>
+<br>
+<p>1) User</p>
+<ul>
+<li>Fields: name, email (unique), phone, passwordHash</li>
+<li>Passwords are hashed with bcrypt in a pre-save hook</li>
+<li>Methods: comparePassword, toJSON (hides passwordHash)</li>
+</ul>
+<pre><code>
+// Hash password before saving
+userSchema.pre('save', async function(next) {
+  if (!this.isModified('passwordHash')) return next();
+  const salt = await bcrypt.genSalt(10);
+  this.passwordHash = await bcrypt.hash(this.passwordHash, salt);
+  next();
+});
+</code></pre>
+<br>
+<p>2) Admin</p>
+<ul>
+<li>Similar to User plus role and permissions array</li>
+<li>Roles: admin, super_admin; permissions: manage_users, manage_flights, manage_trains, manage_hotels, view_reports</li>
+</ul>
+<br>
+<p>3) Flight</p>
+<ul>
+<li>Includes times, price, seats, and ensures arrival after departure; prevents availableSeats > totalSeats</li>
+</ul>
+<br>
+<p>4) Train</p>
+<ul>
+<li>Similar constraints as Flight, with class and seats</li>
+</ul>
+<br>
+<p>5) Hotel</p>
+<ul>
+<li>Location, address, price per night, rating, room counts, roomType</li>
+</ul>
+<br>
+<p>6) Booking</p>
+<ul>
+<li>References a user, holds bookingType, status, payment status, and a nested trip object with specific details for flight/train/hotel</li>
+</ul>
+<br>
+<p>ER-style relationships (simplified)</p>
+<pre><code>
+classDiagram
+  User "1" --&gt; "many" Booking : userId
+  Booking --&gt; Flight : flightDetails.flightId
+  Booking --&gt; Train  : trainDetails.trainId
+  Booking --&gt; Hotel  : hotelDetails.hotelId
+  Admin : role, permissions
+</code></pre>
+<br>
+<br>
+<p>Part 7: Middleware (auth, rate limiting, permissions)</p>
+<br>
+<ul>
+<li>authenticateUser: verifies JWT, loads req.user</li>
+<li>authenticateAdmin: verifies JWT, loads req.admin</li>
+<li>checkPermission('permission'): ensures admin has required rights (or is super_admin)</li>
+<li>rateLimitAuth: limits repeated login attempts per IP</li>
+</ul>
+<pre><code>
+exports.checkPermission = (permission) =&gt; {
+  return (req, res, next) =&gt; {
+    if (!req.admin) return res.status(401).json({ error: { message: 'Authentication failed. Admin not found.', status: 401 } });
+    const perms = Array.isArray(req.admin.permissions) ? req.admin.permissions : [];
+    if (req.admin.role === 'super_admin' || perms.includes(permission)) next();
+    else return res.status(403).json({ error: { message: 'Access denied. Insufficient permissions.', status: 403 } });
+  };
+};
+</code></pre>
+<br>
+<p>Auth flow</p>
+<pre><code>
+flowchart LR
+  A[Register/Login] --&gt; B[Server issues JWT]
+  B --&gt; C[Client stores token]
+  C --&gt; D[Client calls protected APIs with Authorization: Bearer &lt;token&gt;]
+  D --&gt; E[authenticateUser verifies token and loads req.user]
+  E --&gt; F[Route handler executes]
+</code></pre>
+<br>
+<br>
+<p>Part 8: Routes and features</p>
+<br>
+<p>8.1 Authentication (/api/auth)</p>
+<ul>
+<li>POST /register: validate input, save User, emit event, sign token</li>
+<li>POST /login: rate-limited, check email+password, sign token</li>
+<li>POST /admin/login: admin login with role</li>
+<li>GET /me: returns current user (requires authenticateUser)</li>
+<li>PUT /change-password: verifies current password and updates</li>
+</ul>
+<pre><code>
+// User Login
+router.post('/login', rateLimitAuth, async (req, res) =&gt; {
+  const { email, password } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) { recordFailedAuth(req); return res.status(401).json({ error: { message: 'Invalid credentials', status: 401 } }); }
+  const isMatch = await user.comparePassword(password);
+  if (!isMatch) { recordFailedAuth(req); return res.status(401).json({ error: { message: 'Invalid credentials', status: 401 } }); }
+  clearAuthAttempts(req);
+  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
+  res.status(200).json({ message: 'Login successful', user: { _id: user._id, name: user.name, email: user.email, phone: user.phone }, token });
+});
+</code></pre>
+<br>
+<p>8.2 Search (/api/search)</p>
+<ul>
+<li>GET /flights: query by source, destination, airline, date; enforces future departures</li>
+<li>GET /trains: similar but simpler date logic</li>
+<li>GET /hotels: filter by location, rating, roomType</li>
+</ul>
+<br>
+<p>8.3 Bookings (/api/bookings)</p>
+<ul>
+<li>POST /flights | /trains | /hotels: create bookings, update availability, emit booking:created event</li>
+<li>POST /bulk: create many bookings in one request (group)</li>
+<li>POST /:id/payment: mock payment success and update booking</li>
+<li>GET /history: current userâ€™s bookings</li>
+<li>GET /:id: specific booking (only if owner)</li>
+<li>DELETE /:id and PUT /:id/cancel: cancel booking and restore availability</li>
+<li>GET /ticket/:bookingId and POST /group-ticket: generate professional PDF tickets via pdfkit</li>
+</ul>
+<pre><code>
+// Create flight booking
+router.post("/flights", authenticateUser, async (req, res) =&gt; {
+  const { flightId, passengerDetails } = req.body;
+  const flight = await Flight.findById(flightId);
+  // validate + create Booking + decrement availableSeats + emit event + return JSON
+});
+</code></pre>
+<br>
+<p>8.4 Users (/api/users)</p>
+<ul>
+<li>GET /profile, PUT /profile</li>
+<li>GET /stats: aggregates bookings by type and status for the current user</li>
+</ul>
+<br>
+<p>8.5 Admin (/api/admin)</p>
+<ul>
+<li>Protected by authenticateAdmin and checkPermission</li>
+<li>Manage users, flights, trains, hotels</li>
+<li>Analytics endpoints (overview, booking types, status, routes, revenue) described in â€œOnline Booking System - Backend API.mdâ€</li>
+</ul>
+<br>
+<br>
+<p>Part 9: Real-time admin stream (SSE) and Event Bus</p>
+<br>
+<ul>
+<li>Event Bus: a simple EventEmitter shared across the app</li>
+<li>When a user registers or a booking is created, the event is emitted</li>
+<li>Server pushes events to connected admin panels via Server-Sent Events (SSE) at /api/admin/stream</li>
+</ul>
+<pre><code>
+const EventEmitter = require('events');
+class EventBus extends EventEmitter {}
+module.exports = new EventBus();
+</code></pre>
+<pre><code>
+// SSE endpoint
+app.get('/api/admin/stream', (req, res) =&gt; {
+  res.setHeader('Content-Type', 'text/event-stream');
+  // register client and stream events...
+});
+// Subscribe events to broadcast
+['user:registered', 'booking:created'].forEach((evt) =&gt; {
+  eventBus.on(evt, (payload) =&gt; broadcast(evt, payload));
+});
+</code></pre>
+<br>
+<p>SSE flow</p>
+<pre><code>
+sequenceDiagram
+  participant AdminUI
+  participant Server
+  participant Bus as EventBus
+
+  AdminUI-&gt;&gt;Server: GET /api/admin/stream (keep-alive)
+  Server--&gt;&gt;AdminUI: event: user:registered / booking:created
+  Note over Bus,Server: Routes emit events to Bus; Server broadcasts to SSE clients
+</code></pre>
+<br>
+<br>
+<p>Part 10: Logging and debugging</p>
+<br>
+<ul>
+<li>Console logging with colors and timestamps in utils/logger.js</li>
+<li>Namespaced debug via DEBUG=booking:* (see .env.example)</li>
+<li>Request logging middleware example in server.js and utils/logger.js</li>
+<li>Health check endpoint: GET /api/health</li>
+</ul>
+<pre><code>
+app.get('/api/health', (req, res) =&gt; {
+  res.json({ status: 'OK', message: 'Online Booking System API is running', timestamp: new Date().toISOString() });
+});
+</code></pre>
+<br>
+<br>
+<p>Part 11: How to add your own feature</p>
+<br>
+<p>Example: Add a â€œCar Rentalsâ€ resource with search and bookings</p>
+<p>1) Create model backend/models/Car.js with fields like carType, pricePerDay, location, availableUnits</p>
+<p>2) Create routes backend/routes/cars.js</p>
+<ul>
+<li>GET /api/cars/search?location=...&type=...</li>
+<li>POST /api/cars/book (authenticateUser) to create a booking with trip.carDetails</li>
+<p>3) Update server.js</p>
+<li>const carRoutes = require('./routes/cars');</li>
+<li>app.use('/api/cars', carRoutes);</li>
+<p>4) Update Booking schema (if you want rich carDetails) similar to flight/train/hotel</p>
+<p>5) Add admin endpoints to manage cars using authenticateAdmin + checkPermission('manage_cars')</p>
+<p>6) Test with Postman and add to API docs</p>
+</ul>
+<br>
+<p>Checklist for any new route</p>
+<ul>
+<li>Validate input (types, formats, required fields)</li>
+<li>Handle auth for protected routes</li>
+<li>Use models to query MongoDB</li>
+<li>Return consistent JSON with status codes</li>
+<li>Emit events (optional) for admin SSE</li>
+<li>Add indexes to the model for performance</li>
+</ul>
+<br>
+<br>
+<p>Part 12: FAQ and examiner-style Q&A</p>
+<br>
+<p>Q: What is the difference between authentication and authorization?</p>
+<ul>
+<li>Authentication verifies identity (JWT token proves who you are). Authorization checks permissions/roles (checkPermission for admin actions).</li>
+</ul>
+<br>
+<p>Q: Where are tokens stored and how are they validated?</p>
+<ul>
+<li>Client stores JWT (e.g., localStorage). Server validates with jwt.verify using the JWT_SECRET. authenticateUser loads req.user.</li>
+</ul>
+<br>
+<p>Q: How does CORS protect the API?</p>
+<ul>
+<li>It restricts which web origins can make browser-based requests. Your config whitelists localhost ports during development and enforces a strict list in production.</li>
+</ul>
+<br>
+<p>Q: How does the app prevent brute-force login attempts?</p>
+<ul>
+<li>rateLimitAuth limits attempts per IP and lockout time; recordFailedAuth and clearAuthAttempts track state.</li>
+</ul>
+<br>
+<p>Q: What happens when a booking is created?</p>
+<ul>
+<li>Validate input -> fetch item (flight/train/hotel) -> create Booking -> decrement availability -> emit booking:created -> return JSON.</li>
+</ul>
+<br>
+<p>Q: How are passwords secured?</p>
+<ul>
+<li>bcrypt hashes passwords with salt in pre-save hooks; plaintext is never stored. comparePassword checks hashes at login.</li>
+</ul>
+<br>
+<p>Q: What are common error response structures?</p>
+<ul>
+<li>{ error: { message, status, details } } with appropriate HTTP status codes (400, 401, 404, 409, 500, etc.).</li>
+</ul>
+<br>
+<p>Q: How would you scale this system?</p>
+<ul>
+<li>Use connection pooling (already configured), add indexes (already present), paginate responses, add caching (e.g., Redis), move static files to CDN, containerize with Docker, use horizontal scaling and a load balancer, implement rate limiting and circuit breakers.</li>
+</ul>
+<br>
+<p>Q: How does the real-time admin view work?</p>
+<ul>
+<li>Admin page keeps an open SSE connection to /api/admin/stream; server pushes events when user registers or a booking is created via EventBus.</li>
+</ul>
+<br>
+<p>Q: How do you run the system locally?</p>
+<ul>
+<li>See backend/RUN_INSTRUCTIONS.md. In short: npm install, copy env.example to .env, start MongoDB, run node data_manager.js --action=setup (optional), then node server.js. Test with GET http://localhost:3000/api/health.</li>
+</ul>
+<br>
+<p>You now have the concepts, code references, and end-to-end understanding to both explain this project and extend it confidently.</p>
+<br>
+</body></html>
+
