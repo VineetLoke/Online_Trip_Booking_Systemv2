@@ -14,8 +14,9 @@ router.get('/profile', authenticateUser, async (req, res) => {
   } catch (error) {
     res.status(500).json({
       error: {
-        message: error.message,
-        status: 500
+        message: "Internal server error",
+        status: 500,
+        details: error.message
       }
     });
   }
@@ -39,8 +40,9 @@ router.put('/profile', authenticateUser, async (req, res) => {
   } catch (error) {
     res.status(500).json({
       error: {
-        message: error.message,
-        status: 500
+        message: "Internal server error",
+        status: 500,
+        details: error.message
       }
     });
   }
@@ -101,8 +103,9 @@ router.get('/stats', authenticateUser, async (req, res) => {
   } catch (error) {
     res.status(500).json({
       error: {
-        message: error.message,
-        status: 500
+        message: "Internal server error",
+        status: 500,
+        details: error.message
       }
     });
   }

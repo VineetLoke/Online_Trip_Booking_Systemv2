@@ -198,6 +198,39 @@ function setupSearchForms() {
 }
 
 /**
+ * Setup Swap Buttons for Flight and Train Search Forms
+ */
+function setupSwapButtons() {
+  // Swap button for flights
+  const swapFlightBtn = document.getElementById('swapFlightBtn');
+  if (swapFlightBtn) {
+    swapFlightBtn.addEventListener('click', function() {
+      const source = document.getElementById('flightSource');
+      const destination = document.getElementById('flightDestination');
+      if (source && destination) {
+        const temp = source.value;
+        source.value = destination.value;
+        destination.value = temp;
+      }
+    });
+  }
+  
+  // Swap button for trains
+  const swapTrainBtn = document.getElementById('swapTrainBtn');
+  if (swapTrainBtn) {
+    swapTrainBtn.addEventListener('click', function() {
+      const source = document.getElementById('trainSource');
+      const destination = document.getElementById('trainDestination');
+      if (source && destination) {
+        const temp = source.value;
+        source.value = destination.value;
+        destination.value = temp;
+      }
+    });
+  }
+}
+
+/**
  * Check Authentication Status
  */
 function checkAuthStatus() {
@@ -253,7 +286,7 @@ function updateAuthUI(isLoggedIn) {
       const user = JSON.parse(localStorage.getItem('user'));
       const userNameElement = document.getElementById('userName');
       if (userNameElement && user) {
-        userNameElement.textContent = user.name;
+        userNameElement.textContent = user.name || 'User';
       }
     } else {
       // Show auth buttons, hide user dropdown
@@ -285,10 +318,14 @@ function register(name, email, phone, password) {
       
       // Close modal and update UI
       const registerModal = bootstrap.Modal.getInstance(document.getElementById('registerModal'));
-      registerModal.hide();
+      if (registerModal) {
+        registerModal.hide();
+      }
       
       updateAuthUI(true);
       showAlert('mainAlert', 'Registration successful! Welcome to Online Booking System.', 'success');
+      // Redirect to homepage after registration
+      window.location.href = '/index.html';
     }
   })
   .catch(error => {
@@ -319,10 +356,15 @@ function login(email, password) {
       
       // Close modal and update UI
       const loginModal = bootstrap.Modal.getInstance(document.getElementById('loginModal'));
-      loginModal.hide();
-      
+      if (loginModal) {
+        loginModal.hide();
+      }
+        
       updateAuthUI(true);
       showAlert('mainAlert', 'Login successful! Welcome back.', 'success');
+      // Redirect to previous page or homepage
+      const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || '/index.html';
+      window.location.href = redirectUrl;
     }
   })
   .catch(error => {
@@ -963,248 +1005,6 @@ async function cancelBookingAPI(bookingId, reason) {
   return await response.json();
 }
 
-// Sample data generation for testing (remove in production)
-/*
-const flightTemplates = [
-  { airline: "Air India", flightNumber: "AI", basePrice: 5000, aircraft: "Boeing 737" },
-  { airline: "IndiGo", flightNumber: "6E", basePrice: 3000, aircraft: "Airbus A320" },
-  { airline: "SpiceJet", flightNumber: "SG", basePrice: 3500, aircraft: "Boeing 737" }
-];
-
-const trainTemplates = [
-  { trainName: "Rajdhani Express", trainNumber: "12345", basePrice: 1500, class: "Sleeper" },
-  { trainName: "Shatabdi Express", trainNumber: "54321", basePrice: 2500, class: "AC Chair" },
-  { trainName: "Duronto Express", trainNumber: "67890", basePrice: 2000, class: "Sleeper" }
-];
-
-const hotelTemplates = [
-  { name: "Taj Hotel", location: "Mumbai", basePrice: 8000, roomType: "Deluxe", amenities: ["WiFi", "Breakfast", "Pool"] },
-  { name: "Marriott Hotel", location: "Delhi", basePrice: 9000, roomType: "Suite", amenities: ["WiFi", "Breakfast", "Gym"] },
-  { name: "Hilton Hotel", location: "Bangalore", basePrice: 7000, roomType: "Standard", amenities: ["WiFi", "Breakfast", "Spa"] }
-];
-
-function generateSampleData() {
-  const flights = [];
-  const trains = [];
-  const hotels = [];
-  
-  const startDate = new Date("2023-10-01");
-  const endDate = new Date("2023-10-31");
-  
-  for (let date = new Date(startDate); date <= endDate; date.setDate(date.getDate() + 1)) {
-  const currentDate = new Date(date);
-
-  // Guarantee at least one flight per day
-  const templateF = flightTemplates[0];
-  const routeF = routes[0];
-  const departureTimeF = new Date(currentDate);
-  departureTimeF.setHours(9, 0, 0, 0);
-  const arrivalTimeF = new Date(departureTimeF);
-  arrivalTimeF.setHours(arrivalTimeF.getHours() + routeF.duration);
-  flights.push({
-    flightNumber: `${templateF.flightNumber}${String(currentDate.getDate()).padStart(2, '0')}${String(currentDate.getMonth()+1).padStart(2, '0')}`,
-    airline: templateF.airline,
-    source: routeF.source,
-    destination: routeF.destination,
-    departureTime: departureTimeF,
-    arrivalTime: arrivalTimeF,
-    price: templateF.basePrice,
-    availableSeats: 100,
-    totalSeats: 120,
-    aircraft: templateF.aircraft,
-    status: "active",
-    createdAt: new Date(),
-    updatedAt: new Date()
-  });
-  // Add extra random flights for variety
-  const numFlights = 2 + Math.floor(Math.random() * 3);
-  for (let i = 0; i < numFlights; i++) {
-    const template = flightTemplates[Math.floor(Math.random() * flightTemplates.length)];
-    const route = routes[Math.floor(Math.random() * routes.length)];
-    const departureTime = new Date(currentDate);
-    departureTime.setHours(6 + i * 3 + Math.floor(Math.random() * 2), Math.floor(Math.random() * 60), 0, 0);
-    const arrivalTime = new Date(departureTime);
-    arrivalTime.setHours(arrivalTime.getHours() + route.duration + Math.floor(Math.random() * 2));
-    const price = template.basePrice + Math.floor(Math.random() * 2000);
-    const totalSeats = 120 + Math.floor(Math.random() * 80);
-    const availableSeats = Math.floor(totalSeats * (0.6 + Math.random() * 0.3));
-    flights.push({
-      flightNumber: `${template.flightNumber}${String(Math.floor(Math.random() * 900) + 100)}`,
-      airline: template.airline,
-      source: route.source,
-      destination: route.destination,
-      departureTime: departureTime,
-      arrivalTime: arrivalTime,
-      price: price,
-      availableSeats: availableSeats,
-      totalSeats: totalSeats,
-      aircraft: template.aircraft,
-      status: "active",
-      createdAt: new Date(),
-      updatedAt: new Date()
-    });
-  }
-
-  // Guarantee at least one train per day
-  const templateT = trainTemplates[0];
-  const routeT = routes[0];
-  const departureTimeT = new Date(currentDate);
-  departureTimeT.setHours(14, 0, 0, 0);
-  const arrivalTimeT = new Date(departureTimeT);
-  arrivalTimeT.setHours(arrivalTimeT.getHours() + routeT.duration * 2);
-  trains.push({
-    trainNumber: `${templateT.trainNumber}${String(currentDate.getDate()).padStart(2, '0')}${String(currentDate.getMonth()+1).padStart(2, '0')}`,
-    trainName: templateT.trainName,
-    source: routeT.source,
-    destination: routeT.destination,
-    departureTime: departureTimeT,
-    arrivalTime: arrivalTimeT,
-    price: templateT.basePrice,
-    availableSeats: 150,
-    totalSeats: 200,
-    class: templateT.class,
-    status: "active",
-    createdAt: new Date(),
-    updatedAt: new Date()
-  });
-  // Add extra random trains for variety
-  const numTrains = 1 + Math.floor(Math.random() * 2);
-  for (let i = 0; i < numTrains; i++) {
-    const template = trainTemplates[Math.floor(Math.random() * trainTemplates.length)];
-    const route = routes[Math.floor(Math.random() * routes.length)];
-    const departureTime = new Date(currentDate);
-    departureTime.setHours(16 + i * 4 + Math.floor(Math.random() * 2), Math.floor(Math.random() * 60), 0, 0);
-    const arrivalTime = new Date(departureTime);
-    arrivalTime.setHours(arrivalTime.getHours() + route.duration * 2 + Math.floor(Math.random() * 8));
-    const price = template.basePrice + Math.floor(Math.random() * 1000);
-    const totalSeats = 200 + Math.floor(Math.random() * 100);
-    const availableSeats = Math.floor(totalSeats * (0.5 + Math.random() * 0.4));
-    trains.push({
-      trainNumber: `${template.trainNumber}${String(Math.floor(Math.random() * 10))}`,
-      trainName: template.trainName,
-      source: route.source,
-      destination: route.destination,
-      departureTime: departureTime,
-      arrivalTime: arrivalTime,
-      price: price,
-      availableSeats: availableSeats,
-      totalSeats: totalSeats,
-      class: template.class,
-      status: "active",
-      createdAt: new Date(),
-      updatedAt: new Date()
-    });
-  }
-
-  // Guarantee at least one hotel per day
-  const templateH = hotelTemplates[0];
-  const priceH = templateH.basePrice;
-  const totalRoomsH = 40;
-  const availableRoomsH = 30;
-  hotels.push({
-    name: `${templateH.name} ${currentDate.getFullYear()}`,
-    location: templateH.location,
-    address: `100 ${templateH.location} Street, ${templateH.location}`,
-    price: priceH,
-    rating: 4.5,
-    amenities: ["WiFi", "Pool", "Restaurant", "Room Service", "Gym"],
-    availableRooms: availableRoomsH,
-    totalRooms: totalRoomsH,
-    roomType: templateH.roomType,
-    images: ["hotel1.jpg"],
-    status: "active",
-    createdAt: new Date(),
-    updatedAt: new Date()
-  });
-  // Add extra random hotels for variety
-  const numHotels = 1 + Math.floor(Math.random() * 3);
-  for (let i = 0; i < numHotels; i++) {
-    const template = hotelTemplates[Math.floor(Math.random() * hotelTemplates.length)];
-    const price = template.basePrice + Math.floor(Math.random() * 2000);
-    const totalRooms = 30 + Math.floor(Math.random() * 40);
-    const availableRooms = Math.floor(totalRooms * (0.4 + Math.random() * 0.5));
-    hotels.push({
-      name: `${template.name} ${currentDate.getFullYear()}`,
-      location: template.location,
-      address: `${Math.floor(Math.random() * 999) + 1} ${template.location} Street, ${template.location}`,
-      price: price,
-      rating: 4.0 + Math.random() * 1.0,
-      amenities: ["WiFi", "Pool", "Restaurant", "Room Service", "Gym"],
-      availableRooms: availableRooms,
-      totalRooms: totalRooms,
-      roomType: template.roomType,
-      images: [`hotel${i + 1}.jpg`],
-      status: "active",
-      createdAt: new Date(),
-      updatedAt: new Date()
-    });
-  }
-}
-
-/**
- * Setup Swap Buttons for Flight and Train Search Forms
- */
-function setupSwapButtons() {
-  // Only setup if we're on a page that has search forms
-  const hasFlightForm = document.getElementById('flightSource') && document.getElementById('flightDestination');
-  const hasTrainForm = document.getElementById('trainSource') && document.getElementById('trainDestination');
-  
-  if (!hasFlightForm && !hasTrainForm) {
-    return; // Skip setup on pages without search forms
-  }
-  
-  // Setup flight swap button
-  const flightSwapBtn = document.getElementById('swapFlightBtn');
-  if (flightSwapBtn && hasFlightForm) {
-    flightSwapBtn.addEventListener('click', function() {
-      swapFields('flightSource', 'flightDestination');
-    });
-  }
-  
-  // Setup train swap button
-  const trainSwapBtn = document.getElementById('swapTrainBtn');
-  if (trainSwapBtn && hasTrainForm) {
-    trainSwapBtn.addEventListener('click', function() {
-      swapFields('trainSource', 'trainDestination');
-    });
-  }
-}
-
-/**
- * Swap values between two input fields
- * @param {string} sourceId - ID of the source input field
- * @param {string} destinationId - ID of the destination input field
- */
-function swapFields(sourceId, destinationId) {
-  console.log('Swapping fields:', sourceId, destinationId);
-  
-  const sourceField = document.getElementById(sourceId);
-  const destinationField = document.getElementById(destinationId);
-  
-  console.log('Source field found:', sourceField);
-  console.log('Destination field found:', destinationField);
-  
-  if (sourceField && destinationField) {
-    const tempValue = sourceField.value;
-    sourceField.value = destinationField.value;
-    destinationField.value = tempValue;
-    
-    console.log('Values swapped successfully');
-    
-    // Add a small animation effect to show the swap
-    const swapBtn = sourceId.includes('flight') ? 
-      document.getElementById('swapFlightBtn') : 
-      document.getElementById('swapTrainBtn');
-    
-    if (swapBtn) {
-      swapBtn.style.transition = 'transform 0.3s ease';
-      swapBtn.style.transform = 'rotate(180deg)';
-      setTimeout(() => {
-        swapBtn.style.transform = 'rotate(0deg)';
-      }, 300);
-    }
-  } else {
-    console.log('One or both fields not found!');
-  }
-}
+// Note: Removed large block of sample data generation code that was wrapped in a
+// nested block comment and caused a stray closing '*/' leading to a SyntaxError.
 

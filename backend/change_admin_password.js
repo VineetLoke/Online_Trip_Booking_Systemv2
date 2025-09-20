@@ -41,7 +41,7 @@ async function changeAdminPassword() {
       console.log('Admin found. Updating password...');
       
       // You can change this to your desired password
-      const newPassword = 'newadmin123'; // Change this to your desired password
+      const newPassword = 'SecureAdmin2024!'; // Change this to your desired password
       
       // Set plain password (will be hashed by pre-save middleware)
       admin.passwordHash = newPassword;

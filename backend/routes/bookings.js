@@ -13,6 +13,34 @@ router.post("/flights", authenticateUser, async (req, res) => {
   try {
     const { flightId, passengerDetails } = req.body;
 
+    // Input validation
+    if (!flightId || typeof flightId !== 'string') {
+      return res.status(400).json({
+        error: {
+          message: "Valid flight ID is required",
+          status: 400,
+        },
+      });
+    }
+
+    if (!passengerDetails || typeof passengerDetails !== 'object') {
+      return res.status(400).json({
+        error: {
+          message: "Passenger details are required",
+          status: 400,
+        },
+      });
+    }
+
+    if (!passengerDetails.name || passengerDetails.name.trim().length < 2) {
+      return res.status(400).json({
+        error: {
+          message: "Passenger name must be at least 2 characters long",
+          status: 400,
+        },
+      });
+    }
+
     // Check if flight exists and has available seats
     const flight = await Flight.findById(flightId);
 
@@ -86,8 +114,9 @@ router.post("/flights", authenticateUser, async (req, res) => {
   } catch (error) {
     res.status(500).json({
       error: {
-        message: error.message,
+        message: "Internal server error",
         status: 500,
+        details: error.message
       },
     });
   }
@@ -172,8 +201,9 @@ router.post("/trains", authenticateUser, async (req, res) => {
   } catch (error) {
     res.status(500).json({
       error: {
-        message: error.message,
+        message: "Internal server error",
         status: 500,
+        details: error.message
       },
     });
   }
@@ -183,6 +213,58 @@ router.post("/trains", authenticateUser, async (req, res) => {
 router.post("/hotels", authenticateUser, async (req, res) => {
   try {
     const { hotelId, checkInDate, checkOutDate, guestDetails } = req.body;
+
+    // Input validation
+    if (!hotelId || typeof hotelId !== 'string') {
+      return res.status(400).json({
+        error: {
+          message: "Valid hotel ID is required",
+          status: 400,
+        },
+      });
+    }
+
+    if (!checkInDate || !checkOutDate) {
+      return res.status(400).json({
+        error: {
+          message: "Check-in and check-out dates are required",
+          status: 400,
+        },
+      });
+    }
+
+    // Validate dates
+    const checkIn = new Date(checkInDate);
+    const checkOut = new Date(checkOutDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (isNaN(checkIn.getTime()) || isNaN(checkOut.getTime())) {
+      return res.status(400).json({
+        error: {
+          message: "Invalid date format",
+          status: 400,
+        },
+      });
+    }
+
+    if (checkIn < today) {
+      return res.status(400).json({
+        error: {
+          message: "Check-in date cannot be in the past",
+          status: 400,
+        },
+      });
+    }
+
+    if (checkOut <= checkIn) {
+      return res.status(400).json({
+        error: {
+          message: "Check-out date must be after check-in date",
+          status: 400,
+        },
+      });
+    }
 
     // Normalize guest details to match schema
     const normalizedGuestDetails = {
@@ -213,8 +295,6 @@ router.post("/hotels", authenticateUser, async (req, res) => {
     }
 
     // Calculate number of nights
-    const checkIn = new Date(checkInDate);
-    const checkOut = new Date(checkOutDate);
     const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
 
     if (nights <= 0) {
@@ -280,8 +360,9 @@ router.post("/hotels", authenticateUser, async (req, res) => {
   } catch (error) {
     res.status(500).json({
       error: {
-        message: error.message,
+        message: "Internal server error",
         status: 500,
+        details: error.message
       },
     });
   }
@@ -412,21 +493,21 @@ router.post("/bulk", authenticateUser, async (req, res) => {
           };
           break;
         case 'hotel':
-          const checkIn = new Date(hotelInfo.checkInDate);
-          const checkOut = new Date(hotelInfo.checkOutDate);
-          const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+          const hotelCheckIn = new Date(hotelInfo.checkInDate);
+          const hotelCheckOut = new Date(hotelInfo.checkOutDate);
+          const nights = Math.ceil((hotelCheckOut - hotelCheckIn) / (1000 * 60 * 60 * 24));
           bookingData.totalAmount = item.price * nights;
           bookingData.trip = {
             type: "hotel",
             destination: item.location,
-            startDate: checkIn,
-            endDate: checkOut,
+            startDate: hotelCheckIn,
+            endDate: hotelCheckOut,
             hotelDetails: {
               hotelId: item._id,
               name: item.name,
               location: item.location,
-              checkInDate: checkIn,
-              checkOutDate: checkOut,
+              checkInDate: hotelCheckIn,
+              checkOutDate: hotelCheckOut,
               nights: nights,
               roomType: item.roomType || "Standard",
               guestDetails: {
@@ -489,8 +570,9 @@ router.post("/bulk", authenticateUser, async (req, res) => {
     console.error('Bulk booking error:', error);
     res.status(500).json({
       error: {
-        message: error.message,
+        message: "Internal server error",
         status: 500,
+        details: error.message
       },
     });
   }
@@ -553,8 +635,9 @@ router.post("/:id/payment", authenticateUser, async (req, res) => {
   } catch (error) {
     res.status(500).json({
       error: {
-        message: error.message,
+        message: "Internal server error",
         status: 500,
+        details: error.message
       },
     });
   }
@@ -573,8 +656,9 @@ router.get("/history", authenticateUser, async (req, res) => {
   } catch (error) {
     res.status(500).json({
       error: {
-        message: error.message,
+        message: "Internal server error",
         status: 500,
+        details: error.message
       },
     });
   }
@@ -608,8 +692,9 @@ router.get("/:id", authenticateUser, async (req, res) => {
   } catch (error) {
     res.status(500).json({
       error: {
-        message: error.message,
+        message: "Internal server error",
         status: 500,
+        details: error.message
       },
     });
   }
@@ -687,8 +772,9 @@ router.delete("/:id", authenticateUser, async (req, res) => {
   } catch (error) {
     res.status(500).json({
       error: {
-        message: error.message,
+        message: "Internal server error",
         status: 500,
+        details: error.message
       },
     });
   }

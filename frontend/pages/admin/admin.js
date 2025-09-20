@@ -38,33 +38,57 @@ window.adminLogout = function(e) {
 // Mark this as an admin page so site-wide scripts can avoid interfering
 window.isAdminPage = true;
 
-// Use the shared API base URL exposed by main.js (defined in frontend/js/main.js)
-// Do not redeclare API_BASE_URL here to avoid SyntaxError when main.js already defines it.
+// Define API_BASE_URL if not already available
+if (!window.API_BASE_URL) {
+  window.API_BASE_URL = 'http://localhost:3000/api';
+}
+
+// Create a local constant for easier use throughout this file (with safe fallback)
+const API_BASE_URL = window.API_BASE_URL || 'http://localhost:3000/api';
+
+// Note: admin panel runs standalone and does not rely on main.js. We expose a default base URL above.
 
 document.addEventListener('DOMContentLoaded', function() {
   // Check if admin is logged in and token is valid
   const token = localStorage.getItem('adminToken');
   console.log('admin.js: adminToken on page load:', token);
-  console.log('admin.js: API_BASE_URL on page load:', window.API_BASE_URL);
+  console.log('admin.js: API_BASE_URL on page load:', API_BASE_URL);
   if (!token) {
     window.location.href = 'login.html';
     return;
   }
   // Verify admin token with backend
-  fetch(`${window.API_BASE_URL}/admin/me`, {
+  fetch(`${API_BASE_URL}/admin/me`, {
     headers: { 'Authorization': `Bearer ${token}` }
   })
     .then(res => {
+      // This is the critical token check; if it fails, force logout
       if (!res.ok) {
-        // Token invalid or expired
-        localStorage.removeItem('adminToken');
-        localStorage.removeItem('adminUser');
-        window.location.href = 'login.html';
+        try {
+          sessionStorage.setItem('adminAuthError', JSON.stringify({
+            status: res.status,
+            statusText: res.statusText,
+            url: res.url || `${API_BASE_URL}/admin/me`,
+            when: new Date().toISOString()
+          }));
+        } catch (_) {}
+        handleAuthResponse(res, { logoutOn401: true });
         throw new Error('Invalid admin token');
       }
+      handleAuthResponse(res, { logoutOn401: false });
       return res.json();
     })
-    .catch(() => {
+    .catch((err) => {
+      console.warn('Admin token validation failed:', err?.message || err);
+      try {
+        if (!sessionStorage.getItem('adminAuthError')) {
+          sessionStorage.setItem('adminAuthError', JSON.stringify({
+            message: err?.message || String(err),
+            url: `${API_BASE_URL}/admin/me`,
+            when: new Date().toISOString()
+          }));
+        }
+      } catch (_) {}
       localStorage.removeItem('adminToken');
       localStorage.removeItem('adminUser');
       window.location.href = 'login.html';
@@ -129,16 +153,30 @@ function setupLogoutButtons() {
   }
 }
 
-// Centralized response checker: if API returns 401, force logout
-function handleAuthResponse(response) {
-  if (response.status === 401) {
-    // Use adminLogout to ensure admin-specific cleanup and redirect
-    if (typeof window.adminLogout === 'function') {
-      window.adminLogout();
-    } else {
-      localStorage.removeItem('adminToken');
-      localStorage.removeItem('adminUser');
-      window.location.href = 'login.html';
+// Centralized response checker: optionally logout on 401 (default: no auto-logout)
+function handleAuthResponse(response, options = {}) {
+  const { logoutOn401 = false } = options;
+  if (response && response.status === 401) {
+    const url = response.url || 'unknown URL';
+    console.warn(`[auth] 401 Unauthorized from ${url}`);
+    // Persist details so login page can display a stable error message
+    try {
+      sessionStorage.setItem('adminAuthError', JSON.stringify({
+        status: response.status,
+        statusText: response.statusText || 'Unauthorized',
+        url,
+        when: new Date().toISOString()
+      }));
+    } catch (_) {}
+    if (logoutOn401) {
+      // Use adminLogout to ensure admin-specific cleanup and redirect
+      if (typeof window.adminLogout === 'function') {
+        window.adminLogout();
+      } else {
+        localStorage.removeItem('adminToken');
+        localStorage.removeItem('adminUser');
+        window.location.href = 'login.html';
+      }
     }
     throw new Error('Unauthorized');
   }
@@ -189,11 +227,12 @@ async function loadDashboardData() {
     ]);
 
     // If any response is unauthorized, handleAuthResponse will logout
-    handleAuthResponse(usersRes);
-    handleAuthResponse(flightsRes);
-    handleAuthResponse(trainsRes);
-    handleAuthResponse(hotelsRes);
-    handleAuthResponse(bookingsRes);
+  // Do not auto-logout on 401 from non-critical endpoints; surface error instead
+  handleAuthResponse(usersRes);
+  handleAuthResponse(flightsRes);
+  handleAuthResponse(trainsRes);
+  handleAuthResponse(hotelsRes);
+  handleAuthResponse(bookingsRes);
 
     const users = await usersRes.json();
     const flights = await flightsRes.json();
@@ -268,7 +307,7 @@ async function loadUsers() {
   
   try {
     const response = await fetch(`${API_BASE_URL}/admin/users`, { headers: getAuthHeaders() });
-    handleAuthResponse(response);
+  handleAuthResponse(response);
     const data = await response.json();
     displayUsers(data.users || []);
   } catch (error) {
@@ -322,7 +361,7 @@ async function loadFlights() {
   
   try {
     const response = await fetch(`${API_BASE_URL}/admin/flights`, { headers: getAuthHeaders() });
-    handleAuthResponse(response);
+  handleAuthResponse(response);
     const data = await response.json();
     displayFlights(data.flights || []);
   } catch (error) {
@@ -382,7 +421,7 @@ async function loadTrains() {
   
   try {
     const response = await fetch(`${API_BASE_URL}/admin/trains`, { headers: getAuthHeaders() });
-    handleAuthResponse(response);
+  handleAuthResponse(response);
     const data = await response.json();
     displayTrains(data.trains || []);
   } catch (error) {
@@ -442,7 +481,7 @@ async function loadHotels() {
   
   try {
     const response = await fetch(`${API_BASE_URL}/admin/hotels`, { headers: getAuthHeaders() });
-    handleAuthResponse(response);
+  handleAuthResponse(response);
     const data = await response.json();
     displayHotels(data.hotels || []);
   } catch (error) {
@@ -504,7 +543,7 @@ async function loadBookings() {
   
   try {
     const response = await fetch(`${API_BASE_URL}/admin/bookings`, { headers: getAuthHeaders() });
-    handleAuthResponse(response);
+  handleAuthResponse(response);
     const data = await response.json();
     // Cache bookings for quick lookup in detail modal
     window.adminBookingsCache = {};
@@ -569,7 +608,7 @@ async function showBookingDetails(bookingId) {
   try {
     // Use the new admin endpoint to get booking details with all related passengers
     const response = await fetch(`${API_BASE_URL}/admin/bookings/${bookingId}/details`, { headers: getAuthHeaders() });
-    handleAuthResponse(response);
+  handleAuthResponse(response);
     if (!response.ok) throw new Error('Failed to fetch booking details');
     
     const data = await response.json();
@@ -1133,7 +1172,7 @@ async function loadOverviewStats() {
       headers: getAuthHeaders() 
     });
     console.log('Overview stats response status:', response.status);
-    handleAuthResponse(response);
+  handleAuthResponse(response);
     
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -1165,7 +1204,7 @@ async function loadBookingTypesChart() {
       headers: getAuthHeaders() 
     });
     console.log('Booking types response status:', response.status);
-    handleAuthResponse(response);
+  handleAuthResponse(response);
     const data = await response.json();
     console.log('Booking types data:', data);
     

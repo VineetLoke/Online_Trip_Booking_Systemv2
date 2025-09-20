@@ -1,22 +1,53 @@
 const express = require('express');
 const router = express.Router();
-const { authenticateAdmin } = require('../middleware/auth');
-// Admin token validation endpoint
-router.get('/auth/admin/me', authenticateAdmin, (req, res) => {
-  res.json({ admin: req.admin });
-});
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const Admin = require('../models/Admin');
-const { authenticateUser } = require('../middleware/auth');
-
+const { authenticateUser, authenticateAdmin, rateLimitAuth, recordFailedAuth, clearAuthAttempts } = require('../middleware/auth');
 const eventBus = require('../utils/eventBus');
 
 // User Registration
 router.post('/register', async (req, res) => {
   try {
     const { name, email, phone, password } = req.body;
+    
+    // Input validation
+    if (!name || name.trim().length < 2) {
+      return res.status(400).json({
+        error: {
+          message: 'Name must be at least 2 characters long',
+          status: 400
+        }
+      });
+    }
+    
+    if (!email || !/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
+      return res.status(400).json({
+        error: {
+          message: 'Please provide a valid email address',
+          status: 400
+        }
+      });
+    }
+    
+    if (!phone || !/^\+?[\d\s-()]+$/.test(phone)) {
+      return res.status(400).json({
+        error: {
+          message: 'Please provide a valid phone number',
+          status: 400
+        }
+      });
+    }
+    
+    if (!password || password.length < 6) {
+      return res.status(400).json({
+        error: {
+          message: 'Password must be at least 6 characters long',
+          status: 400
+        }
+      });
+    }
     
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -58,7 +89,7 @@ router.post('/register', async (req, res) => {
     res.status(201).json({
       message: 'User registered successfully',
       user: {
-        id: user._id,
+        _id: user._id,
         name: user.name,
         email: user.email,
         phone: user.phone
@@ -68,21 +99,42 @@ router.post('/register', async (req, res) => {
   } catch (error) {
     res.status(500).json({
       error: {
-        message: error.message,
-        status: 500
+        message: "Internal server error",
+        status: 500,
+        details: error.message
       }
     });
   }
 });
 
 // User Login
-router.post('/login', async (req, res) => {
+router.post('/login', rateLimitAuth, async (req, res) => {
   try {
     const { email, password } = req.body;
+    
+    // Input validation
+    if (!email || !/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
+      return res.status(400).json({
+        error: {
+          message: 'Please provide a valid email address',
+          status: 400
+        }
+      });
+    }
+    
+    if (!password || password.trim().length === 0) {
+      return res.status(400).json({
+        error: {
+          message: 'Password is required',
+          status: 400
+        }
+      });
+    }
     
     // Check if user exists
     const user = await User.findOne({ email });
     if (!user) {
+      recordFailedAuth(req);
       return res.status(401).json({
         error: {
           message: 'Invalid credentials',
@@ -94,6 +146,7 @@ router.post('/login', async (req, res) => {
     // Check password
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
+      recordFailedAuth(req);
       return res.status(401).json({
         error: {
           message: 'Invalid credentials',
@@ -101,6 +154,9 @@ router.post('/login', async (req, res) => {
         }
       });
     }
+    
+    // Clear failed attempts on successful login
+    clearAuthAttempts(req);
     
     // Generate JWT token
     const token = jwt.sign(
@@ -112,7 +168,7 @@ router.post('/login', async (req, res) => {
     res.status(200).json({
       message: 'Login successful',
       user: {
-        id: user._id,
+        _id: user._id,
         name: user.name,
         email: user.email,
         phone: user.phone
@@ -122,15 +178,16 @@ router.post('/login', async (req, res) => {
   } catch (error) {
     res.status(500).json({
       error: {
-        message: error.message,
-        status: 500
+        message: "Internal server error",
+        status: 500,
+        details: error.message
       }
     });
   }
 });
 
 // Admin Login
-router.post('/admin/login', async (req, res) => {
+router.post('/admin/login', rateLimitAuth, async (req, res) => {
   try {
     const { email, password } = req.body;
     
@@ -178,8 +235,9 @@ router.post('/admin/login', async (req, res) => {
   } catch (error) {
     res.status(500).json({
       error: {
-        message: error.message,
-        status: 500
+        message: "Internal server error",
+        status: 500,
+        details: error.message
       }
     });
   }
@@ -194,8 +252,9 @@ router.get('/me', authenticateUser, async (req, res) => {
   } catch (error) {
     res.status(500).json({
       error: {
-        message: error.message,
-        status: 500
+        message: "Internal server error",
+        status: 500,
+        details: error.message
       }
     });
   }
@@ -227,11 +286,17 @@ router.put('/change-password', authenticateUser, async (req, res) => {
   } catch (error) {
     res.status(500).json({
       error: {
-        message: error.message,
-        status: 500
+        message: "Internal server error",
+        status: 500,
+        details: error.message
       }
     });
   }
+});
+
+// Admin token validation endpoint
+router.get('/admin/me', authenticateAdmin, (req, res) => {
+  res.json({ admin: req.admin });
 });
 
 module.exports = router;

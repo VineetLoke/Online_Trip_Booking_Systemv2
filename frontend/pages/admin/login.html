@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Admin Login - Online Booking System</title>
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -102,47 +105,104 @@
 
   <!-- Bootstrap Bundle with Popper -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- Custom JavaScript -->
-  <script src="../../js/main.js"></script>
+  
   <script>
+    // Define API_BASE_URL directly - no dependency on external files
+    const API_BASE_URL = 'http://localhost:3000/api';
+    
+    // showAlert function for displaying messages
+    function showAlert(elementId, message, type) {
+      const alertContainer = document.getElementById(elementId);
+      if (alertContainer) {
+        alertContainer.innerHTML = `
+          <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        `;
+      } else {
+        console.error('Alert container not found:', elementId);
+        alert(message); // Fallback to browser alert
+      }
+    }
+    
     document.addEventListener('DOMContentLoaded', function() {
-      // Always clear any old admin tokens on login page load
+      console.log('Admin login page loaded. API URL:', API_BASE_URL);
+      
+      // Clear any old admin tokens on login page load
       localStorage.removeItem('adminToken');
       localStorage.removeItem('adminUser');
-      // Check if admin is already logged in (should never happen now, but keep for safety)
+
+      // Surface last auth error (from redirected dashboard) if any
+      try {
+        const lastErr = sessionStorage.getItem('adminAuthError');
+        if (lastErr) {
+          const info = JSON.parse(lastErr);
+          const msg = info?.status
+            ? `Last error: ${info.status} ${info.statusText || ''} at ${info.url || ''}`
+            : (info?.message || 'Authentication error');
+          showAlert('loginAlert', msg, 'warning');
+          // Keep it for one view, then remove so it doesn't persist forever
+          sessionStorage.removeItem('adminAuthError');
+        }
+      } catch (_) {}
+      
+      // Check if admin is already logged in
       if (localStorage.getItem('adminToken')) {
         window.location.href = 'index.html';
         return;
       }
+      
       // Handle admin login form
-      document.getElementById('adminLoginForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        const email = document.getElementById('adminEmail').value;
-        const password = document.getElementById('adminPassword').value;
-        try {
-          const response = await fetch(`${window.API_BASE_URL}/auth/admin/login`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ email, password })
-          });
-          const data = await response.json();
-          if (response.ok) {
+      const loginForm = document.getElementById('adminLoginForm');
+      if (loginForm) {
+        loginForm.addEventListener('submit', async function(e) {
+          e.preventDefault();
+          
+          const email = document.getElementById('adminEmail').value;
+          const password = document.getElementById('adminPassword').value;
+          
+          if (!email || !password) {
+            showAlert('loginAlert', 'Please enter both email and password.', 'warning');
+            return;
+          }
+          
+          try {
+            console.log('Attempting login to:', `${API_BASE_URL}/auth/admin/login`);
+            
+            const response = await fetch(`${API_BASE_URL}/auth/admin/login`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ email, password })
+            });
+            
+            console.log('Response status:', response.status);
+            
+            if (!response.ok) {
+              throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const data = await response.json();
+            console.log('Login successful:', data);
+            
             // Store admin token
             localStorage.setItem('adminToken', data.token);
             localStorage.setItem('adminUser', JSON.stringify(data.admin));
+            
             // Redirect to admin dashboard
             window.location.href = 'index.html';
-          } else {
-            const errorMessage = data.error?.message || data.message || 'Login failed';
+            
+          } catch (error) {
+            console.error('Login error:', error);
+            const errorMessage = error.message || 'Login failed. Please try again.';
             showAlert('loginAlert', errorMessage, 'danger');
           }
-        } catch (error) {
-          console.error('Login error:', error);
-          showAlert('loginAlert', 'Network error. Please try again.', 'danger');
-        }
-      });
+        });
+      } else {
+        console.error('Login form not found!');
+      }
     });
   </script>
 </body>

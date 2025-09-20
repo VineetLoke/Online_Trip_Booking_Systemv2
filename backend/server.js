@@ -12,6 +12,23 @@ const adminRoutes = require('./routes/admin');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// CORS Configuration - Environment-based origin control (declare before any routes use it)
+const allowedOrigins = process.env.NODE_ENV === 'production' 
+  ? ['https://yourdomain.com', 'https://www.yourdomain.com'] // Replace with your actual domain
+  : [
+      'http://localhost:3000',
+      'http://127.0.0.1:3000',
+      'http://localhost:5500',
+      'http://127.0.0.1:5500',
+      'http://localhost:8000',
+      'http://127.0.0.1:8000'
+    ];
+
+const isDevLocalhost = (origin) => {
+  if (process.env.NODE_ENV === 'production') return false;
+  return /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin || '');
+};
+
 // Simple in-memory SSE client registry
 const sseClients = new Set();
 const eventHistory = [];
@@ -23,7 +40,10 @@ app.get('/api/admin/stream', (req, res) => {
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
   // Allow CORS for SSE explicitly (some browsers are picky on EventSource)
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin) || isDevLocalhost(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
   res.flushHeaders && res.flushHeaders();
 
   // Keep connection alive
@@ -54,8 +74,20 @@ app.get('/api/admin/stream', (req, res) => {
 
 // Middleware
 app.use(cors({
-  origin: '*', // Allow all origins for development
-  credentials: true
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin) || isDevLocalhost(origin)) {
+      callback(null, true);
+    } else {
+      console.warn(`CORS blocked origin: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  maxAge: 86400 // Cache preflight response for 24 hours
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -66,18 +98,52 @@ app.use((req, res, next) => {
   next();
 });
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => {
-  console.log('Connected to MongoDB');
-})
-.catch((error) => {
-  console.error('MongoDB connection error:', error);
-  process.exit(1);
-});
+// MongoDB Connection with retry logic
+const connectToMongoDB = async (retryCount = 0) => {
+  const maxRetries = 5;
+  const retryDelay = 5000; // 5 seconds
+  
+  try {
+    await mongoose.connect(process.env.MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 10000, // 10 second timeout
+      heartbeatFrequencyMS: 2000, // Check connection every 2 seconds
+      maxPoolSize: 10, // Maximum number of connections
+      minPoolSize: 2,  // Minimum number of connections
+    });
+    console.log('✅ Successfully connected to MongoDB');
+    
+    // Handle MongoDB connection events
+    mongoose.connection.on('error', (error) => {
+      console.error('❌ MongoDB connection error:', error);
+    });
+    
+    mongoose.connection.on('disconnected', () => {
+      console.warn('⚠️  MongoDB disconnected. Attempting to reconnect...');
+    });
+    
+    mongoose.connection.on('reconnected', () => {
+      console.log('✅ MongoDB reconnected successfully');
+    });
+    
+  } catch (error) {
+    console.error(`❌ MongoDB connection attempt ${retryCount + 1} failed:`, error.message);
+    
+    if (retryCount < maxRetries) {
+      console.log(`⏳ Retrying MongoDB connection in ${retryDelay / 1000} seconds... (${retryCount + 1}/${maxRetries})`);
+      setTimeout(() => {
+        connectToMongoDB(retryCount + 1);
+      }, retryDelay);
+    } else {
+      console.error('💀 Failed to connect to MongoDB after maximum retries. Exiting...');
+      process.exit(1);
+    }
+  }
+};
+
+// Initialize MongoDB connection
+connectToMongoDB();
 
 // Routes
 app.use('/api/auth', authRoutes);

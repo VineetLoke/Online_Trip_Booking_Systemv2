@@ -27,9 +27,12 @@ const trainSchema = new mongoose.Schema({
     required: [true, 'Departure time is required'],
     validate: {
       validator: function(value) {
-        return value > new Date();
+        // Allow 5 minutes buffer for near-future trains and data entry
+        const bufferMinutes = 5;
+        const minimumTime = new Date(Date.now() - (bufferMinutes * 60 * 1000));
+        return value > minimumTime;
       },
-      message: 'Departure time must be in the future'
+      message: 'Departure time cannot be more than 5 minutes in the past'
     }
   },
   arrivalTime: {

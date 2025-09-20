@@ -295,23 +295,18 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/main.js"></script>
     <script>
-        // Use API_BASE_URL from main.js (don't redeclare it)
-        const API_BASE_URL = window.API_BASE_URL || 'http://localhost:3000/api';
+        // Define API_BASE_URL for this page
+        const API_BASE_URL = window.API_BASE_URL || (window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1') 
+            ? 'http://localhost:3000/api' 
+            : `${window.location.protocol}//${window.location.hostname}:3000/api`);
 
         // Populate profile data from stored user object
         document.addEventListener("DOMContentLoaded", () => {
-            console.log('Profile page loaded - checking user data...');
-            
             const userJson = localStorage.getItem('user');
             const token = localStorage.getItem('token');
             
-            console.log('Token found:', !!token);
-            console.log('User JSON found:', !!userJson);
-            console.log('User JSON content:', userJson);
-            
             if (!userJson || !token) {
                 // Not logged in -> redirect to home page
-                console.log('No user data or token found, redirecting...');
                 showAlert('mainAlert', 'Please log in to view your profile.', 'warning');
                 setTimeout(() => {
                     window.location.href = '../index.html';
@@ -321,62 +316,53 @@
 
             try {
                 const user = JSON.parse(userJson);
-                console.log('Parsed user object:', user);
                 
-                // Update profile information
-                const username = user.name || user.username || user.fullName || 'User';
-                const email = user.email || 'No email provided';
-                const phone = user.phone || user.phoneNumber || 'Not provided';
-                
-                console.log('Setting profile data:', { username, email, phone });
-                
-                document.getElementById('profileUsername').textContent = username;
-                document.getElementById('profileEmail').textContent = email;
-                document.getElementById('profilePhone').textContent = phone;
-                
-                // Format join date if available
-                let joinDate = 'Not available';
-                if (user.createdAt) {
-                    try {
-                        joinDate = new Date(user.createdAt).toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric'
-                        });
-                    } catch (dateError) {
-                        console.error('Error formatting date:', dateError);
-                        joinDate = 'Invalid date format';
-                    }
-                } else if (user.joinDate) {
-                    try {
-                        joinDate = new Date(user.joinDate).toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric'
-                        });
-                    } catch (dateError) {
-                        console.error('Error formatting join date:', dateError);
-                        joinDate = 'Invalid date format';
-                    }
-                }
-                
-                console.log('Setting join date:', joinDate);
-                document.getElementById('profileJoinDate').textContent = joinDate;
+                // Optimistically render from localStorage first
+                document.getElementById('profileUsername').textContent = user.name || 'User';
+                document.getElementById('profileEmail').textContent = user.email || 'No email provided';
+                document.getElementById('profilePhone').textContent = user.phone || 'Not provided';
+                document.getElementById('profileJoinDate').textContent = user.createdAt
+                  ? new Date(user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+                  : 'Not available';
 
                 // Update navbar dropdown display if present
                 const usernameDisplay = document.getElementById('userName');
                 if (usernameDisplay) {
-                    usernameDisplay.textContent = username;
+                    usernameDisplay.textContent = user.name || 'User';
                 }
-                
-                console.log('Profile data loaded successfully');
-                
+
+                // Refresh from API to ensure latest data and createdAt
+                fetch(`${API_BASE_URL}/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                })
+                  .then(res => res.ok ? res.json() : Promise.reject(res))
+                  .then(data => {
+                      if (!data || !data.user) return;
+                      localStorage.setItem('user', JSON.stringify(data.user));
+                      document.getElementById('profileUsername').textContent = data.user.name || 'User';
+                      document.getElementById('profileEmail').textContent = data.user.email || 'No email provided';
+                      document.getElementById('profilePhone').textContent = data.user.phone || 'Not provided';
+                      document.getElementById('profileJoinDate').textContent = data.user.createdAt
+                        ? new Date(data.user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+                        : 'Not available';
+                      const usernameDisplay2 = document.getElementById('userName');
+                      if (usernameDisplay2) usernameDisplay2.textContent = data.user.name || 'User';
+                  })
+                  .catch(async (res) => {
+                      try {
+                        const err = typeof res.json === 'function' ? await res.json() : {};
+                        const msg = err?.error?.message || res.statusText || 'Failed to load profile.';
+                        if (res.status === 401) {
+                          showAlert('mainAlert', 'Session expired. Please log in again.', 'warning');
+                          setTimeout(() => { window.location.href = '../index.html'; }, 1500);
+                        } else {
+                          console.warn('Profile refresh error:', msg);
+                        }
+                      } catch (_) { /* ignore */ }
+                  });
             } catch (err) {
                 console.error('Error parsing user from localStorage', err);
                 showAlert('mainAlert', 'Error loading profile data. Please try logging in again.', 'danger');
-                
-                // Show what data we actually have for debugging
-                console.log('Raw userJson that failed to parse:', userJson);
             }
 
             // Setup edit profile functionality

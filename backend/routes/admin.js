@@ -27,8 +27,9 @@ router.get('/users', authenticateAdmin, checkPermission('manage_users'), async (
   } catch (error) {
     res.status(500).json({
       error: {
-        message: error.message,
-        status: 500
+        message: "Internal server error",
+        status: 500,
+        details: error.message
       }
     });
   }
@@ -52,8 +53,9 @@ router.get('/users/:id', authenticateAdmin, checkPermission('manage_users'), asy
   } catch (error) {
     res.status(500).json({
       error: {
-        message: error.message,
-        status: 500
+        message: "Internal server error",
+        status: 500,
+        details: error.message
       }
     });
   }
@@ -72,8 +74,9 @@ router.get('/users/:id/bookings', authenticateAdmin, checkPermission('manage_use
   } catch (error) {
     res.status(500).json({
       error: {
-        message: error.message,
-        status: 500
+        message: "Internal server error",
+        status: 500,
+        details: error.message
       }
     });
   }
@@ -91,8 +94,9 @@ router.get('/flights', authenticateAdmin, checkPermission('manage_flights'), asy
   } catch (error) {
     res.status(500).json({
       error: {
-        message: error.message,
-        status: 500
+        message: "Internal server error",
+        status: 500,
+        details: error.message
       }
     });
   }
@@ -111,8 +115,9 @@ router.post('/flights', authenticateAdmin, checkPermission('manage_flights'), as
   } catch (error) {
     res.status(500).json({
       error: {
-        message: error.message,
-        status: 500
+        message: "Internal server error",
+        status: 500,
+        details: error.message
       }
     });
   }
@@ -142,8 +147,9 @@ router.put('/flights/:id', authenticateAdmin, checkPermission('manage_flights'),
   } catch (error) {
     res.status(500).json({
       error: {
-        message: error.message,
-        status: 500
+        message: "Internal server error",
+        status: 500,
+        details: error.message
       }
     });
   }
@@ -168,8 +174,9 @@ router.delete('/flights/:id', authenticateAdmin, checkPermission('manage_flights
   } catch (error) {
     res.status(500).json({
       error: {
-        message: error.message,
-        status: 500
+        message: "Internal server error",
+        status: 500,
+        details: error.message
       }
     });
   }
@@ -187,8 +194,9 @@ router.get('/trains', authenticateAdmin, checkPermission('manage_trains'), async
   } catch (error) {
     res.status(500).json({
       error: {
-        message: error.message,
-        status: 500
+        message: "Internal server error",
+        status: 500,
+        details: error.message
       }
     });
   }
@@ -207,8 +215,9 @@ router.post('/trains', authenticateAdmin, checkPermission('manage_trains'), asyn
   } catch (error) {
     res.status(500).json({
       error: {
-        message: error.message,
-        status: 500
+        message: "Internal server error",
+        status: 500,
+        details: error.message
       }
     });
   }
@@ -238,8 +247,9 @@ router.put('/trains/:id', authenticateAdmin, checkPermission('manage_trains'), a
   } catch (error) {
     res.status(500).json({
       error: {
-        message: error.message,
-        status: 500
+        message: "Internal server error",
+        status: 500,
+        details: error.message
       }
     });
   }
@@ -264,8 +274,9 @@ router.delete('/trains/:id', authenticateAdmin, checkPermission('manage_trains')
   } catch (error) {
     res.status(500).json({
       error: {
-        message: error.message,
-        status: 500
+        message: "Internal server error",
+        status: 500,
+        details: error.message
       }
     });
   }
@@ -283,8 +294,9 @@ router.get('/hotels', authenticateAdmin, checkPermission('manage_hotels'), async
   } catch (error) {
     res.status(500).json({
       error: {
-        message: error.message,
-        status: 500
+        message: "Internal server error",
+        status: 500,
+        details: error.message
       }
     });
   }
@@ -303,8 +315,9 @@ router.post('/hotels', authenticateAdmin, checkPermission('manage_hotels'), asyn
   } catch (error) {
     res.status(500).json({
       error: {
-        message: error.message,
-        status: 500
+        message: "Internal server error",
+        status: 500,
+        details: error.message
       }
     });
   }
@@ -334,8 +347,9 @@ router.put('/hotels/:id', authenticateAdmin, checkPermission('manage_hotels'), a
   } catch (error) {
     res.status(500).json({
       error: {
-        message: error.message,
-        status: 500
+        message: "Internal server error",
+        status: 500,
+        details: error.message
       }
     });
   }
@@ -360,8 +374,9 @@ router.delete('/hotels/:id', authenticateAdmin, checkPermission('manage_hotels')
   } catch (error) {
     res.status(500).json({
       error: {
-        message: error.message,
-        status: 500
+        message: "Internal server error",
+        status: 500,
+        details: error.message
       }
     });
   }
@@ -381,8 +396,9 @@ router.get('/bookings', authenticateAdmin, checkPermission('view_reports'), asyn
   } catch (error) {
     res.status(500).json({
       error: {
-        message: error.message,
-        status: 500
+        message: "Internal server error",
+        status: 500,
+        details: error.message
       }
     });
   }
@@ -470,8 +486,9 @@ router.get('/bookings/:id/details', authenticateAdmin, checkPermission('view_rep
   } catch (error) {
     res.status(500).json({
       error: {
-        message: error.message,
-        status: 500
+        message: "Internal server error",
+        status: 500,
+        details: error.message
       }
     });
   }
@@ -700,8 +717,9 @@ router.get('/reports/bookings', authenticateAdmin, checkPermission('view_reports
   } catch (error) {
     res.status(500).json({
       error: {
-        message: error.message,
-        status: 500
+        message: "Internal server error",
+        status: 500,
+        details: error.message
       }
     });
   }

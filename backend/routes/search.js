@@ -9,6 +9,34 @@ router.get('/flights', async (req, res) => {
   try {
     const { source, destination, date, airline } = req.query;
     
+    // Input validation
+    if (source && source.trim().length < 2) {
+      return res.status(400).json({
+        error: {
+          message: 'Source must be at least 2 characters long',
+          status: 400
+        }
+      });
+    }
+    
+    if (destination && destination.trim().length < 2) {
+      return res.status(400).json({
+        error: {
+          message: 'Destination must be at least 2 characters long',
+          status: 400
+        }
+      });
+    }
+    
+    if (date && isNaN(new Date(date).getTime())) {
+      return res.status(400).json({
+        error: {
+          message: 'Invalid date format',
+          status: 400
+        }
+      });
+    }
+    
     // Build query
     const query = {};
     
@@ -53,8 +81,9 @@ router.get('/flights', async (req, res) => {
   } catch (error) {
     res.status(500).json({
       error: {
-        message: error.message,
-        status: 500
+        message: "Internal server error",
+        status: 500,
+        details: error.message
       }
     });
   }
@@ -99,8 +128,9 @@ router.get('/trains', async (req, res) => {
   } catch (error) {
     res.status(500).json({
       error: {
-        message: error.message,
-        status: 500
+        message: "Internal server error",
+        status: 500,
+        details: error.message
       }
     });
   }
@@ -110,6 +140,52 @@ router.get('/trains', async (req, res) => {
 router.get('/hotels', async (req, res) => {
   try {
     const { location, checkIn, checkOut, roomType, minRating } = req.query;
+    
+    // Input validation
+    if (location && location.trim().length < 2) {
+      return res.status(400).json({
+        error: {
+          message: 'Location must be at least 2 characters long',
+          status: 400
+        }
+      });
+    }
+    
+    if (checkIn && isNaN(new Date(checkIn).getTime())) {
+      return res.status(400).json({
+        error: {
+          message: 'Invalid check-in date format',
+          status: 400
+        }
+      });
+    }
+    
+    if (checkOut && isNaN(new Date(checkOut).getTime())) {
+      return res.status(400).json({
+        error: {
+          message: 'Invalid check-out date format',
+          status: 400
+        }
+      });
+    }
+    
+    if (checkIn && checkOut && new Date(checkOut) <= new Date(checkIn)) {
+      return res.status(400).json({
+        error: {
+          message: 'Check-out date must be after check-in date',
+          status: 400
+        }
+      });
+    }
+    
+    if (minRating && (isNaN(minRating) || minRating < 0 || minRating > 5)) {
+      return res.status(400).json({
+        error: {
+          message: 'Minimum rating must be between 0 and 5',
+          status: 400
+        }
+      });
+    }
     
     // Build query
     const query = {};
@@ -133,8 +209,9 @@ router.get('/hotels', async (req, res) => {
   } catch (error) {
     res.status(500).json({
       error: {
-        message: error.message,
-        status: 500
+        message: "Internal server error",
+        status: 500,
+        details: error.message
       }
     });
   }
@@ -158,8 +235,9 @@ router.get('/flights/:id', async (req, res) => {
   } catch (error) {
     res.status(500).json({
       error: {
-        message: error.message,
-        status: 500
+        message: "Internal server error",
+        status: 500,
+        details: error.message
       }
     });
   }
@@ -183,8 +261,9 @@ router.get('/trains/:id', async (req, res) => {
   } catch (error) {
     res.status(500).json({
       error: {
-        message: error.message,
-        status: 500
+        message: "Internal server error",
+        status: 500,
+        details: error.message
       }
     });
   }
@@ -208,12 +287,12 @@ router.get('/hotels/:id', async (req, res) => {
   } catch (error) {
     res.status(500).json({
       error: {
-        message: error.message,
-        status: 500
+        message: "Internal server error",
+        status: 500,
+        details: error.message
       }
     });
   }
 });
 
 module.exports = router;
-

@@ -22,12 +22,19 @@ describe('Online Booking System API Tests', () => {
   let userId;
   let bookingId;
 
-  // Test user credentials
+  // Test user credentials with dynamic email to avoid conflicts
   const testUser = {
-    email: 'test@example.com',
+    email: `test_${Date.now()}@example.com`,
     password: 'Test@123',
     name: 'Test User',
     phone: '1234567890'
+  };
+
+  // Dynamic date for testing (7 days from now)
+  const getTestDate = () => {
+    const date = new Date();
+    date.setDate(date.getDate() + 7);
+    return date.toISOString().split('T')[0];
   };
 
   // Before all tests - register a test user
@@ -131,6 +138,42 @@ describe('Online Booking System API Tests', () => {
           done();
         });
     });
+
+    it('should not register with invalid email', (done) => {
+      chai.request(API_URL)
+        .post('/auth/register')
+        .send({
+          name: 'Test User',
+          email: 'invalid-email',
+          phone: '1234567890',
+          password: 'Test@123'
+        })
+        .end((err, res) => {
+          res.should.have.status(400);
+          res.body.should.be.a('object');
+          res.body.should.have.property('error');
+          res.body.error.should.have.property('message').include('valid email');
+          done();
+        });
+    });
+
+    it('should not register with short password', (done) => {
+      chai.request(API_URL)
+        .post('/auth/register')
+        .send({
+          name: 'Test User',
+          email: 'test@example.com',
+          phone: '1234567890',
+          password: '123'
+        })
+        .end((err, res) => {
+          res.should.have.status(400);
+          res.body.should.be.a('object');
+          res.body.should.have.property('error');
+          res.body.error.should.have.property('message').include('6 characters');
+          done();
+        });
+    });
   });
 
   // Search Tests
@@ -141,7 +184,7 @@ describe('Online Booking System API Tests', () => {
         .query({
           source: 'Mumbai',
           destination: 'Delhi',
-          date: '2025-07-10'
+          date: getTestDate()
         })
         .end((err, res) => {
           res.should.have.status(200);
@@ -162,7 +205,7 @@ describe('Online Booking System API Tests', () => {
         .query({
           source: 'Mumbai',
           destination: 'Delhi',
-          date: '2025-07-10'
+          date: getTestDate()
         })
         .end((err, res) => {
           res.should.have.status(200);
@@ -178,12 +221,17 @@ describe('Online Booking System API Tests', () => {
     });
 
     it('should search for hotels', (done) => {
+      const checkInDate = getTestDate();
+      const checkOutDate = new Date();
+      checkOutDate.setDate(checkOutDate.getDate() + 9); // 2 days after check-in
+      const formattedCheckOut = checkOutDate.toISOString().split('T')[0];
+      
       chai.request(API_URL)
         .get('/search/hotels')
         .query({
           location: 'Mumbai',
-          checkIn: '2025-07-10',
-          checkOut: '2025-07-12'
+          checkIn: checkInDate,
+          checkOut: formattedCheckOut
         })
         .end((err, res) => {
           res.should.have.status(200);
@@ -199,6 +247,65 @@ describe('Online Booking System API Tests', () => {
     });
   });
 
+  // Edge Case Tests for Search
+  describe('Search Edge Cases', () => {
+    it('should handle search with invalid date format', (done) => {
+      chai.request(API_URL)
+        .get('/search/flights')
+        .query({
+          source: 'Mumbai',
+          destination: 'Delhi',
+          date: 'invalid-date'
+        })
+        .end((err, res) => {
+          res.should.have.status(400);
+          res.body.should.be.a('object');
+          res.body.should.have.property('error');
+          res.body.error.should.have.property('message').include('Invalid date');
+          done();
+        });
+    });
+
+    it('should handle search with short source', (done) => {
+      chai.request(API_URL)
+        .get('/search/flights')
+        .query({
+          source: 'a',
+          destination: 'Delhi',
+          date: getTestDate()
+        })
+        .end((err, res) => {
+          res.should.have.status(400);
+          res.body.should.be.a('object');
+          res.body.should.have.property('error');
+          res.body.error.should.have.property('message').include('2 characters');
+          done();
+        });
+    });
+
+    it('should handle hotel search with invalid check-out date', (done) => {
+      const checkInDate = getTestDate();
+      const checkOutDate = new Date();
+      checkOutDate.setDate(checkOutDate.getDate() + 5); // Before check-in
+      const formattedCheckOut = checkOutDate.toISOString().split('T')[0];
+      
+      chai.request(API_URL)
+        .get('/search/hotels')
+        .query({
+          location: 'Mumbai',
+          checkIn: checkInDate,
+          checkOut: formattedCheckOut
+        })
+        .end((err, res) => {
+          res.should.have.status(400);
+          res.body.should.be.a('object');
+          res.body.should.have.property('error');
+          res.body.error.should.have.property('message').include('after check-in');
+          done();
+        });
+    });
+  });
+
   // Booking Tests (requires authentication)
   describe('Booking Functionality', () => {
     it('should create a flight booking', (done) => {
@@ -208,7 +315,7 @@ describe('Online Booking System API Tests', () => {
         .query({
           source: 'Mumbai',
           destination: 'Delhi',
-          date: '2025-07-10'
+          date: getTestDate()
         })
         .end((err, res) => {
           if (res.body.length === 0) {
@@ -221,21 +328,16 @@ describe('Online Booking System API Tests', () => {
           
           // Create booking
           chai.request(API_URL)
-            .post('/bookings')
+            .post('/bookings/flights')
             .set('Authorization', `Bearer ${authToken}`)
             .send({
-              type: 'flight',
-              itemId: flightId,
-              travelerInfo: {
+              flightId: flightId,
+              passengerDetails: {
                 name: 'John Doe',
                 age: 30,
                 gender: 'Male',
                 idType: 'Passport',
                 idNumber: 'AB123456'
-              },
-              paymentInfo: {
-                method: 'credit_card',
-                amount: res.body[0].price
               }
             })
             .end((err, res) => {
@@ -254,7 +356,7 @@ describe('Online Booking System API Tests', () => {
 
     it('should get user bookings', (done) => {
       chai.request(API_URL)
-        .get('/users/bookings')
+        .get('/bookings/history')
         .set('Authorization', `Bearer ${authToken}`)
         .end((err, res) => {
           res.should.have.status(200);
@@ -297,7 +399,7 @@ describe('Online Booking System API Tests', () => {
       }
 
       chai.request(API_URL)
-        .put(`/bookings/${bookingId}/cancel`)
+        .delete(`/bookings/${bookingId}`)
         .set('Authorization', `Bearer ${authToken}`)
         .send({
           reason: 'Change of plans'
@@ -349,10 +451,44 @@ describe('Online Booking System API Tests', () => {
     });
   });
 
+  // Edge Case Tests
+  describe('Edge Cases', () => {
+    it('should handle search with invalid date format', (done) => {
+      chai.request(API_URL)
+        .get('/search/flights')
+        .query({
+          source: 'Mumbai',
+          destination: 'Delhi',
+          date: 'invalid-date'
+        })
+        .end((err, res) => {
+          res.should.have.status(400);
+          res.body.should.be.a('object');
+          res.body.should.have.property('error');
+          res.body.error.should.have.property('message').include('Invalid date');
+          done();
+        });
+    });
+
+    it('should not create booking without authentication', (done) => {
+      chai.request(API_URL)
+        .post('/bookings/flights')
+        .send({
+          flightId: '507f1f77bcf86cd799439011',
+          passengerDetails: {
+            name: 'John Doe'
+          }
+        })
+        .end((err, res) => {
+          res.should.have.status(401);
+          done();
+        });
+    });
+  });
+
   // After all tests - clean up (optional)
   after((done) => {
     // Clean up could involve deleting test user, but we'll keep it for now
     done();
   });
 });
-
