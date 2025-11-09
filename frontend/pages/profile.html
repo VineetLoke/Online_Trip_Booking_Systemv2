@@ -295,10 +295,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/main.js"></script>
     <script>
-        // Define API_BASE_URL for this page
-        const API_BASE_URL = window.API_BASE_URL || (window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1') 
-            ? 'http://localhost:3000/api' 
-            : `${window.location.protocol}//${window.location.hostname}:3000/api`);
+        // API_BASE_URL is already defined in main.js and available globally via window.API_BASE_URL
+        // We'll use window.API_BASE_URL directly in this script
 
         // Populate profile data from stored user object
         document.addEventListener("DOMContentLoaded", () => {
@@ -316,6 +314,7 @@
 
             try {
                 const user = JSON.parse(userJson);
+                console.log('User from localStorage:', user);
                 
                 // Optimistically render from localStorage first
                 document.getElementById('profileUsername').textContent = user.name || 'User';
@@ -330,35 +329,56 @@
                 if (usernameDisplay) {
                     usernameDisplay.textContent = user.name || 'User';
                 }
+                
+                console.log('Initial profile render complete from localStorage');
 
                 // Refresh from API to ensure latest data and createdAt
-                fetch(`${API_BASE_URL}/auth/me`, {
+                fetch(`${window.API_BASE_URL}/auth/me`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 })
-                  .then(res => res.ok ? res.json() : Promise.reject(res))
+                  .then(res => {
+                      console.log('Profile API response status:', res.status);
+                      if (!res.ok) {
+                          return res.json().then(err => {
+                              throw new Error(err?.error?.message || `HTTP ${res.status}`);
+                          });
+                      }
+                      return res.json();
+                  })
                   .then(data => {
-                      if (!data || !data.user) return;
+                      console.log('Profile data received:', data);
+                      if (!data || !data.user) {
+                          console.error('No user data in response');
+                          return;
+                      }
+                      // Update localStorage with fresh data
                       localStorage.setItem('user', JSON.stringify(data.user));
+                      
+                      // Update all profile fields
                       document.getElementById('profileUsername').textContent = data.user.name || 'User';
                       document.getElementById('profileEmail').textContent = data.user.email || 'No email provided';
                       document.getElementById('profilePhone').textContent = data.user.phone || 'Not provided';
                       document.getElementById('profileJoinDate').textContent = data.user.createdAt
                         ? new Date(data.user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
                         : 'Not available';
+                      
+                      // Update navbar display
                       const usernameDisplay2 = document.getElementById('userName');
                       if (usernameDisplay2) usernameDisplay2.textContent = data.user.name || 'User';
+                      
+                      console.log('Profile updated successfully');
                   })
-                  .catch(async (res) => {
-                      try {
-                        const err = typeof res.json === 'function' ? await res.json() : {};
-                        const msg = err?.error?.message || res.statusText || 'Failed to load profile.';
-                        if (res.status === 401) {
+                  .catch((error) => {
+                      console.error('Profile refresh error:', error);
+                      // If API fails but we have localStorage data, keep showing it
+                      // Only redirect on 401 (unauthorized)
+                      if (error.message && error.message.includes('401')) {
                           showAlert('mainAlert', 'Session expired. Please log in again.', 'warning');
                           setTimeout(() => { window.location.href = '../index.html'; }, 1500);
-                        } else {
-                          console.warn('Profile refresh error:', msg);
-                        }
-                      } catch (_) { /* ignore */ }
+                      } else {
+                          // Show error but keep displaying cached data
+                          console.warn('Using cached profile data due to API error');
+                      }
                   });
             } catch (err) {
                 console.error('Error parsing user from localStorage', err);
@@ -418,7 +438,7 @@
                         submitBtn.disabled = true;
                         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Saving...';
 
-                        const res = await fetch(`${API_BASE_URL}/users/profile`, {
+                        const res = await fetch(`${window.API_BASE_URL}/users/profile`, {
                             method: 'PUT',
                             headers: {
                                 'Content-Type': 'application/json',
