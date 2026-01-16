@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('yamljs');
 require('dotenv').config({ path: __dirname + '/.env' });
 
 const authRoutes = require('./routes/auth');
@@ -144,6 +146,10 @@ const connectToMongoDB = async (retryCount = 0) => {
 
 // Initialize MongoDB connection
 connectToMongoDB();
+
+// Swagger setup
+const swaggerDocument = YAML.load('./swagger.yaml');
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Routes
 app.use('/api/auth', authRoutes);
