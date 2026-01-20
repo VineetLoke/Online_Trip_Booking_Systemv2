@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('yamljs');
 require('dotenv').config({ path: __dirname + '/.env' });
 
 const authRoutes = require('./routes/auth');
@@ -145,6 +147,10 @@ const connectToMongoDB = async (retryCount = 0) => {
 // Initialize MongoDB connection
 connectToMongoDB();
 
+// Swagger setup
+const swaggerDocument = YAML.load('./swagger.yaml');
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/search', searchRoutes);
@@ -226,65 +232,38 @@ app.use('*', (req, res) => {
   });
 });
 
-// Function to find available port
-const findAvailablePort = (startPort) => {
-  return new Promise((resolve, reject) => {
-    const server = app.listen(startPort, '0.0.0.0', () => {
-      const port = server.address().port;
-      server.close(() => resolve(port));
-    });
-    
-    server.on('error', (err) => {
-      if (err.code === 'EADDRINUSE') {
-        // Try next port
-        findAvailablePort(startPort + 1).then(resolve).catch(reject);
-      } else {
-        reject(err);
-      }
-    });
+// Start server with recursive port finding
+const startServer = (port) => {
+  const server = app.listen(port, '0.0.0.0', () => {
+    console.log(`Server is running on http://0.0.0.0:${port}`);
+    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
   });
-};
 
-// Start server with error handling
-const startServer = async () => {
-  try {
-    const availablePort = await findAvailablePort(PORT);
-    
-    const server = app.listen(availablePort, '0.0.0.0', () => {
-      console.log(`Server is running on http://0.0.0.0:${availablePort}`);
-      console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-    });
-    
-    // Handle server errors
-    server.on('error', (err) => {
+  server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.log(`Port ${port} is in use, trying ${port + 1}...`);
+      startServer(port + 1);
+    } else {
       console.error('Server error:', err);
-      if (err.code === 'EADDRINUSE') {
-        console.error(`Port ${err.port} is already in use. Please stop the existing process or use a different port.`);
-      }
       process.exit(1);
+    }
+  });
+
+  // Graceful shutdown
+  const shutdown = () => {
+    console.log('Shutting down server...');
+    server.close(() => {
+      console.log('Server closed');
+      process.exit(0);
     });
-    
-    // Graceful shutdown
-    process.on('SIGTERM', () => {
-      server.close(() => {
-        process.exit(0);
-      });
-    });
-    
-    process.on('SIGINT', () => {
-      server.close(() => {
-        process.exit(0);
-      });
-    });
-    
-  } catch (error) {
-    console.error('Failed to start server:', error);
-    process.exit(1);
-  }
+  };
+
+  process.on('SIGTERM', shutdown);
+  process.on('SIGINT', shutdown);
 };
 
 // Start the server
-startServer();
+startServer(PORT);
 
 module.exports = app;
 

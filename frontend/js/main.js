@@ -2,13 +2,6 @@
  * Online Booking System - Main JavaScript
  */
 
-// API Base URL - can be configured via environment or defaults to localhost
-const API_BASE_URL = window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1') 
-  ? 'http://localhost:3000/api' 
-  : `${window.location.protocol}//${window.location.hostname}:3000/api`;
-// Make available on the window so page-specific scripts can reuse it without redeclaring
-window.API_BASE_URL = API_BASE_URL;
-
 // Safe fallback for admin logout to avoid ReferenceError if admin.js fails to load
 if (typeof window.adminLogout !== 'function') {
   window.adminLogout = function(e) {
@@ -227,72 +220,6 @@ function setupSwapButtons() {
         destination.value = temp;
       }
     });
-  }
-}
-
-/**
- * Check Authentication Status
- */
-function checkAuthStatus() {
-  const token = localStorage.getItem('token');
-  
-  if (token) {
-    // User is logged in
-    fetch(`${API_BASE_URL}/auth/me`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    })
-    .then(response => {
-      if (response.ok) {
-        return response.json();
-      } else {
-        // Token is invalid or expired
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        updateAuthUI(false);
-        throw new Error('Invalid token');
-      }
-    })
-    .then(data => {
-      // Store user data
-      localStorage.setItem('user', JSON.stringify(data.user));
-      updateAuthUI(true);
-    })
-    .catch(error => {
-      console.error('Error checking auth status:', error);
-      updateAuthUI(false);
-    });
-  } else {
-    // User is not logged in
-    updateAuthUI(false);
-  }
-}
-
-/**
- * Update Authentication UI
- */
-function updateAuthUI(isLoggedIn) {
-  const authButtons = document.getElementById('authButtons');
-  const userDropdown = document.getElementById('userDropdown');
-  
-  if (authButtons && userDropdown) {
-    if (isLoggedIn) {
-      // Show user dropdown, hide auth buttons
-      authButtons.classList.add('d-none');
-      userDropdown.classList.remove('d-none');
-      
-      // Update user name
-      const user = JSON.parse(localStorage.getItem('user'));
-      const userNameElement = document.getElementById('userName');
-      if (userNameElement && user) {
-        userNameElement.textContent = user.name || 'User';
-      }
-    } else {
-      // Show auth buttons, hide user dropdown
-      authButtons.classList.remove('d-none');
-      userDropdown.classList.add('d-none');
-    }
   }
 }
 
@@ -736,60 +663,6 @@ function bookHotel(hotelId) {
 }
 
 /**
- * Check if User is Logged In
- */
-function isLoggedIn() {
-  return localStorage.getItem('token') !== null;
-}
-
-/**
- * Show Login Prompt
- */
-function showLoginPrompt() {
-  // Show login modal
-  const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
-  loginModal.show();
-  
-  // Show alert in modal
-  showAlert('loginAlert', 'Please login to continue with booking.', 'info');
-}
-
-/**
- * Show Alert
- */
-function showAlert(elementId, message, type) {
-  const alertElement = document.getElementById(elementId);
-  
-  if (alertElement) {
-    alertElement.innerHTML = `
-      <div class="alert alert-${type} alert-dismissible fade show" role="alert">
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
-    `;
-    
-    // Auto-dismiss after 5 seconds
-    setTimeout(() => {
-      const alert = alertElement.querySelector('.alert');
-      if (alert) {
-        const bsAlert = new bootstrap.Alert(alert);
-        bsAlert.close();
-      }
-    }, 5000);
-  }
-}
-
-/**
- * Get Duration String
- */
-function getDurationString(start, end) {
-  const durationMs = end - start;
-  const hours = Math.floor(durationMs / (1000 * 60 * 60));
-  const minutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
-  
-  return `${hours}h ${minutes}m`;
-}
-/**
  * Setup Terms & Conditions Modal
  */
 function setupTermsModal() {
@@ -956,33 +829,6 @@ function createTermsModalHTML() {
 }
 
 /**
- * Focus trap for accessibility
- */
-function trapFocus(modal) {
-  const focusableElements = modal.querySelectorAll(
-    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-  );
-  const firstFocusableElement = focusableElements[0];
-  const lastFocusableElement = focusableElements[focusableElements.length - 1];
-  
-  modal.addEventListener('keydown', function(e) {
-    if (e.key === 'Tab') {
-      if (e.shiftKey) {
-        if (document.activeElement === firstFocusableElement) {
-          lastFocusableElement.focus();
-          e.preventDefault();
-        }
-      } else {
-        if (document.activeElement === lastFocusableElement) {
-          firstFocusableElement.focus();
-          e.preventDefault();
-        }
-      }
-    }
-  });
-}
-
-/**
  * API function to cancel booking (moved from bookings.html)
  */
 async function cancelBookingAPI(bookingId, reason) {
@@ -1007,4 +853,3 @@ async function cancelBookingAPI(bookingId, reason) {
 
 // Note: Removed large block of sample data generation code that was wrapped in a
 // nested block comment and caused a stray closing '*/' leading to a SyntaxError.
-
